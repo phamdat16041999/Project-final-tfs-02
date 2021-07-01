@@ -3,16 +3,17 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"hotel/auth"
 	"hotel/connect"
 	"hotel/gmail"
 	"math/rand"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	// "github.com/dgrijalva/jwt-go"
-	// "github.com/gin-gonic/gin"
 )
 
 // var (
@@ -26,9 +27,9 @@ type User struct {
 	DOB                time.Time        `json:"dob"`
 	Address            string           `gorm:"type:varchar(100); json:"address"`
 	Phone              int              `json:"phone"`
-	Email              string           `gorm:"type:varchar(100); json:"email"`
-	CodeAuthentication string           `gorm:"type:varchar(20); json:"codeAuthentication"`
-	UserName           string           `gorm:"type:varchar(100); json:"userName"`
+	Email              string           `gorm:"type:varchar(100);unique; json:"email"`
+	CodeAuthentication string           `gorm:"type:varchar(20);unique; json:"codeAuthentication"`
+	UserName           string           `gorm:"type:varchar(100);unique; json:"userName"`
 	Password           string           `gorm:"type:varchar(100); json:"password"`
 	Active             *bool            `json:"active"`
 	Authentication     []Authentication `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
@@ -104,41 +105,34 @@ func HashPassword(password string) (string, error) {
 // Hash là mật khẩu lấy từ database
 // match := CheckPasswordHash(password, hash)
 // fmt.Println("Match:   ", match)
-// func CheckPasswordHash(password, hash string) bool {
-//     err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-//     return err == nil
-// }
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
 
-// func LoginAcount(c *gin.Context) {
-// 	var u User
-// 	if err := c.ShouldBindJSON(&u); err != nil {
-// 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
-// 		return
-// 	}
-// 	//compare the user from the request, with the one we defined:
-// 	if user.UserName != u.UserName || user.Password != u.Password {
-// 		c.JSON(http.StatusUnauthorized, "Please provide valid login details")
-// 		return
-// 	}
-// 	token, err := CreateToken(user.ID)
-// 	if err != nil {
-// 		c.JSON(http.StatusUnprocessableEntity, err.Error())
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, token)
-// }
-// func CreateToken(userId uint64) (string, error) {
-// 	var err error
-// 	//Creating Access Token
-// 	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd") //this should be in an env file
-// 	atClaims := jwt.MapClaims{}
-// 	atClaims["authorized"] = true
-// 	atClaims["user_id"] = userId
-// 	atClaims["exp"] = time.Now().Add(time.Minute * 15).Unix()
-// 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-// 	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	return token, nil
-// }
+func LoginAcount(w http.ResponseWriter, r *http.Request) {
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	db := connect.Connect()
+	var query User
+	db.Where("user_name = ?", user.UserName).Find(&query)
+	b, _ := json.Marshal(query.Password)
+	password := strings.Split(string(b), "\"")
+	if CheckPasswordHash(user.Password, password[1]) {
+		b, _ := json.Marshal(query.ID)
+		id, _ := strconv.ParseUint(string(b), 10, 64)
+		token, err := auth.CreateToken(id)
+		if err != nil {
+			fmt.Fprint(w, err.Error())
+			return
+		}
+		auth.JSON(w, http.StatusOK, token)
+	} else {
+		fmt.Fprint(w, "Mat khau khong dung")
+	}
+
+}
