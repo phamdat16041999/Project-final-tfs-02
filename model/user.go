@@ -41,12 +41,6 @@ type User struct {
 	Bill               []Bill           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
 }
 
-// var user = User{
-// 	ID : 1,
-// 	UserName: "nguyenthang",
-// 	Password: "123",
-// }
-
 func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -69,9 +63,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Successfully")
 }
 
-// func ActiveAccount(w http.ResponseWriter, r *http.Request){
-
-// }
 // Random code
 func codeAuthentication() string {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -110,7 +101,65 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
+// func ActiveAccount(w http.ResponseWriter, r *http.Request) {
+// 	var user User
+// 	err := json.NewDecoder(r.Body).Decode(&user)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusBadRequest)
+// 		return
+// 	}
+// 	db := connect.Connect()
+// 	var query User
+// 	db.Where("active = ?", user.Active).Find(&query)
+// 	b, _ := json.Marshal(query.Active)
+// 	fmt.Fprintf(w, string(b))
+// 	return
+
+// }
+
 func LoginAcount(w http.ResponseWriter, r *http.Request) {
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	db := connect.Connect()
+	var query User
+	db.Where("user_name = ?", user.UserName).Find(&query)
+	b1, _ := json.Marshal(query.UserName)
+	username := string(b1)
+	fmt.Printf("%T, %s\n", username, username)
+	if username == "" {
+		fmt.Fprint(w, "Wrong username")
+	} else {
+		db.Where("user_name = ?", user.UserName).Find(&query)
+		b, _ := json.Marshal(query.Password)
+		password := strings.Split(string(b), "\"")
+
+		db.Where("active = ?", user.Active).Find(&query)
+		bb, _ := json.Marshal(query.Active)
+		x := string(bb)
+
+		if CheckPasswordHash(user.Password, password[1]) {
+			b, _ := json.Marshal(query.ID)
+			id, _ := strconv.ParseUint(string(b), 10, 64)
+			if x == "true" {
+				token, err := auth.CreateToken(id)
+				if err != nil {
+					fmt.Fprint(w, err.Error())
+					return
+				}
+				auth.JSON(w, http.StatusOK, token)
+			} else {
+				fmt.Fprint(w, "Not Active!!!")
+			}
+		} else {
+			fmt.Fprint(w, "Wrong Password!!!")
+		}
+	}
+}
+func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -122,17 +171,26 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	db.Where("user_name = ?", user.UserName).Find(&query)
 	b, _ := json.Marshal(query.Password)
 	password := strings.Split(string(b), "\"")
+
+	db.Where("active = ?", user.Active).Find(&query)
+	bb, _ := json.Marshal(query.Active)
+	x := string(bb)
+
 	if CheckPasswordHash(user.Password, password[1]) {
 		b, _ := json.Marshal(query.ID)
 		id, _ := strconv.ParseUint(string(b), 10, 64)
-		token, err := auth.CreateToken(id)
-		if err != nil {
-			fmt.Fprint(w, err.Error())
-			return
+		if x == "true" {
+			token, err := auth.CreateToken(id)
+			if err != nil {
+				fmt.Fprint(w, err.Error())
+				return
+			}
+			auth.JSON(w, http.StatusOK, token)
+		} else {
+			fmt.Fprint(w, "Not Active!!!")
 		}
-		auth.JSON(w, http.StatusOK, token)
 	} else {
-		fmt.Fprint(w, "Mat khau khong dung")
+		fmt.Fprint(w, "Error Password!!!")
 	}
 
 }
