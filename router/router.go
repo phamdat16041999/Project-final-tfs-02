@@ -12,6 +12,7 @@ func Run() {
 	r := mux.NewRouter().StrictSlash(true)
 	post := r.Methods(http.MethodPost).Subrouter()
 	post.Path("/account").HandlerFunc(model.CreateAccount)
+	// post.Path("/login").HandlerFunc(model.LoginAcount)
 	http.Handle("/", r)
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},

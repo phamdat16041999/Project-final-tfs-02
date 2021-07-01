@@ -11,7 +11,13 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	// "github.com/dgrijalva/jwt-go"
+	// "github.com/gin-gonic/gin"
 )
+
+// var (
+// 	router = gin.Default()
+// )
 
 type User struct {
 	gorm.Model
@@ -33,6 +39,12 @@ type User struct {
 	Rate               []Rate           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
 	Bill               []Bill           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
 }
+
+// var user = User{
+// 	ID : 1,
+// 	UserName: "nguyenthang",
+// 	Password: "123",
+// }
 
 func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	var user User
@@ -95,4 +107,38 @@ func HashPassword(password string) (string, error) {
 // func CheckPasswordHash(password, hash string) bool {
 //     err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 //     return err == nil
+// }
+
+// func LoginAcount(c *gin.Context) {
+// 	var u User
+// 	if err := c.ShouldBindJSON(&u); err != nil {
+// 		c.JSON(http.StatusUnprocessableEntity, "Invalid json provided")
+// 		return
+// 	}
+// 	//compare the user from the request, with the one we defined:
+// 	if user.UserName != u.UserName || user.Password != u.Password {
+// 		c.JSON(http.StatusUnauthorized, "Please provide valid login details")
+// 		return
+// 	}
+// 	token, err := CreateToken(user.ID)
+// 	if err != nil {
+// 		c.JSON(http.StatusUnprocessableEntity, err.Error())
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, token)
+// }
+// func CreateToken(userId uint64) (string, error) {
+// 	var err error
+// 	//Creating Access Token
+// 	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd") //this should be in an env file
+// 	atClaims := jwt.MapClaims{}
+// 	atClaims["authorized"] = true
+// 	atClaims["user_id"] = userId
+// 	atClaims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+// 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
+// 	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	return token, nil
 // }
