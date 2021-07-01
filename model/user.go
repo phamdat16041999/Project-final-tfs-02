@@ -194,3 +194,29 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+// active account
+func ActiveAccount(w http.ResponseWriter, r *http.Request) {
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	db := connect.Connect()
+	var query User
+	db.First(&query, user.ID)
+	b, _ := json.Marshal(query.CodeAuthentication)
+	code := strings.Split(string(b), "\"")
+	if code[1] == user.CodeAuthentication {
+		result := db.Model(&query).Where("ID = ?", user.ID).Update("active", true)
+		if result.Error != nil {
+			fmt.Fprint(w, "Account activation failed")
+		} else {
+			fmt.Fprint(w, "Successfully")
+		}
+
+	} else {
+		fmt.Fprint(w, "Wrong code")
+	}
+}
