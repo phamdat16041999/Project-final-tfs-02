@@ -127,17 +127,13 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	var query User
 	db.Where("user_name = ?", user.UserName).Find(&query)
-	b1, _ := json.Marshal(query.UserName)
-	username := string(b1)
-	fmt.Printf("%T, %s\n", username, username)
-	if username == "" {
+	b, _ := json.Marshal(query.UserName)
+	username := string(b)
+	if len(username) == 2 {
 		fmt.Fprint(w, "Wrong username")
 	} else {
-		db.Where("user_name = ?", user.UserName).Find(&query)
 		b, _ := json.Marshal(query.Password)
 		password := strings.Split(string(b), "\"")
-
-		db.Where("active = ?", user.Active).Find(&query)
 		bb, _ := json.Marshal(query.Active)
 		x := string(bb)
 
