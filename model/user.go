@@ -130,7 +130,7 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(query.UserName)
 	username := string(b)
 	if len(username) == 2 {
-		fmt.Fprint(w, "Wrong username")
+		fmt.Fprint(w, "Username not created yet!")
 	} else {
 		b, _ := json.Marshal(query.Password)
 		password := strings.Split(string(b), "\"")
@@ -148,10 +148,10 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 				}
 				auth.JSON(w, http.StatusOK, token)
 			} else {
-				fmt.Fprint(w, "Not Active!!!")
+				fmt.Fprint(w, "Not Active!")
 			}
 		} else {
-			fmt.Fprint(w, "Wrong Password!!!")
+			fmt.Fprint(w, "Wrong Password!")
 		}
 	}
 }
@@ -164,31 +164,34 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	db := connect.Connect()
 	var query User
-	db.Where("user_name = ?", user.UserName).Find(&query)
-	b, _ := json.Marshal(query.Password)
-	password := strings.Split(string(b), "\"")
-
-	db.Where("active = ?", user.Active).Find(&query)
-	bb, _ := json.Marshal(query.Active)
-	x := string(bb)
-
-	if CheckPasswordHash(user.Password, password[1]) {
-		b, _ := json.Marshal(query.ID)
-		id, _ := strconv.ParseUint(string(b), 10, 64)
-		if x == "true" {
-			token, err := auth.CreateToken(id)
-			if err != nil {
-				fmt.Fprint(w, err.Error())
-				return
-			}
-			auth.JSON(w, http.StatusOK, token)
-		} else {
-			fmt.Fprint(w, "Not Active!!!")
-		}
+	db.Where("email = ?", user.Email).Find(&query)
+	b, _ := json.Marshal(query.Email)
+	email := strings.Split(string(b), "\"")
+	if email[1] == "" {
+		fmt.Println("Email does not exist")
 	} else {
-		fmt.Fprint(w, "Error Password!!!")
+		fmt.Println("OK")
 	}
+}
 
+func ChangePassword(w http.ResponseWriter, r *http.Request) {
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	db := connect.Connect()
+	// Encrypt password
+	hash, _ := HashPassword(user.Password)
+	// Create password
+	var User = User{FirstName: user.FirstName, LastName: user.LastName, DOB: user.DOB, Address: user.Address, Phone: user.Phone, Email: user.Email, UserName: user.UserName, Password: hash, Active: user.Active}
+	result := db.Create(&User)
+	if result.Error != nil {
+		fmt.Fprint(w, result.Error)
+		return
+	}
+	fmt.Fprint(w, "Successfully")
 }
 
 // active account

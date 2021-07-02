@@ -15,6 +15,8 @@ func Run() {
 	post := r.Methods(http.MethodPost).Subrouter()
 	post.Path("/account").HandlerFunc(model.CreateAccount)
 	post.Path("/login").HandlerFunc(model.LoginAcount)
+	post.Path("/forgotpassword").HandlerFunc(model.ForgotPassword)
+	post.Path("/changepassword").HandlerFunc(model.ChangePassword)
 	post.Path("/active").HandlerFunc(model.ActiveAccount)
 
 	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
