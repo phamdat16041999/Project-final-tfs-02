@@ -168,9 +168,12 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(query.Email)
 	email := strings.Split(string(b), "\"")
 	if email[1] == "" {
-		fmt.Println("Email does not exist")
+		fmt.Fprint(w, "Email does not exist")
 	} else {
-		fmt.Println("OK")
+		fmt.Fprint(w, "Trả về được dẫn nhập mã code và gửi code vào email")
+		randomCode := codeAuthentication()
+		gmail.SendEmail(user.Email, randomCode)
+
 	}
 }
 
@@ -182,16 +185,34 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	db := connect.Connect()
-	// Encrypt password
+
 	hash, _ := HashPassword(user.Password)
-	// Create password
-	var User = User{FirstName: user.FirstName, LastName: user.LastName, DOB: user.DOB, Address: user.Address, Phone: user.Phone, Email: user.Email, UserName: user.UserName, Password: hash, Active: user.Active}
-	result := db.Create(&User)
-	if result.Error != nil {
-		fmt.Fprint(w, result.Error)
-		return
+
+	var query User
+	db.First(&query, user.ID)
+	b, _ := json.Marshal(query.CodeAuthentication)
+	code := strings.Split(string(b), "\"")
+
+	db.Where("email = ?", user.Email).Find(&query)
+	// b1, _ := json.Marshal(query.Email)
+	// email := strings.Split(string(b1), "\"")
+	// randomCode := codeAuthentication()
+	// gmail.SendEmail(user.Email, randomCode)
+	// db.Model(&query).Where("ID = ?", user.ID).Update("code_authentication", randomCode)
+
+	fmt.Fprint(w, code[1])
+	fmt.Fprint(w, "-------------------")
+	fmt.Fprint(w, user.CodeAuthentication)
+	if code[1] == user.CodeAuthentication {
+		result := db.Model(&query).Where("ID = ?", user.ID).Update("password", hash)
+		if result.Error != nil {
+			fmt.Fprint(w, "Error")
+		} else {
+			fmt.Fprint(w, "Successfully")
+		}
+	} else {
+		fmt.Fprint(w, "Wrong code")
 	}
-	fmt.Fprint(w, "Successfully")
 }
 
 // active account
