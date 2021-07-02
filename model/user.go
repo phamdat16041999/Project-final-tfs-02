@@ -22,16 +22,17 @@ import (
 
 type User struct {
 	gorm.Model
-	FirstName          string           `gorm:"type:varchar(100); json:"firstName"`
-	LastName           string           `gorm:"type:varchar(100); json:"lastName"`
+	FirstName          string           `gorm:"type:varchar(100);" json:"firstName"`
+	LastName           string           `gorm:"type:varchar(100);" json:"lastName"`
 	DOB                time.Time        `json:"dob"`
-	Address            string           `gorm:"type:varchar(100); json:"address"`
+	Address            string           `gorm:"type:varchar(100);" json:"address"`
 	Phone              int              `json:"phone"`
-	Email              string           `gorm:"type:varchar(100);unique; json:"email"`
-	CodeAuthentication string           `gorm:"type:varchar(20);unique; json:"codeAuthentication"`
-	UserName           string           `gorm:"type:varchar(100);unique; json:"userName"`
-	Password           string           `gorm:"type:varchar(100); json:"password"`
-	Active             *bool            `json:"active"`
+	Email              string           `gorm:"type:varchar(100);unique;" json:"email"`
+	CodeAuthentication string           `gorm:"type:varchar(20);unique;" json:"codeAuthentication"`
+	UserName           string           `gorm:"type:varchar(100);unique;" json:"userName"`
+	Password           string           `gorm:"type:varchar(100); default: 123;" json:"password"`
+	Active             *bool            `gorm:"default: false;" json:"active"`
+	RoleID             uint             `gorm:"default: 0;" json:"roleid"`
 	Authentication     []Authentication `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
 	Conversation1      []Conversation   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User1ID; associationForeignKey:ID"`
 	Conversation2      []Conversation   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User2ID; associationForeignKey:ID"`
@@ -54,7 +55,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	// Create password
 	randomCode := codeAuthentication()
 	gmail.SendEmail(user.Email, randomCode)
-	var User = User{FirstName: user.FirstName, LastName: user.LastName, DOB: user.DOB, Address: user.Address, Phone: user.Phone, Email: user.Email, CodeAuthentication: randomCode, UserName: user.UserName, Password: hash, Active: user.Active}
+	var User = User{FirstName: user.FirstName, LastName: user.LastName, DOB: user.DOB, Address: user.Address, Phone: user.Phone, Email: user.Email, CodeAuthentication: randomCode, UserName: user.UserName, Password: hash, Active: user.Active, RoleID: user.RoleID}
 	result := db.Create(&User)
 	if result.Error != nil {
 		fmt.Fprint(w, result.Error)
@@ -117,6 +118,26 @@ func CheckPasswordHash(password, hash string) bool {
 
 // }
 
+// func extractClaims(tokenStr string) (jwt.MapClaims, bool) {
+// 	hmacSecretString := // Value
+// 	hmacSecret := []byte(hmacSecretString)
+// 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+// 			// check token signing method etc
+// 			return hmacSecret, nil
+// 	})
+
+// 	if err != nil {
+// 		return nil, false
+// 	}
+
+// 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+// 		return claims, true
+// 	} else {
+// 		log.Printf("Invalid JWT Token")
+// 		return nil, false
+// 	}
+// }
+
 func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -127,8 +148,13 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	var query User
 	db.Where("user_name = ?", user.UserName).Find(&query)
+	db.Where("role_id = ?", user.RoleID).Find(&query)
 	b, _ := json.Marshal(query.UserName)
+	b1, _ := json.Marshal(query.RoleID)
 	username := string(b)
+	role1 := string(b1)
+	fmt.Fprint(w, username)
+	fmt.Fprint(w, role1)
 	if len(username) == 2 {
 		fmt.Fprint(w, "Username not created yet!")
 	} else {
@@ -139,9 +165,11 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 
 		if CheckPasswordHash(user.Password, password[1]) {
 			b, _ := json.Marshal(query.ID)
-			id, _ := strconv.ParseUint(string(b), 10, 64)
+			b1, _ := json.Marshal(query.ID)
+			userid, _ := strconv.ParseUint(string(b), 10, 64)
+			roleid, _ := strconv.ParseUint(string(b1), 10, 64)
 			if x == "true" {
-				token, err := auth.CreateToken(id)
+				token, err := auth.CreateToken(userid, roleid)
 				if err != nil {
 					fmt.Fprint(w, err.Error())
 					return
@@ -170,10 +198,9 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if email[1] == "" {
 		fmt.Fprint(w, "Email does not exist")
 	} else {
-		fmt.Fprint(w, "Trả về được dẫn nhập mã code và gửi code vào email")
-		randomCode := codeAuthentication()
-		gmail.SendEmail(user.Email, randomCode)
-
+		fmt.Fprint(w, "Trả về đường dẫn để nhập mã code và gửi code vào email")
+		RandomCode := codeAuthentication()
+		gmail.SendEmail(user.Email, RandomCode)
 	}
 }
 
@@ -192,26 +219,21 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	db.First(&query, user.ID)
 	b, _ := json.Marshal(query.CodeAuthentication)
 	code := strings.Split(string(b), "\"")
-
-	db.Where("email = ?", user.Email).Find(&query)
 	// b1, _ := json.Marshal(query.Email)
 	// email := strings.Split(string(b1), "\"")
 	// randomCode := codeAuthentication()
-	// gmail.SendEmail(user.Email, randomCode)
+	// gmail.SendEmail(user.Email, randomCode) // gửi mã code về mail người dùng
 	// db.Model(&query).Where("ID = ?", user.ID).Update("code_authentication", randomCode)
 
-	fmt.Fprint(w, code[1])
-	fmt.Fprint(w, "-------------------")
-	fmt.Fprint(w, user.CodeAuthentication)
-	if code[1] == user.CodeAuthentication {
+	if code[1] == user.CodeAuthentication { //Mã code người dùng nhập đúng thì update mật khẩu
 		result := db.Model(&query).Where("ID = ?", user.ID).Update("password", hash)
 		if result.Error != nil {
-			fmt.Fprint(w, "Error")
+			fmt.Fprint(w, "Error change")
 		} else {
-			fmt.Fprint(w, "Successfully")
+			fmt.Fprint(w, "Change Password Successfully")
 		}
 	} else {
-		fmt.Fprint(w, "Wrong code")
+		fmt.Fprint(w, "Wrong Code Authentication")
 	}
 }
 

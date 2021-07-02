@@ -4,6 +4,6 @@ import "gorm.io/gorm"
 
 type Option struct {
 	gorm.Model
-	Name  string  `gorm:"type:varchar(20); json:"name"`
+	Name  string  `gorm:"type:varchar(20);" json:"name"`
 	Price []Price `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:OptionID;associationForeignKey:ID"`
 }
