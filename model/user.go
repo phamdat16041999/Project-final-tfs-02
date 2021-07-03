@@ -32,7 +32,6 @@ type User struct {
 	UserName           string           `gorm:"type:varchar(100);unique;" json:"userName"`
 	Password           string           `gorm:"type:varchar(100); default: 123;" json:"password"`
 	Active             *bool            `gorm:"default: false;" json:"active"`
-	RoleID             uint             `gorm:"default: 0;" json:"roleid"`
 	Authentication     []Authentication `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
 	Conversation1      []Conversation   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User1ID; associationForeignKey:ID"`
 	Conversation2      []Conversation   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User2ID; associationForeignKey:ID"`
@@ -55,7 +54,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	// Create password
 	randomCode := codeAuthentication()
 	gmail.SendEmail(user.Email, randomCode)
-	var User = User{FirstName: user.FirstName, LastName: user.LastName, DOB: user.DOB, Address: user.Address, Phone: user.Phone, Email: user.Email, CodeAuthentication: randomCode, UserName: user.UserName, Password: hash, Active: user.Active, RoleID: user.RoleID}
+	var User = User{FirstName: user.FirstName, LastName: user.LastName, DOB: user.DOB, Address: user.Address, Phone: user.Phone, Email: user.Email, CodeAuthentication: randomCode, UserName: user.UserName, Password: hash, Active: user.Active}
 	result := db.Create(&User)
 	if result.Error != nil {
 		fmt.Fprint(w, result.Error)
@@ -118,26 +117,6 @@ func CheckPasswordHash(password, hash string) bool {
 
 // }
 
-// func extractClaims(tokenStr string) (jwt.MapClaims, bool) {
-// 	hmacSecretString := // Value
-// 	hmacSecret := []byte(hmacSecretString)
-// 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-// 			// check token signing method etc
-// 			return hmacSecret, nil
-// 	})
-
-// 	if err != nil {
-// 		return nil, false
-// 	}
-
-// 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-// 		return claims, true
-// 	} else {
-// 		log.Printf("Invalid JWT Token")
-// 		return nil, false
-// 	}
-// }
-
 func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -147,15 +126,27 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	}
 	db := connect.Connect()
 	var query User
+	var queryAuth Authentication
+	var queryRole Role
+
 	db.Where("user_name = ?", user.UserName).Find(&query)
-	db.Where("role_id = ?", user.RoleID).Find(&query)
+	db.Where("user_id = ?", query.ID).Find(&queryAuth)
+	db.Where("id = ?", queryAuth.RoleID).Find(&queryRole)
+
 	b, _ := json.Marshal(query.UserName)
-	b1, _ := json.Marshal(query.RoleID)
-	username := string(b)
-	role1 := string(b1)
-	fmt.Fprint(w, username)
-	fmt.Fprint(w, role1)
-	if len(username) == 2 {
+	// b1, _ := json.Marshal(query.ID)
+	// b2, _ := json.Marshal(queryAuth.RoleID)
+	b3, _ := json.Marshal(queryRole.Name)
+	userName := string(b)
+	// userId := string(b1)
+	// roleId := string(b2)
+	roleName := string(b3)
+
+	// fmt.Fprint(w, userId)
+	// fmt.Fprint(w, roleId)
+	fmt.Fprint(w, roleName)
+
+	if len(userName) == 2 {
 		fmt.Fprint(w, "Username not created yet!")
 	} else {
 		b, _ := json.Marshal(query.Password)
