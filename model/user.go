@@ -69,13 +69,10 @@ func codeAuthentication() string {
 	return randomString(12)
 }
 func randomString(len int) string {
-
 	bytes := make([]byte, len)
-
 	for i := 0; i < len; i++ {
 		bytes[i] = byte(randInt(97, 122))
 	}
-
 	return string(bytes)
 }
 
@@ -151,8 +148,8 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	} else {
 		b, _ := json.Marshal(query.Password)
 		password := strings.Split(string(b), "\"")
-		bb, _ := json.Marshal(query.Active)
-		x := string(bb)
+		b1, _ := json.Marshal(query.Active)
+		x := string(b1)
 
 		if CheckPasswordHash(user.Password, password[1]) {
 			b, _ := json.Marshal(query.ID)
