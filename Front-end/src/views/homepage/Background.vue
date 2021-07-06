@@ -3,18 +3,14 @@
     <div class="content">
       <div class="slogan">Stay With Us & Relax</div>
     </div>
-    <div class="container">
+    <div class="container" id="app-4">
       <div class="row">
         <div class="col-12 checkIn">
           <div class="row">
             <div class="col-xl-3 col-12">
               <label>City</label>
               <select class="form-control">
-                <option>Ha Noi</option>
-                <option>Yen Bai</option>
-                <option>Hai Duong</option>
-                <option>Ninh Binh</option>
-                <option>Thanh Hoa</option>
+                <option v-for="post,indext in posts" :key="indext">{{post.address}}</option>
               </select>
             </div>
             <div class="col-xl-3 col-12">
@@ -27,9 +23,10 @@
             </div>
             <div class="col-xl-3 col-12">
               <label></label>
-              <button type="button" class="btn btn-danger">
+              <a href="/showhotel" type="button" class="btn btn-danger">Check availability</a>
+              <!-- <button type="button" class="btn btn-danger">
                 Check availability
-              </button>
+              </button> -->
             </div>
           </div>
         </div>
@@ -38,7 +35,28 @@
   </div>
 </template>
 <script>
-export default {};
+import axios from 'axios';
+export default {
+  el: '#app-4',
+  data() {
+    return {
+      posts: [
+        {}
+      ],
+      errors: []
+    }
+  },
+  created(){
+    axios.get(`http://localhost:8000/homepage`)
+    .then(response => {
+      this.posts = response.data
+    })
+    .catch(e => {
+      this.errors.push(e)
+      console.log(this.errors);
+    })
+  }
+};
 </script>
 <style scoped>
 .slogan {

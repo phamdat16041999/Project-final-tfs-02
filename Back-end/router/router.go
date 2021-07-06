@@ -18,9 +18,19 @@ func Run() {
 	post.Path("/forgotpassword").HandlerFunc(model.ForgotPassword)
 	post.Path("/changepassword").HandlerFunc(model.ChangePassword)
 	post.Path("/active").HandlerFunc(model.ActiveAccount)
+	// post.Path("/homepage").HandlerFunc(model.DataHomePage)
+	// post.Path("/getdatahotel/{}").HandlerFunc(model.DataHomePage)
 
+	//get method
+	get := r.Methods(http.MethodGet).Subrouter()
+	get.Path("/homepage").HandlerFunc(model.DataHomePage)
+	get.Path("/homepage/hotel/{address}").HandlerFunc(model.GetHotel)
+	get.Path("/homepage/tophotel").HandlerFunc(model.TopHotel)
+
+	// methodput
 	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
 	http.Handle("/", r)
+
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},
 	}).Handler(r)
