@@ -14,7 +14,10 @@
         <div class="col-12 col-lg-6">
           <div class="row">
             <div class="col-xl-2 col-12"></div>
-            <div class="col-xl-8 col-12" style="color: white; margin-top: 130px">
+            <div
+              class="col-xl-8 col-12"
+              style="color: white; margin-top: 130px"
+            >
               <h2>Don't have an account?</h2>
               <h5>
                 If you do not have an account, please create an account to use
@@ -31,7 +34,10 @@
         <div class="col-12 col-lg-6">
           <div class="row">
             <div class="col-xl-2 col-12"></div>
-            <div class="col-xl-8 col-12" style="color: white; margin-top: 130px">
+            <div
+              class="col-xl-8 col-12"
+              style="color: white; margin-top: 130px"
+            >
               <h2>Have an account?</h2>
               <h5>
                 If you already have an account, please login to use our service
@@ -47,8 +53,8 @@
       </div>
       <div class="row">
         <div class="col-xl-2 col-12"></div>
-        <div class="col-xl-4 col-12 formInput" id="formInput">
-          <div class="row" id="signUp">
+        <div id="formInput" v-bind:class="leftToRightData.formInput">
+          <div class="row" id="signUp" v-if="signUp">
             <div class="col-xl-2 col-12"></div>
             <div class="col-xl-8 col-12">
               <div class="row">
@@ -98,7 +104,7 @@
             </div>
             <div class="col-xl-2 col-12"></div>
           </div>
-          <div class="row" id="login" style="visibility: hidden">
+          <div class="row" id="login" v-if="login">
             <div class="col-xl-2 col-12"></div>
             <div class="col-xl-8 col-12">
               <div class="row">
@@ -134,19 +140,31 @@
 <script>
 export default {
   name: "HelloWorld",
-  props: {},
+  data() {
+    return {
+      login: false,
+      signUp: true,
+      leftToRightData: {
+        formInput: "col-4",
+        login: "",
+        signUp: "",
+      },
+    };
+  },
   methods: {
     leftToRight() {
-      document.getElementById("formInput").className =
-        "col-4 formInput leftToRight";
-      document.getElementById("login").style.visibility = "visible";
-      document.getElementById("signUp").style.visibility = "hidden";
+      (this.leftToRightData.formInput = "col-4 formInput leftToRight"),
+        (this.leftToRightData.login = "visible"),
+        (this.leftToRightData.signUp = "hidden"),
+        (this.login = true),
+        (this.signUp = false);
     },
     rightToleft() {
-      document.getElementById("formInput").className =
-        "col-4 formInput rightToleft";
-      document.getElementById("login").style.visibility = "hidden";
-      document.getElementById("signUp").style.visibility = "visible";
+      (this.leftToRightData.formInput = "col-4 formInput rightToleft"),
+        (this.leftToRightData.login = "hidden"),
+        (this.leftToRightData.signUp = "visible"),
+        (this.login = false),
+        (this.signUp = true);
     },
   },
 };
