@@ -18,6 +18,7 @@ func Run() {
 	post.Path("/forgotpassword").HandlerFunc(model.ForgotPassword)
 	post.Path("/changepassword").HandlerFunc(model.ChangePassword)
 	post.Path("/active").HandlerFunc(model.ActiveAccount)
+	post.Path("/createbill/{datahotel}").HandlerFunc(model.ActiveAccount)
 
 	//get method
 	get := r.Methods(http.MethodGet).Subrouter()
