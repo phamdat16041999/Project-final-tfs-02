@@ -9,6 +9,7 @@
             <input
               type="text"
               class="form-control"
+              required
               v-model="formData.firstName"
             />
           </div>
@@ -17,6 +18,7 @@
             <input
               type="text"
               class="form-control"
+              required
               v-model="formData.lastName"
             />
           </div>
