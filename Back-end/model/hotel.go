@@ -48,5 +48,6 @@ func GetHotel(w http.ResponseWriter, r *http.Request) {
 }
 func TopHotel(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
+	fmt.Println(db)
 
 }
