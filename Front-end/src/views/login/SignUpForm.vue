@@ -96,11 +96,10 @@ export default {
     signUp() {
       const a = this.formData;
       axios
-        .post("http://localhost:8000/account", {
+        .post("http://localhost:8000/account", a, {
           headers: {
-            "Content-type": "application/x-www-form-urlencoded",
+            "Content-type": "application/json",
           },
-          data: a,
         })
         .then((res) => {
           console.log(res.data);

@@ -14,6 +14,10 @@ func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
 			fmt.Fprint(w, "Render tới trang web")
 			return
 		}
+
+		// r.Header.Set("user_id", "1")
+		// ctx := r.Context()
+
 		next(w, r)
 	}
 }

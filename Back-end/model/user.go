@@ -22,23 +22,23 @@ import (
 
 type User struct {
 	gorm.Model
-	FirstName          string           `gorm:"type:varchar(100);" json:"firstName"`
-	LastName           string           `gorm:"type:varchar(100);" json:"lastName"`
-	Address            string           `gorm:"type:varchar(100);" json:"address"`
-	DOB                string           `json:"dob"`
-	Phone              string           `json:"phone"`
-	Email              string           `gorm:"type:varchar(100);unique;" json:"email"`
-	CodeAuthentication string           `gorm:"type:varchar(20);unique;" json:"codeAuthentication"`
-	UserName           string           `gorm:"type:varchar(100);unique;" json:"userName"`
-	Password           string           `gorm:"type:varchar(100); default: 123;" json:"password"`
-	Active             *bool            `gorm:"default: false;" json:"active"`
-	Authentication     []Authentication `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
-	Conversation1      []Conversation   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User1ID; associationForeignKey:ID"`
-	Conversation2      []Conversation   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User2ID; associationForeignKey:ID"`
-	Messenger          []Messenger      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
-	Hotel              []Hotel          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
-	Rate               []Rate           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
-	Bill               []Bill           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
+	FirstName          string            `gorm:"type:varchar(100);" json:"firstName"`
+	LastName           string            `gorm:"type:varchar(100);" json:"lastName"`
+	Address            string            `gorm:"type:varchar(100);" json:"address"`
+	DOB                string            `json:"dob"`
+	Phone              string            `json:"phone"`
+	Email              string            `gorm:"type:varchar(100);unique;" json:"email"`
+	CodeAuthentication string            `gorm:"type:varchar(20);unique;" json:"codeAuthentication"`
+	UserName           string            `gorm:"type:varchar(100);unique;" json:"userName"`
+	Password           string            `gorm:"type:varchar(100); default: 123;" json:"password"`
+	Active             *bool             `gorm:"default: false;" json:"active"`
+	Authentication     []*Authentication `json:"authentication,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
+	Conversation1      []Conversation    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User1ID; associationForeignKey:ID"`
+	Conversation2      []Conversation    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User2ID; associationForeignKey:ID"`
+	Messenger          []Messenger       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
+	Hotel              []Hotel           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
+	Rate               []Rate            `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
+	Bill               []Bill            `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
 }
 
 func CreateAccount(w http.ResponseWriter, r *http.Request) {
@@ -48,31 +48,31 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	db := connect.Connect()
-	// Encrypt password
-	hash, _ := HashPassword(user.Password)
-	// Create password
-	randomCode := codeAuthentication()
-	// gmail.SendEmail(user.Email, randomCode)
-	var User = User{
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		DOB:                user.DOB,
-		Address:            user.Address,
-		Phone:              user.Phone,
-		Email:              user.Email,
-		CodeAuthentication: randomCode,
-		UserName:           user.UserName,
-		Password:           hash,
-		Active:             user.Active,
-	}
-	result := db.Create(&User)
-	if result.Error != nil {
-		fmt.Fprint(w, result.Error)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	b, _ := json.Marshal(&User)
+	// db := connect.Connect()
+	// // Encrypt password
+	// hash, _ := HashPassword(user.Password)
+	// // Create password
+	// randomCode := codeAuthentication()
+	// // gmail.SendEmail(user.Email, randomCode)
+	// var User = User{
+	// 	FirstName:          user.FirstName,
+	// 	LastName:           user.LastName,
+	// 	DOB:                user.DOB,
+	// 	Address:            user.Address,
+	// 	Phone:              user.Phone,
+	// 	Email:              user.Email,
+	// 	CodeAuthentication: randomCode,
+	// 	UserName:           user.UserName,
+	// 	Password:           hash,
+	// 	Active:             user.Active,
+	// }
+	// result := db.Create(&User)
+	// if result.Error != nil {
+	// 	fmt.Fprint(w, result.Error)
+	// 	return
+	// }
+	// w.Header().Set("Content-Type", "application/json")
+	b, _ := json.Marshal(&user)
 	fmt.Fprint(w, string(b))
 }
 
@@ -261,5 +261,8 @@ func ActiveAccount(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		fmt.Fprint(w, "Wrong code")
+
+		w.WriteHeader(http.StatusInternalServerError)
+
 	}
 }
