@@ -34,31 +34,42 @@
   </div>
 </template>
 <script>
+import axios from 'axios';
 export default {
+   el: '#app-2',
   data() {
     return {
       hotel: [
         {
-          id: 0,
-          name: "Le Beryl Hanoi Hotel",
-          Image:
-            "https://cf.bstatic.com/xdata/images/hotel/max1024x768/224709373.jpg?k=88684ffc04f58b9b8fd06734222e3fdf181f9cfa79818edfd83544b6288b8ffb&o=&hp=1",
-        },
-        {
-          id: 1,
-          name: "Hanoi Pho Hotel",
-          Image:
-            "https://cf.bstatic.com/xdata/images/hotel/max1024x768/108020995.jpg?k=0a3121506fadc880849a402a352c6e63f55c1b609fe087cd0e644012c49a31a8&o=&hp=1",
-        },
-        {
-          id: 2,
-          name: "Serenity Diamond Hotel ",
-          Image:
-            "https://cf.bstatic.com/xdata/images/hotel/square200/224709373.webp?k=88684ffc04f58b9b8fd06734222e3fdf181f9cfa79818edfd83544b6288b8ffb&o=",
-        },
-      ],
+        //   id: 0,
+        //   name: "Le Beryl Hanoi Hotel",
+        //   Image:
+        //     "https://cf.bstatic.com/xdata/images/hotel/max1024x768/224709373.jpg?k=88684ffc04f58b9b8fd06734222e3fdf181f9cfa79818edfd83544b6288b8ffb&o=&hp=1",
+        // },
+        // {
+        //   id: 1,
+        //   name: "Hanoi Pho Hotel",
+        //   Image:
+        //     "https://cf.bstatic.com/xdata/images/hotel/max1024x768/108020995.jpg?k=0a3121506fadc880849a402a352c6e63f55c1b609fe087cd0e644012c49a31a8&o=&hp=1",
+        // },
+        // {
+        //   id: 2,
+        //   name: "Serenity Diamond Hotel ",
+        //   Image:
+        //     "https://cf.bstatic.com/xdata/images/hotel/square200/224709373.webp?k=88684ffc04f58b9b8fd06734222e3fdf181f9cfa79818edfd83544b6288b8ffb&o=",
+        }
+      ]
     };
   },
+  created(){
+    axios.get(`http://localhost:8000/homepage/tophotel`)
+    .then(response => {
+      this.hotel = response.data
+    })
+    .catch(e => {
+      console.log(e);
+    })
+  }
 };
 </script>
 <style scoped>
