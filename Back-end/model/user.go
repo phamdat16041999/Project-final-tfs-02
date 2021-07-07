@@ -24,9 +24,9 @@ type User struct {
 	gorm.Model
 	FirstName          string           `gorm:"type:varchar(100);" json:"firstName"`
 	LastName           string           `gorm:"type:varchar(100);" json:"lastName"`
-	DOB                time.Time        `json:"dob"`
 	Address            string           `gorm:"type:varchar(100);" json:"address"`
-	Phone              int              `json:"phone"`
+	DOB                string           `json:"dob"`
+	Phone              string           `json:"phone"`
 	Email              string           `gorm:"type:varchar(100);unique;" json:"email"`
 	CodeAuthentication string           `gorm:"type:varchar(20);unique;" json:"codeAuthentication"`
 	UserName           string           `gorm:"type:varchar(100);unique;" json:"userName"`
@@ -53,14 +53,27 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	hash, _ := HashPassword(user.Password)
 	// Create password
 	randomCode := codeAuthentication()
-	gmail.SendEmail(user.Email, randomCode)
-	var User = User{FirstName: user.FirstName, LastName: user.LastName, DOB: user.DOB, Address: user.Address, Phone: user.Phone, Email: user.Email, CodeAuthentication: randomCode, UserName: user.UserName, Password: hash, Active: user.Active}
+	// gmail.SendEmail(user.Email, randomCode)
+	var User = User{
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		DOB:                user.DOB,
+		Address:            user.Address,
+		Phone:              user.Phone,
+		Email:              user.Email,
+		CodeAuthentication: randomCode,
+		UserName:           user.UserName,
+		Password:           hash,
+		Active:             user.Active,
+	}
 	result := db.Create(&User)
 	if result.Error != nil {
 		fmt.Fprint(w, result.Error)
 		return
 	}
-	fmt.Fprint(w, "Successfully")
+	w.Header().Set("Content-Type", "application/json")
+	b, _ := json.Marshal(&User)
+	fmt.Fprint(w, string(b))
 }
 
 // Random code
