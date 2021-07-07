@@ -26,6 +26,11 @@ type Hotel struct {
 	Bill        []Bill       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 }
 
+type ratehotel struct {
+	HotelId uint
+	Rate    int
+}
+
 // type Results struct {
 // 	Address string `json:"address"`
 // }
@@ -46,11 +51,6 @@ func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 	db.Where("address LIKE ?", vars["address"]).Find(&hotels)
 	b, _ := json.Marshal(hotels)
 	fmt.Fprintln(w, string(b))
-}
-
-type ratehotel struct {
-	HotelId uint
-	Rate    int
 }
 
 func TopHotel(w http.ResponseWriter, r *http.Request) {

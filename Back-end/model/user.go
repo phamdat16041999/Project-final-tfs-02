@@ -144,17 +144,17 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	db.Where("id = ?", queryAuth.RoleID).Find(&queryRole)
 
 	b, _ := json.Marshal(query.UserName)
-	// b1, _ := json.Marshal(query.ID)
-	// b2, _ := json.Marshal(queryAuth.RoleID)
+	b1, _ := json.Marshal(query.ID)
+	b2, _ := json.Marshal(queryAuth.RoleID)
 	b3, _ := json.Marshal(queryRole.Name)
 	userName := string(b)
-	// userId := string(b1)
-	// roleId := string(b2)
+	userId := string(b1)
+	roleId := string(b2)
 	roleName := string(b3)
 
-	// fmt.Fprint(w, userId)
-	// fmt.Fprint(w, roleId)
-	fmt.Fprint(w, roleName)
+	fmt.Fprintln(w, userId)
+	fmt.Fprintln(w, roleId)
+	fmt.Fprintln(w, roleName)
 
 	if len(userName) == 2 {
 		fmt.Fprint(w, "Username not created yet!")
