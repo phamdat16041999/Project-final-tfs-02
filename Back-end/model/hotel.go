@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"hotel/connect"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -37,7 +38,7 @@ func DataHomePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(b))
 
 }
-func GetHotel(w http.ResponseWriter, r *http.Request) {
+func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	vars := mux.Vars(r)
 	// vars["address"]
@@ -46,7 +47,41 @@ func GetHotel(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(hotels)
 	fmt.Fprintln(w, string(b))
 }
-func TopHotel(w http.ResponseWriter, r *http.Request) {
-	// db := connect.Connect()
 
+type ratehotel struct {
+	HotelId uint
+	Rate    int
+}
+
+func TopHotel(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	var rates []Rate
+	db.Limit(2).Select("hotel_id", "rate").Order("rate desc").Find(&rates)
+	w.Header().Set("Content-Type", "application/json")
+	var rate1 []ratehotel
+	for i := 0; i < len(rates); i++ {
+		rate1 = append(rate1, ratehotel{HotelId: rates[i].HotelID,
+			Rate: rates[i].Rate})
+	}
+	for i := 0; i < len(rate1); i++ {
+		var hotels []Hotel
+		db.Where("id = ?", rate1[i].HotelId).Find(&hotels)
+		b, _ := json.Marshal(hotels)
+		fmt.Fprintln(w, string(b))
+
+	}
+
+	b1, _ := json.Marshal(rate1)
+	fmt.Fprintln(w, rate1[0].HotelId)
+	fmt.Fprintln(w, string(b1))
+}
+
+func GetEachHotel(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	vars := mux.Vars(r)["id"]
+	id, _ := strconv.Atoi(vars)
+	var query Hotel
+	db.Where("id = ?", id).Find(&query)
+	b, _ := json.Marshal(query)
+	fmt.Fprintln(w, string(b))
 }
