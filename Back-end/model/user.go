@@ -28,11 +28,11 @@ type User struct {
 	DOB                string            `json:"dob"`
 	Phone              string            `json:"phone"`
 	Email              string            `gorm:"type:varchar(100);unique;" json:"email"`
-	CodeAuthentication string            `gorm:"type:varchar(20);unique;" json:"codeAuthentication"`
+	CodeAuthentication string            `gorm:"type:varchar(20);unique;" json:"codeAuthentication authentication,omitempty"`
 	UserName           string            `gorm:"type:varchar(100);unique;" json:"userName"`
 	Password           string            `gorm:"type:varchar(100); default: 123;" json:"password"`
-	Active             *bool             `gorm:"default: false;" json:"active"`
-	Authentication     []*Authentication `json:"authentication,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
+	Active             *bool             `gorm:"default: false;" json:"active authentication omitempty"`
+	Authentication     []*Authentication `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
 	Conversation1      []Conversation    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User1ID; associationForeignKey:ID"`
 	Conversation2      []Conversation    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User2ID; associationForeignKey:ID"`
 	Messenger          []Messenger       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
