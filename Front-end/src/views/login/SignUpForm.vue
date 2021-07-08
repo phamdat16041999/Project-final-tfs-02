@@ -24,7 +24,7 @@
           </div>
           <div class="col-6">
             <label>Date of birth</label>
-            <input type="date" class="form-control" v-model="formData.dob" />
+            <input type="date" class="form-control" v-model="formData.dob" required/>
           </div>
           <div class="col-6">
             <label>Phone</label>
@@ -32,6 +32,7 @@
               type="number"
               class="form-control"
               v-model="formData.phone"
+              required
             />
           </div>
           <div class="col-12">
@@ -40,11 +41,12 @@
               type="text"
               class="form-control"
               v-model="formData.address"
+              required
             />
           </div>
           <div class="col-12">
             <label>Email</label>
-            <input type="text" class="form-control" v-model="formData.email" />
+            <input type="email" class="form-control" v-model="formData.email" required/>
           </div>
           <div class="col-12">
             <label>User name</label>
@@ -52,6 +54,7 @@
               type="text"
               class="form-control"
               v-model="formData.username"
+              required
             />
           </div>
           <div class="col-12">
@@ -60,13 +63,15 @@
               type="password"
               class="form-control"
               v-model="formData.password"
+              required
             />
           </div>
           <div class="col-12">
             <label>Confirm password</label>
-            <input type="password" class="form-control" />
+            <input type="password" class="form-control"  v-model="passwordConfirm" required/>
           </div>
           <div class="col-12" style="text-align: center; margin-top: 10px">
+            <p id="err">{{err}}</p>
             <button type="submit" class="btn btn-light">Sign up</button>
           </div>
         </div>
@@ -92,23 +97,36 @@ export default {
         username: null,
         password: null,
       },
+      passwordConfirm: null,
+      err: null
     };
   },
   methods: {
     signUp() {
-      const a = this.formData;
+      if (this.formData.password != this.passwordConfirm){
+        this.err = "Repeated password is incorrect"
+      }else{
       axios
-        .post("http://localhost:8000/account", a, {
+        .post("http://localhost:8000/account", this.formData, {
           headers: {
             "Content-type": "application/json",
           },
         })
         .then((res) => {
-          console.log(res.data);
+          if (res.status == 200){
+            // chuyen huong sang trang login
+             this.err = res.data
+          }else{
+            this.err = res.data
+          }
         });
+      }
     },
   },
 };
 </script>
 <style scoped>
+#err{
+color: red;
+}
 </style>

@@ -48,32 +48,37 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// db := connect.Connect()
-	// // Encrypt password
-	// hash, _ := HashPassword(user.Password)
-	// // Create password
-	// randomCode := codeAuthentication()
-	// // gmail.SendEmail(user.Email, randomCode)
-	// var User = User{
-	// 	FirstName:          user.FirstName,
-	// 	LastName:           user.LastName,
-	// 	DOB:                user.DOB,
-	// 	Address:            user.Address,
-	// 	Phone:              user.Phone,
-	// 	Email:              user.Email,
-	// 	CodeAuthentication: randomCode,
-	// 	UserName:           user.UserName,
-	// 	Password:           hash,
-	// 	Active:             user.Active,
-	// }
-	// result := db.Create(&User)
-	// if result.Error != nil {
-	// 	fmt.Fprint(w, result.Error)
-	// 	return
-	// }
-	// w.Header().Set("Content-Type", "application/json")
-	b, _ := json.Marshal(&user)
-	fmt.Fprint(w, string(b))
+	db := connect.Connect()
+	// Encrypt password
+	hash, _ := HashPassword(user.Password)
+	// Create password
+	randomCode := codeAuthentication()
+	errmail := gmail.SendEmail(user.Email, randomCode)
+	var User = User{
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		DOB:                user.DOB,
+		Address:            user.Address,
+		Phone:              user.Phone,
+		Email:              user.Email,
+		CodeAuthentication: randomCode,
+		UserName:           user.UserName,
+		Password:           hash,
+		Active:             user.Active,
+	}
+	if errmail != "" {
+		fmt.Fprintln(w, "Email is incorrect !")
+		return
+	} else {
+		result := db.Create(&User)
+		if result.Error != nil {
+			fmt.Fprintln(w, "Account already in use, please change username and email !")
+			return
+		} else {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, "Create successfull")
+		}
+	}
 }
 
 // Random code

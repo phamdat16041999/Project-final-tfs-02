@@ -91,23 +91,30 @@ func saveToken(file string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func SendEmail(Email, Content string) {
+func SendEmail(Email, Content string) string {
 	ctx := context.Background()
+	var a = ""
 
 	b, err := ioutil.ReadFile("gmail/client_secret.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
+		a = "Unable to read client secret file:"
+		return a
 	}
 
 	config, err := google.ConfigFromJSON(b, gmail.MailGoogleComScope)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		a = "Unable to parse client secret file to config:"
+		return a
 	}
 	client := getClient(ctx, config)
 
 	srv, err := gmail.New(client)
 	if err != nil {
 		log.Fatalf("Unable to retrieve gmail Client %v", err)
+		a = "Unable to retrieve gmail Client.."
+		return a
 	}
 
 	var message gmail.Message
@@ -124,7 +131,10 @@ func SendEmail(Email, Content string) {
 
 	_, err = srv.Users.Messages.Send("me", &message).Do()
 	if err != nil {
-		log.Fatalf("Unable to send. %v", err)
+		// log.Fatalf("Unable to send. %v", err)
+		a = "Unable to send."
+		return a
 	}
+	return a
 
 }
