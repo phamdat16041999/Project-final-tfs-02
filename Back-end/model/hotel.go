@@ -13,17 +13,17 @@ import (
 
 type Hotel struct {
 	gorm.Model
-	Name        string       `json:"authentication omitempty" gorm:"type:varchar(100);" json:"name" `
-	Address     string       ` gorm:"type:varchar(100);" json:"address" `
+	Name        string       `gorm:"type:varchar(100);" json:"name" `
+	Address     string       `gorm:"type:varchar(100);" json:"address" `
 	Description string       `gorm:"type:varchar(100);" json:"description" `
-	Image       string       ` gorm:"type:varchar(100);" json:"image" `
-	Longitude   string       ` gorm:"type:varchar(100);" json:"longitude" `
-	Latitude    string       ` gorm:"type:varchar(100);" json:"latitude" `
+	Image       string       `gorm:"type:varchar(100);" json:"image" `
+	Longitude   string       `gorm:"type:varchar(100);" json:"longitude" `
+	Latitude    string       `gorm:"type:varchar(100);" json:"latitude" `
 	UserID      uint         `json:"userID"`
-	ImageHotel  []ImageHotel `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Room        []Room       `gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Rate        []Rate       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Bill        []Bill       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	ImageHotel  []ImageHotel `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	Room        []Room       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	Rate        []Rate       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	Bill        []Bill       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 }
 
 type ratehotel struct {
@@ -76,13 +76,37 @@ func TopHotel(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(b1))
 }
 
-func GetEachHotel(w http.ResponseWriter, r *http.Request) {
+// type Rooms struct {
+// 	RoomID uint
+// 	Image   string
+// }
+
+func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
 	vars := mux.Vars(r)["id"]
 	id, _ := strconv.Atoi(vars)
-	var query Hotel
-	db.Where("id = ?", id).Find(&query)
-	b, _ := json.Marshal(query)
-	fmt.Fprintln(w, string(b))
+	var hotels Hotel
+	var rooms []Room
+	var imageRooms []ImageRoom
+	// var img []Image
+	db.Where("id = ?", id).Find(&hotels)
+	db.Where("hotel_id = ?", id).Find(&rooms)
+	for i := 0; i < len(rooms); i++ {
+		db.Where("room_id = ?", rooms[i].ID).Find(&imageRooms)
+		rooms = append(rooms, Room{ImageRoom: imageRooms})
+		fmt.Fprint(w, rooms)
+
+		b2, _ := json.Marshal(imageRooms[i])
+		fmt.Fprint(w, "Image Room ")
+		fmt.Fprint(w, rooms[i].ID)
+		fmt.Fprintln(w, string(b2))
+	}
+
+	// b, _ := json.Marshal(hotels)
+	// fmt.Fprintln(w, "Hotels: ")
+	// fmt.Fprintln(w, string(b))
+	// b1, _ := json.Marshal(rooms)
+	// fmt.Fprintln(w, "Room: ")
+	// fmt.Fprintln(w, string(b1))
 }
