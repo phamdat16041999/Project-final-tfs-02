@@ -2,8 +2,8 @@
   <div>
     <div class="container-xl">
       <div class="row"> 
-          <nav class="navbar navbar-expand-lg navbar-light col-12">
-        <a class="navbar-brand" href="#">Navbar</a>
+          <nav class="navbar navbar-expand-lg col-12">
+        <a class="navbar-brand toolbarText" @click="homePage">DKT Booking</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -19,16 +19,16 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="#"
+              <a class="nav-link toolbarText" @click="homePage"
                 >Home <span class="sr-only">(current)</span></a
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
+              <a class="nav-link toolbarText" href="#">Link</a>
             </li>
             <li class="nav-item dropdown">
               <a
-                class="nav-link dropdown-toggle"
+                class="nav-link dropdown-toggle toolbarText"
                 href="#"
                 id="navbarDropdown"
                 role="button"
@@ -46,7 +46,7 @@
               </div>
             </li>
             <li class="nav-item">
-              <a class="nav-link disabled" href="#">Disabled</a>
+              <a class="nav-link toolbarText" @click="login">Login</a>
             </li>
           </ul>
           <form class="form-inline my-2 my-lg-0">
@@ -67,7 +67,20 @@
   </div>
 </template>
 <script>
-export default {};
+export default {
+  methods: {
+    homePage() {
+      this.$router.push('/');
+    },
+    login(){
+      this.$router.push('/login');
+    }
+  },
+};
 </script>
-<style>
+<style scoped>
+.toolbarText{
+  color: white;
+  cursor: pointer;
+}
 </style>

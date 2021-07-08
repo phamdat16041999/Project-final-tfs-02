@@ -1,6 +1,6 @@
 <template>
-  <div class="row" id="singUp">
-    <form v-on:submit.prevent="signUp" method="post">
+  <div id="singUp">
+    <form v-on:submit.prevent="signUp" method="post" class="row">
       <div class="col-xl-2 col-12"></div>
       <div class="col-xl-8 col-12">
         <div class="row">
