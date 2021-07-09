@@ -25,7 +25,7 @@ func Run() {
 	get.Path("/homepage").HandlerFunc(model.DataHomePage)
 	get.Path("/homepage/hotel/{address}").HandlerFunc(model.GetHotelAddress)
 	get.Path("/homepage/tophotel").HandlerFunc(model.TopHotel)
-	get.Path("/homepage/eachhotel/{id}").HandlerFunc(model.GetEachHotel)
+	get.Path("/homepage/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
 
 	// methodput
 	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
@@ -34,7 +34,7 @@ func Run() {
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},
 	}).Handler(r)
-	http.ListenAndServe(":8000", handler)
+	http.ListenAndServe(":8080", handler)
 }
 func Test(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "test")
