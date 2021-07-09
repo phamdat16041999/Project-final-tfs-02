@@ -28,8 +28,12 @@ func Run() {
 	get.Path("/homepage/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
 
 	// methodput
+	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
 	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
 	http.Handle("/", r)
+
+	//methoddelete
+	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
 
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},

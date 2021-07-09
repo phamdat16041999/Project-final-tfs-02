@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	// "errors"
 	"fmt"
 	"hotel/auth"
 	"hotel/connect"
@@ -12,6 +13,9 @@ import (
 	"strings"
 	"time"
 
+	// "github.com/badoux/checkmail"
+
+	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -54,6 +58,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	// Create password
 	randomCode := codeAuthentication()
 	errmail := gmail.SendEmail(user.Email, randomCode)
+	fmt.Fprint(w, errmail)
 	var User = User{
 		FirstName:          user.FirstName,
 		LastName:           user.LastName,
@@ -78,6 +83,56 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			fmt.Fprint(w, "Create successfull")
 		}
+	}
+}
+func UpdateAccount(w http.ResponseWriter, r *http.Request) {
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	db := connect.Connect()
+	hash, _ := HashPassword(user.Password)
+	randomCode := codeAuthentication()
+	var query User
+	var query1 User
+	params := mux.Vars(r)
+	id := params["id"]
+	db.Where("id = ?", id).Find(&query1)
+	b, _ := json.Marshal(query1.ID)
+	if string(b) != "0" {
+		db.Model(query).Where("id = ?", id).Updates(User{
+			FirstName:          user.FirstName,
+			LastName:           user.LastName,
+			DOB:                user.DOB,
+			Address:            user.Address,
+			Phone:              user.Phone,
+			Email:              user.Email,
+			CodeAuthentication: randomCode,
+			UserName:           user.UserName,
+			Password:           hash,
+			Active:             user.Active,
+		})
+		fmt.Fprintln(w, "Update successfull!")
+	} else {
+		fmt.Fprintln(w, "Can not find ID")
+	}
+
+}
+
+func DeleteAccount(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	var query User
+	params := mux.Vars(r)
+	id := params["id"]
+	db.Where("id = ?", id).Find(&query)
+	b, _ := json.Marshal(query.ID)
+	if string(b) != "0" {
+		db.Where("id = ?", id).Delete(&query)
+		fmt.Fprintln(w, "Delete successfull!")
+	} else {
+		fmt.Fprintln(w, "Can not find ID")
 	}
 }
 
@@ -189,6 +244,7 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
 func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
