@@ -13,24 +13,17 @@ import (
 
 type Hotel struct {
 	gorm.Model
-	Name        string       `gorm:"type:varchar(100);" json:"name"`
-	Address     string       `gorm:"type:varchar(100);" json:"address"`
-	Description string       `gorm:"type:varchar(100);" json:"description"`
-	Image       string       `gorm:"type:varchar(100);" json:"image"`
-	Longitude   string       `gorm:"type:varchar(100);" json:"longitude"`
-	Latitude    string       `gorm:"type:varchar(100);" json:"latitude"`
+	Name        string       `gorm:"type:varchar(100);" json:"name" `
+	Address     string       `gorm:"type:varchar(100);" json:"address" `
+	Description string       `gorm:"type:varchar(100);" json:"description" `
+	Image       string       `gorm:"type:varchar(100);" json:"image" `
+	Longitude   string       `gorm:"type:varchar(100);" json:"longitude" `
+	Latitude    string       `gorm:"type:varchar(100);" json:"latitude" `
 	UserID      uint         `json:"userID"`
-<<<<<<< HEAD
 	ImageHotel  []ImageHotel `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 	Room        []Room       `gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 	Rate        []Rate       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 	Bill        []Bill       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-=======
-	ImageHotel  []ImageHotel `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Room        []Room       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Rate        []Rate       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Bill        []Bill       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
->>>>>>> ed93aae230e20b9f878e8ae97479e64c00bb2d30
 }
 
 type ratehotel struct {
@@ -83,7 +76,6 @@ func TopHotel(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(b1))
 }
 
-<<<<<<< HEAD
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
@@ -111,14 +103,4 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	b1, _ := json.Marshal(hotel)
 	fmt.Fprintln(w, string(b1))
 
-=======
-func GetEachHotel(w http.ResponseWriter, r *http.Request) {
-	db := connect.Connect()
-	vars := mux.Vars(r)["id"]
-	id, _ := strconv.Atoi(vars)
-	var query Hotel
-	db.Where("id = ?", id).Find(&query)
-	b, _ := json.Marshal(query)
-	fmt.Fprintln(w, string(b))
->>>>>>> ed93aae230e20b9f878e8ae97479e64c00bb2d30
 }
