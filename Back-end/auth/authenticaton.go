@@ -11,7 +11,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func TokenValid(r *http.Request) error {
+func TokenValid(r *http.Request) string {
 	tokenString := ExtractToken(r)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -20,13 +20,13 @@ func TokenValid(r *http.Request) error {
 		return []byte(os.Getenv("API_SECRET")), nil
 	})
 	if err != nil {
-		return err
+		return "err"
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		Pretty(claims)
-
+		DecodeToken := Pretty(claims)
+		return DecodeToken
 	}
-	return nil
+	return "err"
 }
 func ExtractToken(r *http.Request) string {
 	keys := r.URL.Query()
@@ -40,11 +40,11 @@ func ExtractToken(r *http.Request) string {
 	}
 	return ""
 }
-func Pretty(data interface{}) {
+func Pretty(data interface{}) string {
 	b, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
 		log.Println(err)
-		return
+		return ""
 	}
-	fmt.Println(string(b))
+	return string(b)
 }

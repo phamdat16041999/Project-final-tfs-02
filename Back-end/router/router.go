@@ -18,7 +18,7 @@ func Run() {
 	post.Path("/forgotpassword").HandlerFunc(model.ForgotPassword)
 	post.Path("/changepassword").HandlerFunc(model.ChangePassword)
 	post.Path("/active").HandlerFunc(model.ActiveAccount)
-	post.Path("/createbill/{datahotel}").HandlerFunc(model.ActiveAccount)
+	post.Path("/createbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Createbill))
 
 	//get method
 	get := r.Methods(http.MethodGet).Subrouter()
@@ -30,7 +30,7 @@ func Run() {
 	// methodput
 	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
 	http.Handle("/", r)
-
+	//aaa
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},
 	}).Handler(r)
