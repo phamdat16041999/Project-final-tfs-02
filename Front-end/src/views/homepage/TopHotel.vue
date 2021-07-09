@@ -20,13 +20,13 @@
         <div class="col-12">
           <div class="row">
             <div class="col-xl-4 col-12" v-for="data, index in topHotel" :key="index">
-              <p>{{index}}</p>
               <div class="article-container">
-                <div class="article-img-holder" v-bind:style="{ backgroundImage: 'url(' + data.Image + ')' }">></div>
+                <div class="article-img-holder" v-bind:style="{backgroundImage: `${data.image} !important`}"></div>
               </div>
               <p>{{data.name}}</p>
               <p></p>
               <p>Price: 8$</p>
+              <p>Rate: {{data.rate}}</p>
             </div>
           </div>
         </div>
