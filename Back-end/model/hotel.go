@@ -21,7 +21,7 @@ type Hotel struct {
 	Latitude    string       `gorm:"type:varchar(100);" json:"latitude" `
 	UserID      uint         `json:"userID"`
 	ImageHotel  []ImageHotel `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Room        []Room       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	Room        []Room       `gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 	Rate        []Rate       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 	Bill        []Bill       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 }
@@ -76,37 +76,31 @@ func TopHotel(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(b1))
 }
 
-// type Rooms struct {
-// 	RoomID uint
-// 	Image   string
-// }
-
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
-	vars := mux.Vars(r)["id"]
-	id, _ := strconv.Atoi(vars)
-	var hotels Hotel
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	var hotel Hotel
 	var rooms []Room
-	var imageRooms []ImageRoom
-	// var img []Image
-	db.Where("id = ?", id).Find(&hotels)
+	db.Where("id = ?", id).Find(&hotel)
 	db.Where("hotel_id = ?", id).Find(&rooms)
 	for i := 0; i < len(rooms); i++ {
+		hotel.Room = append(hotel.Room, rooms[i])
+		var imageRooms []ImageRoom
 		db.Where("room_id = ?", rooms[i].ID).Find(&imageRooms)
-		rooms = append(rooms, Room{ImageRoom: imageRooms})
-		fmt.Fprint(w, rooms)
-
-		b2, _ := json.Marshal(imageRooms[i])
-		fmt.Fprint(w, "Image Room ")
-		fmt.Fprint(w, rooms[i].ID)
-		fmt.Fprintln(w, string(b2))
+		for j := 0; j < len(imageRooms); j++ {
+			hotel.Room[i].ImageRoom = append(hotel.Room[i].ImageRoom, imageRooms[j])
+		}
+		var priceroom []Price
+		db.Where("room_id = ?", rooms[i].ID).Find(&priceroom)
+		for j := 0; j < len(priceroom); j++ {
+			hotel.Room[i].Price = append(hotel.Room[i].Price, priceroom[j])
+			// var option Option
+			// db.Where("id = ?", priceroom[i].OptionID).Find(&option)
+			// hotel.Room[i].Price[j].OptionID = append(hotel.Room[i].Price[j].OptionID, option)
+		}
 	}
+	b1, _ := json.Marshal(hotel)
+	fmt.Fprintln(w, string(b1))
 
-	// b, _ := json.Marshal(hotels)
-	// fmt.Fprintln(w, "Hotels: ")
-	// fmt.Fprintln(w, string(b))
-	// b1, _ := json.Marshal(rooms)
-	// fmt.Fprintln(w, "Room: ")
-	// fmt.Fprintln(w, string(b1))
 }
