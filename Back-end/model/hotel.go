@@ -58,21 +58,21 @@ func TopHotel(w http.ResponseWriter, r *http.Request) {
 	var rates []Rate
 	db.Limit(2).Select("hotel_id", "rate").Order("rate desc").Find(&rates)
 	w.Header().Set("Content-Type", "application/json")
-	var rate1 []ratehotel
-	for i := 0; i < len(rates); i++ {
-		rate1 = append(rate1, ratehotel{HotelId: rates[i].HotelID,
-			Rate: rates[i].Rate})
-	}
-	for i := 0; i < len(rate1); i++ {
-		var hotels []Hotel
-		db.Where("id = ?", rate1[i].HotelId).Find(&hotels)
-		b, _ := json.Marshal(hotels)
-		fmt.Fprintln(w, string(b))
+	// var rate1 []ratehotel
+	// for i := 0; i < len(rates); i++ {
+	// 	rate1 = append(rate1, ratehotel{HotelId: rates[i].HotelID,
+	// 		Rate: rates[i].Rate})
+	// }
+	// for i := 0; i < len(rate1); i++ {
+	// 	var hotels []Hotel
+	// 	db.Where("id = ?", rate1[i].HotelId).Find(&hotels)
+	// 	b, _ := json.Marshal(hotels)
+	// 	fmt.Fprintln(w, string(b))
 
-	}
+	// }
 
-	b1, _ := json.Marshal(rate1)
-	fmt.Fprintln(w, rate1[0].HotelId)
+	b1, _ := json.Marshal(rates)
+	// fmt.Fprintln(w, rate1[0].HotelId)
 	fmt.Fprintln(w, string(b1))
 }
 
