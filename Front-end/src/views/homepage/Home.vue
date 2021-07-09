@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import toolbar from "./Toolbar.vue";
+import toolbar from "../Toolbar.vue";
 import background from "./Background.vue";
 import description from "./Description.vue";
 import topHotel from "./TopHotel.vue";
