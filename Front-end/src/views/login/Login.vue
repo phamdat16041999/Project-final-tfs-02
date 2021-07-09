@@ -123,7 +123,7 @@ export default {
 }
 #formInput {
   height: 600px;
-  background-color: #ecf0f1;
+  background-color:floralwhite;
   margin-top: 120px;
   border-radius: 15px;
   position: absolute;
@@ -144,7 +144,7 @@ export default {
   }
   to {
     left: 50%;
-    background-color: #ecf0f1;
+    background-color: floralwhite;
   }
 }
 .rightToleft {
@@ -157,7 +157,7 @@ export default {
   }
   to {
     left: 18%;
-    background-color: #ecf0f1;
+    background-color: floralwhite;
   }
 }
 </style>
