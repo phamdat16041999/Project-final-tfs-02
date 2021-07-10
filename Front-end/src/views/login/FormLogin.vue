@@ -24,8 +24,11 @@
         </div>
         <div class="col-12" style="text-align: center; margin-top: 10px">
           <p>{{ checkError }}</p>
-          <p>{{ err }}</p>
-          <button type="button" class="btn btn-light">Login</button>
+          <p>{{ errCode }}</p>
+          <p>{{ msg }}</p>
+          <button type="button" class="btn btn-light" @click="login">
+            Login
+          </button>
         </div>
       </div>
     </div>
@@ -43,18 +46,34 @@ export default {
         this.loginData.username.length < 5 &&
         this.loginData.username.length > 0
       ) {
-        return "Username phải lớn hơn 5";
+        return this.reject();
       }
       if (
         this.loginData.password.length < 5 &&
         this.loginData.password.length > 0
       ) {
-        return "Password phải lớn hơn 5";
+        return this.reject();
+      } else if (
+        this.loginData.username.length > 5 &&
+        this.loginData.password.length > 5
+      ) {
+        return this.validate();
       }
-      else if (this.loginData.username.length > 5 && this.loginData.password.length > 5) {
-          return this.validate();
+      return "";
+    },
+    errCode: function () {
+      if (
+        this.loginData.username.length > 0 ||
+        this.loginData.password.length > 0
+      ) {
+        if (this.err == false) {
+          return "Tên đăng nhập hoặc mật khẩu phải lớn hơn 5";
+        } else if (this.err == true) {
+          return "";
+        }
       }
-      return ""
+      return "";
+      // return this.err
     },
   },
   data() {
@@ -63,6 +82,7 @@ export default {
         username: "",
         password: "",
       },
+      msg: "",
       err: false,
     };
   },
@@ -70,24 +90,25 @@ export default {
     validate() {
       this.err = true;
     },
-    login() {
-      if (this.formData.password != this.passwordConfirm) {
-        this.err = "Repeated password is incorrect";
-      } else {
-        axios
-          .post("http://localhost:8000/login", this.login, {
-            headers: {
-              "Content-type": "application/json",
-            },
-          })
-          .then((res) => {
-            if (res.status == 200) {
-              // chuyen huong sang trang login
-              this.err = res.data;
-            } else {
-              this.err = res.data;
-            }
-          });
+    reject() {
+      this.msg = ""
+      this.err = false;
+    },
+    async login() {
+      if (this.err == true) {
+        let users = await axios.post(
+          "http://localhost:8080/login",
+          this.loginData
+        );
+        if (users.data.split("\n")[3] == "Username not created yet!") {
+          console.log(users.data.split("\n")[3]);
+          this.msg = "Username not created yet!";
+        } else if (users.data.split("\n")[3] == "Wrong Password!") {
+          this.msg = "Wrong Password!";
+        } else {
+          localStorage.setItem("token", users.data.split("\n")[3]);
+          this.$router.push('/');
+        }
       }
     },
   },

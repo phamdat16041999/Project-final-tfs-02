@@ -19,11 +19,11 @@
         </div>
         <div class="col-12">
           <div class="row">
-            <div class="col-xl-4 col-12" v-for="data, index in topHotel" :key="index">
+            <div class="col-xl-4 col-12" v-for="data, index in topHotel.topHotel" :key="index">
               <div class="article-container">
-                <div class="article-img-holder" v-bind:style="{backgroundImage: `${data.image} !important`}"></div>
+                <div class="article-img-holder" :style="{ backgroundImage: 'url(' + data.image + ')' }"></div>
               </div>
-              <p>{{data.name}}</p>
+              <p>Name: {{data.name}}</p>
               <p></p>
               <p>Price: 8$</p>
               <p>Rate: {{data.rate}}</p>
@@ -62,7 +62,6 @@ export default {
 .article-img-holder {
   width: 100%;
   height: 100%;
-  /* background: url(https://awik.io/demo/background-image-zoom/traffic2.jpg); */
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;

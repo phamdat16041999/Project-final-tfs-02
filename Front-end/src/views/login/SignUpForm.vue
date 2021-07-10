@@ -107,7 +107,7 @@ export default {
         this.err = "Repeated password is incorrect"
       }else{
       axios
-        .post("http://localhost:8000/account", this.formData, {
+        .post("http://localhost:8080/account", this.formData, {
           headers: {
             "Content-type": "application/json",
           },
