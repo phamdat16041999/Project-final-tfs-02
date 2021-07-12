@@ -20,10 +20,10 @@
         <div class="col-12">
           <div class="row">
             <div class="col-xl-4 col-12" v-for="data, index in topHotel.topHotel" :key="index">
-              <div class="article-container">
+              <div class="article-container" @click="product(data.id)">
                 <div class="article-img-holder" :style="{ backgroundImage: 'url(' + data.image + ')' }"></div>
               </div>
-              <p>Name: {{data.name}}</p>
+              <p>Name: {{data.id}}</p>
               <p></p>
               <p>Price: 8$</p>
               <p>Rate: {{data.rate}}</p>
@@ -41,6 +41,11 @@ export default {
   computed: mapState(["topHotel"]),
   created() {
     this.$store.dispatch("setTopHotel");
+  },
+ methods: {
+    product(ID){
+       this.$router.push('/product?id='+ID);
+    }
   },
 };
 </script>
