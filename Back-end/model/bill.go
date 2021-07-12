@@ -26,8 +26,6 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value("user_id")
 	// string --> fill struct
 	// tk := make(jwt.MapClaims)
-<<<<<<< HEAD
-=======
 
 	// a, _ := json.Marshal(token)
 	// var b DataToken
@@ -36,7 +34,6 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 	// 	fmt.Print(err)
 	// }
 	fmt.Fprint(w, token)
->>>>>>> 27b04179e06ccea5443898f03f4ed1b4c6deba72
 
 	// a, _ := json.Marshal(token)
 	// var b DataToken
