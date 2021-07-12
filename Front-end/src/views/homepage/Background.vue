@@ -42,27 +42,8 @@
   </div>
 </template>
 <script>
-import axios from 'axios';
 export default {
-  el: '#app-4',
-  data() {
-    return {
-      posts: [
-        {}
-      ],
-      errors: []
-    }
-  },
-  created(){
-    axios.get(`http://localhost:8000/homepage`)
-    .then(response => {
-      this.posts = response.data
-    })
-    .catch(e => {
-      this.errors.push(e)
-      console.log(this.errors);
-    })
-  }
+
 };
 </script>
 <style scoped>

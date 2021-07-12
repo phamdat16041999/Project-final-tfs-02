@@ -26,9 +26,16 @@ type Hotel struct {
 	Bill        []Bill       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 }
 
-type ratehotel struct {
-	HotelId uint
-	Rate    int
+type TopHotel struct {
+	ID          int    `json:"id"`
+	Name        string `gorm:"type:varchar(100);" json:"name" `
+	Address     string `gorm:"type:varchar(100);" json:"address" `
+	Description string `gorm:"type:varchar(100);" json:"description" `
+	Image       string `gorm:"type:varchar(100);" json:"image" `
+	Longitude   string `gorm:"type:varchar(100);" json:"longitude" `
+	Latitude    string `gorm:"type:varchar(100);" json:"latitude" `
+	UserID      uint   `json:"userID"`
+	Rate        int    `json:"rate"`
 }
 
 // type Results struct {
@@ -53,27 +60,40 @@ func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(b))
 }
 
-func TopHotel(w http.ResponseWriter, r *http.Request) {
+func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	var rates []Rate
 	db.Limit(2).Select("hotel_id", "rate").Order("rate desc").Find(&rates)
 	w.Header().Set("Content-Type", "application/json")
-	// var rate1 []ratehotel
-	// for i := 0; i < len(rates); i++ {
-	// 	rate1 = append(rate1, ratehotel{HotelId: rates[i].HotelID,
-	// 		Rate: rates[i].Rate})
-	// }
-	// for i := 0; i < len(rate1); i++ {
-	// 	var hotels []Hotel
-	// 	db.Where("id = ?", rate1[i].HotelId).Find(&hotels)
-	// 	b, _ := json.Marshal(hotels)
-	// 	fmt.Fprintln(w, string(b))
+	var topHotel []TopHotel
+	var hotel Hotel
+	for i := 0; i < len(rates); i++ {
+		// b, _ := json.Marshal(rates[i].HotelID)
+		// ID, _ := strconv.Atoi(string(b))
+		// fmt.Fprintln(w, ID)
+		db.First(&hotel, rates[i].HotelID)
+		// b2, _ := json.Marshal(hotel)
+		// fmt.Fprintln(w, hotel)
+		v := TopHotel{
+			ID:          int(hotel.ID),
+			Name:        hotel.Name,
+			Address:     hotel.Address,
+			Description: hotel.Description,
+			Image:       hotel.Image,
+			Longitude:   hotel.Longitude,
+			Latitude:    hotel.Latitude,
+			Rate:        rates[i].Rate,
+		}
+		topHotel = append(topHotel, v)
+		// topHotel = append(topHotel, hotel)
 
-	// }
+	}
+	b2, _ := json.Marshal(topHotel)
+	fmt.Fprintln(w, string(b2))
 
-	b1, _ := json.Marshal(rates)
+	// b1, _ := json.Marshal(rates)
 	// fmt.Fprintln(w, rate1[0].HotelId)
-	fmt.Fprintln(w, string(b1))
+	// fmt.Fprintln(w, string(b1))
 }
 
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
