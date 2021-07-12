@@ -75,6 +75,7 @@ export default {
     },
     totalPrice(){
       let time = this.msToTime
+      console.log(this.msToTime)
       time = time.split(" ")
       if(time[1] == "Sec"){
         return "Sorry we are unable to serve with the above time. Please book more than 2 hours"

@@ -19,6 +19,9 @@ func Run() {
 	post.Path("/changepassword").HandlerFunc(model.ChangePassword)
 	post.Path("/active").HandlerFunc(model.ActiveAccount)
 	post.Path("/createbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Createbill))
+	post.Path("/rating").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Rating))
+	post.Path("/checkroomstatus").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Checkroomstatus))
+	// post.Path("/payment").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Payment))
 
 	//get method
 	get := r.Methods(http.MethodGet).Subrouter()
@@ -31,7 +34,6 @@ func Run() {
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
 	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
 	http.Handle("/", r)
-
 	//methoddelete
 	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
 
