@@ -21,6 +21,8 @@ type Hotel struct {
 	Longitude   string       `gorm:"type:varchar(100);" json:"longitude" `
 	Latitude    string       `gorm:"type:varchar(100);" json:"latitude" `
 	UserID      uint         `json:"userID"`
+	AverageRate float64      `gorm:"default:0.0;" json:"averagerate"`
+	NumberRate  float64      `gorm:"default:0;" json:"numberrate"`
 	ImageHotel  []ImageHotel `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 	Room        []Room       `gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 	Rate        []Rate       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
@@ -28,7 +30,7 @@ type Hotel struct {
 }
 
 type TopHotel struct {
-	ID          int    `json:"id"`
+	ID          uint64 `json:"id"`
 	Name        string `gorm:"type:varchar(100);" json:"name" `
 	Address     string `gorm:"type:varchar(100);" json:"address" `
 	Description string `gorm:"type:varchar(100);" json:"description" `
@@ -80,30 +82,12 @@ func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetTopHotel(w http.ResponseWriter, r *http.Request) {
-	db := connect.Connect()
-	var rates []Rate
-	db.Limit(2).Select("hotel_id", "rate").Order("rate desc").Find(&rates)
 	w.Header().Set("Content-Type", "application/json")
-	var topHotel []TopHotel
-	var hotel Hotel
-	for i := 0; i < len(rates); i++ {
-		b, _ := json.Marshal(rates[i].HotelID)
-		ID, _ := strconv.Atoi(string(b))
-		db.Where("id = ? ", ID).Find(&hotel)
-		v := TopHotel{
-			ID:          int(ID),
-			Name:        hotel.Name,
-			Address:     hotel.Address,
-			Description: hotel.Description,
-			Image:       hotel.Image,
-			Longitude:   hotel.Longitude,
-			Latitude:    hotel.Latitude,
-			Rate:        rates[i].Rate,
-		}
-		topHotel = append(topHotel, v)
-	}
-	b2, _ := json.Marshal(topHotel)
-	fmt.Fprintln(w, string(b2))
+	db := connect.Connect()
+	var hotel []Hotel
+	db.Limit(2).Order("average_rate desc").Find(&hotel)
+	b, _ := json.Marshal(hotel)
+	fmt.Fprintln(w, string(b))
 }
 
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
@@ -174,6 +158,7 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var hotelrate HotelRate
 	var rate Rate
+	var hotel Hotel
 	err := json.NewDecoder(r.Body).Decode(&hotelrate)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -181,6 +166,8 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 	}
 	db := connect.Connect()
 	db.Where("user_id = ? AND hotel_id = ?", hotelrate.UserID, hotelrate.HotelID).Find(&rate)
+	b1, _ := json.Marshal(&rate.HotelID)
+	ID, _ := strconv.ParseUint(string(b1), 10, 32)
 	b, _ := json.Marshal(&rate.Rate)
 	var Rate = Rate{
 		UserID:  hotelrate.UserID,
@@ -198,6 +185,15 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		result := db.Model(&rate).Where("user_id = ? AND hotel_id = ?", hotelrate.UserID, hotelrate.HotelID).Update("rate", hotelrate.Rate)
+		db.Where("id = ?", ID).Find(&hotel)
+		b, _ := json.Marshal(&hotel.NumberRate)
+		NumberRate, _ := strconv.ParseFloat(string(b), 64)
+		b1, _ := json.Marshal(&hotel.AverageRate)
+		b3, _ := json.Marshal(&rate.Rate)
+		Rate, _ := strconv.ParseUint(string(b3), 10, 64)
+		AverageRate, _ := strconv.ParseFloat(string(b1), 64)
+		AverageRate = (AverageRate*NumberRate + float64(Rate)) / (NumberRate + 1)
+		db.Model(Hotel{}).Where("id = ?", hotelrate.HotelID).Updates(Hotel{NumberRate: NumberRate + 1.0, AverageRate: AverageRate})
 		if result.Error != nil {
 			fmt.Fprintln(w, "Update rating error: ", result.Error)
 			return

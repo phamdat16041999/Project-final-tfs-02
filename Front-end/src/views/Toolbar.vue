@@ -98,7 +98,7 @@ export default {
   },
   data() {
     return {
-      user: false,
+      user: null,
     };
   },
 };
