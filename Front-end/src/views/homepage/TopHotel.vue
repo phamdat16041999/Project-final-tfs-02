@@ -44,11 +44,8 @@ export default {
   },
  methods: {
     product(ID){
-<<<<<<< HEAD
        this.$router.push('/product?id='+ID);
-=======
        this.$router.push('/hotel?id='+ID);
->>>>>>> 27b04179e06ccea5443898f03f4ed1b4c6deba72
     }
   },
 };

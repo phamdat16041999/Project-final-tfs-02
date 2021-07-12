@@ -40,7 +40,7 @@ func Run() {
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},
 	}).Handler(r)
-	http.ListenAndServe(":8000", handler)
+	http.ListenAndServe(":8080", handler)
 }
 func Test(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "test")
