@@ -31,18 +31,13 @@ func Run() {
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
 	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
 	http.Handle("/", r)
-<<<<<<< HEAD
-	//aaa
-=======
-
 	//methoddelete
 	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
 
->>>>>>> 22925bf7fe798609cce31c2b9ae0deebf674a766
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},
 	}).Handler(r)
-	http.ListenAndServe(":8080", handler)
+	http.ListenAndServe(":8000", handler)
 }
 func Test(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "test")
