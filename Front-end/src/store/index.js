@@ -1,36 +1,23 @@
 import { createStore } from 'vuex'
-import { createApp } from 'vue'
-import App from '../App.vue'
-import Vuex from "vuex";
-import axios from "axios";
-import VueAxios from "vue-axios";
+// import { createApp } from 'vue'
+// import App from '../App.vue'
+// import Vuex from "vuex";
+// import axios from "axios";
+// import VueAxios from "vue-axios";
 
-const Vue = createApp(App)
-Vue.use(Vuex);
-Vue.use(VueAxios, axios);
+// const Vue = createApp(App)
+// Vue.use(Vuex);
+// Vue.use(VueAxios, axios);
+
+
+import topHotel from "./topHotel"
+import login from "./login"
 
 export default createStore({
-  state: {
-    topHotel: []
-  },
-  actions: {
-    setTopHotel({ commit }) {
-      Vue.axios
-        .get("http://localhost:8080/tophotel")
-        .then((result) => {
-          console.log(result.data);
-          commit("saveTopHotel", result.data);
-        })
-        .catch((error) => {
-          throw new Error(`API ${error}`);
-        });
-    }
-  },
-  mutations: {
-    saveTopHotel(state, topHotel) {
-      state.topHotel = topHotel;
-    }
-  },
+  strict: true,
   modules: {
+    topHotel,
+    login,
   }
 })
+

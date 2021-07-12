@@ -19,14 +19,14 @@
         </div>
         <div class="col-12">
           <div class="row">
-            <div class="col-xl-4 col-12" v-for="data, index in topHotel" :key="index">
-              <p>{{index}}</p>
-              <div class="article-container">
-                <div class="article-img-holder" v-bind:style="{ backgroundImage: 'url(' + data.Image + ')' }">></div>
+            <div class="col-xl-4 col-12" v-for="data, index in topHotel.topHotel" :key="index">
+              <div class="article-container" @click="product(data.id)">
+                <div class="article-img-holder" :style="{ backgroundImage: 'url(' + data.image + ')' }"></div>
               </div>
-              <p>{{data.name}}</p>
+              <p>Name: {{data.id}}</p>
               <p></p>
               <p>Price: 8$</p>
+              <p>Rate: {{data.rate}}</p>
             </div>
           </div>
         </div>
@@ -41,6 +41,11 @@ export default {
   computed: mapState(["topHotel"]),
   created() {
     this.$store.dispatch("setTopHotel");
+  },
+ methods: {
+    product(ID){
+       this.$router.push('/product?id='+ID);
+    }
   },
 };
 </script>
@@ -62,7 +67,6 @@ export default {
 .article-img-holder {
   width: 100%;
   height: 100%;
-  /* background: url(https://awik.io/demo/background-image-zoom/traffic2.jpg); */
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
