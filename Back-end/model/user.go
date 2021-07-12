@@ -57,7 +57,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	hash, _ := HashPassword(user.Password)
 	// Create password
 	randomCode := codeAuthentication()
-	// errmail := gmail.SendEmail(user.Email, randomCode)
+	errmail := gmail.SendEmail(user.Email, randomCode)
 	var User = User{
 		FirstName:          user.FirstName,
 		LastName:           user.LastName,
@@ -70,17 +70,28 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		Password:           hash,
 		Active:             user.Active,
 	}
-	// if errmail != "" {
-	// 	fmt.Fprintln(w, "Email is incorrect !")
-	// 	return
-	// } else {
-	result := db.Create(&User)
-	if result.Error != nil {
-		fmt.Fprintln(w, "Account already in use, please change username and email !")
+	if errmail != "" {
+		fmt.Fprintln(w, "Email is incorrect !")
 		return
 	} else {
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "Create successfull")
+		result := db.Create(&User)
+		if result.Error != nil {
+			fmt.Fprintln(w, "Account already in use, please change username and email !")
+			return
+		} else {
+			var newUser = User
+			type Response struct {
+				ID        int
+				Messenger string
+			}
+			db.Last(&newUser)
+			var response Response
+			response.ID = int(newUser.ID)
+			response.Messenger = "Create successfull"
+			w.WriteHeader(http.StatusOK)
+			b, _ := json.Marshal(response)
+			fmt.Fprint(w, string(b))
+		}
 	}
 }
 

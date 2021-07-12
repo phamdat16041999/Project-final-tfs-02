@@ -13,9 +13,14 @@ const routes = [
     component: () => import("../views/login/Login.vue"),
   },
   {
-    path: "/product",
-    name: "Product",
+    path: "/hotel",
+    name: "hotel",
     component: () => import("../views/product/ProductInformation.vue"),
+  },
+  {
+    path: "/active",
+    name: "active",
+    component: () => import("../views/activeAccount/active.vue"),
   },
 ];
 
