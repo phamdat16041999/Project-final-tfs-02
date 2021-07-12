@@ -68,14 +68,11 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	var topHotel []TopHotel
 	var hotel Hotel
 	for i := 0; i < len(rates); i++ {
-		// b, _ := json.Marshal(rates[i].HotelID)
-		// ID, _ := strconv.Atoi(string(b))
-		// fmt.Fprintln(w, ID)
-		db.First(&hotel, rates[i].HotelID)
-		// b2, _ := json.Marshal(hotel)
-		// fmt.Fprintln(w, hotel)
+		b, _ := json.Marshal(rates[i].HotelID)
+		ID, _ := strconv.Atoi(string(b))
+		db.Where("id = ? ", ID).Find(&hotel)
 		v := TopHotel{
-			ID:          int(hotel.ID),
+			ID:          int(ID),
 			Name:        hotel.Name,
 			Address:     hotel.Address,
 			Description: hotel.Description,
@@ -85,15 +82,9 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 			Rate:        rates[i].Rate,
 		}
 		topHotel = append(topHotel, v)
-		// topHotel = append(topHotel, hotel)
-
 	}
 	b2, _ := json.Marshal(topHotel)
 	fmt.Fprintln(w, string(b2))
-
-	// b1, _ := json.Marshal(rates)
-	// fmt.Fprintln(w, rate1[0].HotelId)
-	// fmt.Fprintln(w, string(b1))
 }
 
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {

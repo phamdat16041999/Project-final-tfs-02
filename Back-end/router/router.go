@@ -34,10 +34,7 @@ func Run() {
 
 	//methoddelete
 	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
-<<<<<<< HEAD
-=======
 
->>>>>>> 0303251b19fa1336f80121750ee83b1a7e66568b
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},
 	}).Handler(r)
