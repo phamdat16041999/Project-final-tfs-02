@@ -1,68 +1,37 @@
 <template>
   <div class="slider">
     <div class="slides">
-      <div id="slide-1">
-        <img
-          src="https://pix10.agoda.net/hotelImages/284282/-1/40b2be4f06e5e22dbe0d83c9de6affae.jpg?s=1024x768"
-          alt=""
-        />
-      </div>
-      <div id="slide-2">
-        <img
-          src="https://pearlriverhotel.vn/wp-content/uploads/2019/07/pearl-river-hotel-home1.jpg"
-          alt=""
-        />
-      </div>
-      <div id="slide-3">
-        <img
-          src="https://pix10.agoda.net/hotelImages/284282/-1/40b2be4f06e5e22dbe0d83c9de6affae.jpg?s=1024x768"
-          alt=""
-        />
-      </div>
-      <div id="slide-4">
-        <img
-          src="https://pearlriverhotel.vn/wp-content/uploads/2019/07/pearl-river-hotel-home1.jpg"
-          alt=""
-        />
-      </div>
-      <div id="slide-5">
-        <img
-          src="https://pix10.agoda.net/hotelImages/284282/-1/40b2be4f06e5e22dbe0d83c9de6affae.jpg?s=1024x768"
-          alt=""
-        />
+      <div v-bind:id="'slide-' + data.ID" v-for="(data, index) in image" :key="index" class="showSlide">
+          <img v-bind:src="data.image" alt="" />
       </div>
     </div>
-
-    <a href="#slide-1"
-      ><img
-        src="https://pix10.agoda.net/hotelImages/284282/-1/40b2be4f06e5e22dbe0d83c9de6affae.jpg?s=1024x768"
-        alt=""
-    /></a>
-    <a href="#slide-2"
-      ><img
-        src="https://pearlriverhotel.vn/wp-content/uploads/2019/07/pearl-river-hotel-home1.jpg"
-        alt=""
-    /></a>
-    <a href="#slide-3"
-      ><img
-        src="https://pix10.agoda.net/hotelImages/284282/-1/40b2be4f06e5e22dbe0d83c9de6affae.jpg?s=1024x768"
-        alt=""
-    /></a>
-    <a href="#slide-4"
-      ><img
-        src="https://pearlriverhotel.vn/wp-content/uploads/2019/07/pearl-river-hotel-home1.jpg"
-        alt=""
-    /></a>
-    <a href="#slide-5"
-      ><img
-        src="https://pix10.agoda.net/hotelImages/284282/-1/40b2be4f06e5e22dbe0d83c9de6affae.jpg?s=1024x768"
-        alt=""
-    /></a>
+    <a v-bind:href="'#slide-' + data.ID" v-for="(data, index) in image" :key="index"  class="carosel">
+      <img v-bind:src="data.image" alt="" />
+    </a>
   </div>
 </template>
 <script>
 export default {
+  created() {
+    let room = this.hotel.room
+    for(var i = 0; i < room.length; i++){
+      var image = this.hotel.room[i].Img
+      for(var j = 0; j < image.length; j++){
+        this.image.push(image[j])
+      }
+  
+    }
+  },
+  props: {
+    hotel: Object,
+  },
+  data() {
+    return {
+      image: [
 
+      ],
+    };
+  },
 };
 </script>
 <style scoped>
@@ -87,7 +56,7 @@ export default {
 .slides::-webkit-scrollbar-track {
   background: transparent;
 }
-.slides > div {
+.showSlide{
   scroll-snap-align: start;
   flex-shrink: 0;
   width: 100%;
@@ -106,20 +75,7 @@ export default {
   font-size: 100px;
 }
 
-.author-info {
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
-  padding: 0.75rem;
-  text-align: center;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  margin: 0;
-}
-.author-info a {
-  color: white;
-}
+
 img {
   object-fit: cover;
   position: absolute;
@@ -129,7 +85,7 @@ img {
   height: 100%;
 }
 
-.slider > a {
+.carosel {
   display: flex;
   width: 5.5rem;
   height: 5.5rem;
@@ -140,5 +96,4 @@ img {
   position: relative;
   float: left;
 }
-
 </style>

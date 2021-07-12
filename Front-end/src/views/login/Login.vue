@@ -70,7 +70,7 @@ import signUpForm from "./SignUpForm.vue";
 export default {
   components:{
     loginForm,
-    signUpForm
+    signUpForm,
   },
   data() {
     return {
@@ -124,7 +124,7 @@ export default {
 #formInput {
   height: 600px;
   background-color:floralwhite;
-  margin-top: 120px;
+  margin-top: 176px;
   border-radius: 15px;
   position: absolute;
   top: 0;
