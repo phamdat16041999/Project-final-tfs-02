@@ -6,6 +6,7 @@ import (
 	"hotel/connect"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -224,36 +225,94 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 func inTimeSpan(start, end, check time.Time) bool {
 	return check.After(start) && check.Before(end)
 }
+func ConvertsTime(time string) []int {
+	a := strings.Split(time, "T")
+	x := strings.Split(a[1], ":")
+	var s []int
+	for i := 0; i < len(x); i++ {
+		x, _ := strconv.Atoi(x[i])
+		s = append(s, x)
+	}
+	return s
+}
+func ConvertsDate(time string) []int {
+	a := strings.Split(time, "T")
+	x := strings.Split(a[0], "-")
+	var s []int
+	for i := 0; i < len(x); i++ {
+		x, _ := strconv.Atoi(x[i])
+		s = append(s, x)
+	}
+	return s
+}
 func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var times Times
-	err := json.NewDecoder(r.Body).Decode(&times)
+	var checkTime Times
+	err := json.NewDecoder(r.Body).Decode(&checkTime)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// b3, _ := json.Marshal(times)
+	// b3, _ := json.Marshal(a)
 	// fmt.Fprintln(w, string(b3))
 	db := connect.Connect()
-	var check Times
-	result := db.Where("room_id = ?", times.RoomID).Find(&check)
+	var times []Times
+	result := db.Where("room_id = ?", checkTime.RoomID).Find(&times)
 	if result.Error != nil {
 		fmt.Fprintln(w, "Can not find room: ", result.Error)
 		return
 	}
-	b, _ := json.Marshal(&times.Date)
-	in, _ := time.Parse(time.RFC822, string(b))
-	b1, _ := json.Marshal(&check.StartTime)
-	start, _ := time.Parse(time.RFC822, string(b1))
-	b2, _ := json.Marshal(&check.EndTime)
-	end, _ := time.Parse(time.RFC822, string(b2))
-	if inTimeSpan(start, end, in) {
-		fmt.Fprintln(w, in, "is between", start, "and", end, ".")
-	} else {
-		fmt.Fprintln(w, in, "is not between", start, "and", end, ".")
+	available := 1
+	for i := 0; i < len(times); i++ {
+		b, _ := json.Marshal(&checkTime.StartTime)
+		checkStartTime := ConvertsTime(string(b))
+		checkStartDate := ConvertsDate(string(b))
+		b3, _ := json.Marshal(&checkTime.EndTime)
+		checkEndTime := ConvertsTime(string(b3))
+		checkEndDate := ConvertsDate(string(b3))
+		b1, _ := json.Marshal(&times[i].StartTime)
+		start := ConvertsTime(string(b1))
+		startDate := ConvertsDate(string(b1))
+		b2, _ := json.Marshal(&times[i].EndTime)
+		end := ConvertsTime(string(b2))
+		endDate := ConvertsDate(string(b2))
+		fmt.Fprintln(w, "check start: ", checkStartTime[0], checkStartDate[2], "check end: ", checkEndTime[0], checkEndDate[1], "start: ", start[0], startDate[1], "end: ", end[0], endDate[2])
+		if checkStartDate[1] == startDate[1] {
+			if checkStartDate[2] == endDate[2] {
+				if checkStartTime[0] > start[0] && checkStartTime[0] < end[0] || checkEndTime[0] > start[0] && checkEndTime[0] < end[0] {
+					available--
+					break
+				} else if checkStartTime[0] == start[0] && checkEndTime[0] == end[0] {
+					if checkStartTime[1] > start[1] || checkEndTime[1] < end[1] {
+						available--
+						break
+					}
+				} else if checkStartTime[0] == start[0] || checkEndTime[0] == end[0] {
+					if checkStartTime[0] == start[0] {
+						if checkStartTime[1] >= start[1] {
+							available--
+							break
+						}
+					} else if checkEndTime[0] == end[0] {
+						if checkEndTime[1] <= end[1] {
+							available--
+							break
+						}
+					}
+				} else if checkStartDate[2] > startDate[2] && checkStartDate[2] < endDate[2] || checkEndDate[2] > startDate[2] && checkEndDate[2] < endDate[2] {
+					available--
+					break
+				}
+			} else if checkStartDate[1] > startDate[1] && checkStartDate[1] < endDate[1] || checkEndDate[1] > startDate[1] && checkEndDate[1] < endDate[1] {
+				available--
+				break
+			}
+		}
 	}
-	//db.Where("date = ? AND start_time = ? AND end_time = ?", time.Date, time.StartTime, time.EndTime).Find(&check)
-	// if times.Date == check.Date && times.StartTime == check.StartTime && times.EndTime == check.EndTime {
-
-	// }
+	fmt.Fprintln(w, available)
+	if available != 1 {
+		fmt.Fprintln(w, "Room has been booked")
+	} else {
+		fmt.Fprintln(w, "Room avaliable")
+	}
 }
