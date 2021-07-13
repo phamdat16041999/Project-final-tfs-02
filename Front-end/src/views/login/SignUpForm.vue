@@ -115,7 +115,8 @@ export default {
         .then((res) => {
           if (res.status == 200){
             // chuyen huong sang trang login
-             this.err = res.data
+             this.err = res.data.Messenger
+             this.$router.push("/active?id="+res.data.ID);
           }else{
             this.err = res.data
           }

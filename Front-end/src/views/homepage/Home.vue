@@ -1,6 +1,5 @@
 <template>
   <div class="parent">
-    <toolbar />
     <background/>
     <description/>
     <topHotel/>
@@ -8,14 +7,12 @@
 </template>
 
 <script>
-import toolbar from "../Toolbar.vue";
 import background from "./Background.vue";
 import description from "./Description.vue";
 import topHotel from "./TopHotel.vue";
 export default {
   name: "Home",
   components: {
-    toolbar,
     background,
     description,
     topHotel

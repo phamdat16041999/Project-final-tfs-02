@@ -71,7 +71,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		Active:             user.Active,
 	}
 	// if errmail != "" {
-	// 	fmt.Fprintln(w, "Email is incorrect !")
+	// 	fmt.Fprintln(w, "Email is incorrect!")
 	// 	return
 	// } else {
 	result := db.Create(&User)
@@ -79,10 +79,20 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Account already in use, please change username and email !")
 		return
 	} else {
+		var newUser = User
+		type Response struct {
+			ID        int
+			Messenger string
+		}
+		db.Last(&newUser)
+		var response Response
+		response.ID = int(newUser.ID)
+		response.Messenger = "Create successfull"
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "Create successfull")
 	}
 }
+
+// }
 
 // }
 func UpdateAccount(w http.ResponseWriter, r *http.Request) {
@@ -204,17 +214,17 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	db.Where("id = ?", queryAuth.RoleID).Find(&queryRole)
 
 	b, _ := json.Marshal(query.UserName)
-	b1, _ := json.Marshal(query.ID)
-	b2, _ := json.Marshal(queryAuth.RoleID)
-	b3, _ := json.Marshal(queryRole.Name)
+	// b1, _ := json.Marshal(query.ID)
+	// b2, _ := json.Marshal(queryAuth.RoleID)
+	// b3, _ := json.Marshal(queryRole.Name)
 	userName := string(b)
-	userId := string(b1)
-	roleId := string(b2)
-	roleName := string(b3)
+	// userId := string(b1)
+	// roleId := string(b2)
+	// roleName := string(b3)
 
-	fmt.Fprintln(w, userId)
-	fmt.Fprintln(w, roleId)
-	fmt.Fprintln(w, roleName)
+	// fmt.Fprintln(w, userId)
+	// fmt.Fprintln(w, roleId)
+	// fmt.Fprintln(w, roleName)
 
 	if len(userName) == 2 {
 		fmt.Fprint(w, "Username not created yet!")

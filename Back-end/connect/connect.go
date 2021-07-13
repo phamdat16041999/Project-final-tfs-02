@@ -6,7 +6,7 @@ import (
 )
 
 func Connect() *gorm.DB {
-	dsn := "root:@tcp(127.0.0.1:3306)/bookingHotel?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:@tcp(127.0.0.1:3306)/bookinghotel?charset=utf8mb4&parseTime=True&loc=Local"
 	db, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	return db
 }

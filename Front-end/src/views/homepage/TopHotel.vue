@@ -45,6 +45,7 @@ export default {
  methods: {
     product(ID){
        this.$router.push('/product?id='+ID);
+       this.$router.push('/hotel?id='+ID);
     }
   },
 };

@@ -15,7 +15,7 @@
           />
         </div>
         <div class="col-12">
-          <label>Passwod</label>
+          <label>Password</label>
           <input
             type="password"
             class="form-control"
@@ -90,7 +90,7 @@ export default {
     validate() {
       this.err = true;
     },
-    reject() {
+    reject() {  
       this.msg = ""
       this.err = false;
     },
