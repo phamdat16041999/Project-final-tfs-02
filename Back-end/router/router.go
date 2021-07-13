@@ -24,9 +24,17 @@ func Run() {
 	//get method
 	get := r.Methods(http.MethodGet).Subrouter()
 	get.Path("/homepage").HandlerFunc(model.DataHomePage)
+<<<<<<< HEAD
 	get.Path("/homepage/hotel/{address}/{rate}").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.SeachHotelAddress))
+=======
+<<<<<<< HEAD
+	get.Path("/hotel/{address}").HandlerFunc(model.GetHotelAddress)
+=======
+	get.Path("/homepage/hotel/{address}/{rate}").HandlerFunc(model.GetHotelAddress)
+>>>>>>> d6d66811dd3574ee337fb74d350d3d08f074d059
+>>>>>>> 3e4c06e05434601c86adf5873677832840af027e
 	get.Path("/tophotel").HandlerFunc(model.GetTopHotel)
-	get.Path("/homepage/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
+	get.Path("/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
 
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
