@@ -52,6 +52,7 @@ type RoomInformation struct {
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
 	Img        []ImageRoom
+	Time       []Times
 	PriceHrs   int `json:"priceHrs"`
 	PriceDay   int `json:"priceDay"`
 	ExtraPrice int `json:"extraPrice"`
@@ -128,9 +129,8 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	// 	}
 	// }
 	hotelInformation := HotelInformation{
-		ID:   int(hotel.ID),
-		Name: hotel.Name,
-		// room       : []RoomInformation
+		ID:          int(hotel.ID),
+		Name:        hotel.Name,
 		Longitude:   hotel.Latitude,
 		Latitude:    hotel.Longitude,
 		Description: hotel.Description,
@@ -143,6 +143,7 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 		var priceHrs Price
 		var priceDay Price
 		var extraPrice Price
+		var time []Times
 		db.Where("room_id = ?", rooms[i].ID).Find(&imageRoom)
 		db.Where("name = ?", "PriceHours").Find(&option1)
 		db.Where("room_id = ? AND option_id = ?", rooms[i].ID, option1.ID).Find(&priceHrs)
@@ -150,6 +151,7 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 		db.Where("room_id = ? AND option_id = ?", rooms[i].ID, option2.ID).Find(&priceDay)
 		db.Where("name = ?", "ExtraPrice").Find(&option3)
 		db.Where("room_id = ? AND option_id = ?", rooms[i].ID, option3.ID).Find(&extraPrice)
+		db.Debug().Where("room_id = ? AND active = ?", rooms[i].ID, true).Find(&time)
 
 		roomInformation := RoomInformation{
 			ID:         int(rooms[i].ID),
@@ -158,6 +160,7 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 			PriceHrs:   priceHrs.Price,
 			PriceDay:   priceDay.Price,
 			ExtraPrice: extraPrice.Price,
+			Time:       time,
 		}
 		hotelInformation.Room = append(hotelInformation.Room, roomInformation)
 	}
