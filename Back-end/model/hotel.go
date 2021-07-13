@@ -75,7 +75,6 @@ func SeachHotelAddress(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
 	vars := mux.Vars(r)
-<<<<<<< HEAD
 	rate, _ := strconv.ParseFloat(vars["rate"], 64)
 	var hotels []Hotel
 	var resulthotels []Hotel
@@ -86,25 +85,7 @@ func SeachHotelAddress(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	b, _ := json.Marshal(resulthotels)
-=======
-	var hotels []Hotel
-<<<<<<< HEAD
-	address := "%" + string(vars["address"]) + "%"
-	result := db.Where("address LIKE ?", address).Find(&hotels)
-	if result.Error != nil {
-		fmt.Fprintln(w, "Error: ", result.Error)
-		return
-	} else {
-		w.WriteHeader(http.StatusOK)
-		b, _ := json.Marshal(hotels)
-		fmt.Fprintln(w, string(b))
-	}
-=======
-	db.Debug().Joins("JOIN rates on rates.hotel_id = hotels.id AND rates.rate = ?", vars["rate"]).Where("address LIKE ?", vars["address"]).Find(&hotels)
-	b, _ := json.Marshal(hotels)
->>>>>>> 3e4c06e05434601c86adf5873677832840af027e
 	fmt.Fprintln(w, string(b))
->>>>>>> d6d66811dd3574ee337fb74d350d3d08f074d059
 }
 
 func GetTopHotel(w http.ResponseWriter, r *http.Request) {
