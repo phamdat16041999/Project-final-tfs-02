@@ -74,11 +74,17 @@ func DataHomePage(w http.ResponseWriter, r *http.Request) {
 func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	vars := mux.Vars(r)
-	// vars["address"]
 	var hotels []Hotel
-	db.Where("address LIKE ?", vars["address"]).Find(&hotels)
-	b, _ := json.Marshal(hotels)
-	fmt.Fprintln(w, string(b))
+	address := "%" + string(vars["address"]) + "%"
+	result := db.Where("address LIKE ?", address).Find(&hotels)
+	if result.Error != nil {
+		fmt.Fprintln(w, "Error: ", result.Error)
+		return
+	} else {
+		w.WriteHeader(http.StatusOK)
+		b, _ := json.Marshal(hotels)
+		fmt.Fprintln(w, string(b))
+	}
 }
 
 func GetTopHotel(w http.ResponseWriter, r *http.Request) {

@@ -93,7 +93,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 // }
-
 // }
 func UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	var user User
