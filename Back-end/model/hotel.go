@@ -182,17 +182,15 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 	}
 	if string(b) == "0" {
 		result := db.Create(&Rate)
-
 		if result.Error != nil {
 			fmt.Fprintln(w, "Rating error: ", result.Error)
 			return
 		} else {
 			db.Where("id = ?", hotelrate.HotelID).Find(&hotel)
-			fmt.Fprintln(w, hotelrate.HotelID)
 			b, _ := json.Marshal(&hotel.NumberRate)
 			NumberRate, _ := strconv.ParseFloat(string(b), 64)
 			b1, _ := json.Marshal(&hotel.AverageRate)
-			b3, _ := json.Marshal(&rate.Rate)
+			b3, _ := json.Marshal(&hotelrate.Rate)
 			Rate, _ := strconv.ParseUint(string(b3), 10, 64)
 			AverageRate, _ := strconv.ParseFloat(string(b1), 64)
 			AverageRate = (AverageRate*NumberRate + float64(Rate)) / (NumberRate + 1)
@@ -201,16 +199,19 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, "Rating successfull")
 		}
 	} else {
+		b3, _ := json.Marshal(&rate.Rate)
 		result := db.Model(&rate).Where("user_id = ? AND hotel_id = ?", hotelrate.UserID, hotelrate.HotelID).Update("rate", hotelrate.Rate)
 		db.Where("id = ?", ID).Find(&hotel)
 		b, _ := json.Marshal(&hotel.NumberRate)
 		NumberRate, _ := strconv.ParseFloat(string(b), 64)
 		b1, _ := json.Marshal(&hotel.AverageRate)
-		b3, _ := json.Marshal(&rate.Rate)
-		Rate, _ := strconv.ParseUint(string(b3), 10, 64)
+		b2, _ := json.Marshal(&hotelrate.Rate)
+		NewRate, _ := strconv.ParseUint(string(b2), 10, 64)
+		OldRate, _ := strconv.ParseUint(string(b3), 10, 64)
+		fmt.Fprintln(w, NewRate, OldRate)
 		AverageRate, _ := strconv.ParseFloat(string(b1), 64)
-		AverageRate = (AverageRate*NumberRate + float64(Rate)) / (NumberRate + 1)
-		db.Model(Hotel{}).Where("id = ?", hotelrate.HotelID).Updates(Hotel{NumberRate: NumberRate + 1.0, AverageRate: AverageRate})
+		AverageRate = (AverageRate*NumberRate - float64(OldRate) + float64(NewRate)) / NumberRate
+		db.Model(Hotel{}).Where("id = ?", hotelrate.HotelID).Updates(Hotel{AverageRate: AverageRate})
 		if result.Error != nil {
 			fmt.Fprintln(w, "Update rating error: ", result.Error)
 			return
@@ -231,6 +232,9 @@ func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	// b3, _ := json.Marshal(times)
+	// fmt.Fprintln(w, string(b3))
+
 	db := connect.Connect()
 	var check Times
 	result := db.Where("room_id = ?", times.RoomID).Find(&check)
