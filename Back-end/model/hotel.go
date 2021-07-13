@@ -234,7 +234,6 @@ func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
 	}
 	// b3, _ := json.Marshal(times)
 	// fmt.Fprintln(w, string(b3))
-
 	db := connect.Connect()
 	var check Times
 	result := db.Where("room_id = ?", times.RoomID).Find(&check)
