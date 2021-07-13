@@ -58,16 +58,20 @@ type RoomInformation struct {
 }
 
 type HotelRate struct {
-	HotelID uint `json: "hotelID"`
-	UserID  uint `json: "userID"`
-	Rate    int  `json: "rate"`
+	HotelID uint `json:"hotelID"`
+	UserID  uint `json:"userID"`
+	Rate    int  `json:"rate"`
 }
 
 func DataHomePage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
 	var results []Hotel
 	db.Model(&Hotel{}).Distinct().Pluck("address", &results)
-	b, _ := json.Marshal(results)
+	b, err := json.Marshal(results)
+	if err != nil {
+		fmt.Fprintln(w, "Error:", err)
+	}
 	fmt.Fprintln(w, string(b))
 
 }
@@ -254,4 +258,69 @@ func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
 	// if times.Date == check.Date && times.StartTime == check.StartTime && times.EndTime == check.EndTime {
 
 	// }
+}
+func CreateHotel(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	w.Header().Set("Content-Type", "application/json")
+	userid := r.Context().Value("user_id")
+	str := fmt.Sprintf("%v", userid)
+	userID, _ := strconv.ParseUint(str, 10, 64)
+
+	var Data Hotel
+	err := json.NewDecoder(r.Body).Decode(&Data)
+	if err != nil {
+		fmt.Fprintln(w, err)
+	}
+	hotel := Hotel{
+		Name:        Data.Name,
+		Address:     Data.Address,
+		Description: Data.Description,
+		Image:       Data.Image,
+		Longitude:   Data.Longitude,
+		Latitude:    Data.Latitude,
+		UserID:      uint(userID),
+	}
+	result := db.Create(&hotel)
+	if result.Error != nil {
+		fmt.Fprint(w, result.Error)
+	}
+	// create each room
+	for i := 0; i < len(Data.Room); i++ {
+		room := Room{
+			Name:        Data.Room[i].Name,
+			Description: Data.Room[i].Description,
+			HotelID:     hotel.ID,
+		}
+		result := db.Create(&room)
+		if result.Error != nil {
+			fmt.Fprint(w, result.Error)
+			continue
+		}
+		// create each image for each room
+		for j := 0; j < len(Data.Room[i].ImageRoom); j++ {
+			imagerRoom := ImageRoom{
+				Image:  Data.Room[i].ImageRoom[j].Image,
+				RoomID: room.ID,
+			}
+			result := db.Create(&imagerRoom)
+			if result.Error != nil {
+				fmt.Fprint(w, result.Error)
+				continue
+			}
+		}
+		for k := 0; k < len(Data.Room[i].Price); k++ {
+			price := Price{
+				Price:    Data.Room[i].Price[k].Price,
+				OptionID: Data.Room[i].Price[k].OptionID,
+				RoomID:   room.ID,
+			}
+			result := db.Create(&price)
+			if result.Error != nil {
+				fmt.Fprint(w, result.Error)
+				continue
+			}
+
+		}
+
+	}
 }

@@ -21,6 +21,7 @@ func Run() {
 	post.Path("/createbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Createbill))
 	post.Path("/rating").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Rating))
 	post.Path("/checkroomstatus").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Checkroomstatus))
+	post.Path("/createhotel").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.CreateHotel))
 	// post.Path("/payment").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Payment))
 
 	//get method
