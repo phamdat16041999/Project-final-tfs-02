@@ -1,38 +1,43 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
+	"hotel/connect"
 	"net/http"
+	"strconv"
 
 	"gorm.io/gorm"
 )
 
 type Bill struct {
 	gorm.Model
-	UserID  uint `json:"userID"`
-	HotelID uint `json:"hotelID"`
-	RoomID  uint `json:"roomID"`
-	TimeID  uint `json:"timeID"`
-	Total   int  `json:"totalID"`
-}
-type DataToken struct {
-	Authorized bool `json:"authorized"`
-	Exp        int  `json:"exp"`
-	Roles_id   int  `json:"roles_id"`
-	User_id    int  `json:"user_id"`
+	UserID  uint64 `json:"userID"`
+	HotelID uint   `json:"hotelID"`
+	RoomID  uint   `json:"roomID"`
+	TimeID  uint   `json:"timeID"`
+	Total   int    `json:"total"`
 }
 
 func Createbill(w http.ResponseWriter, r *http.Request) {
-	token := r.Context().Value("user_id")
-	// string --> fill struct
-	// tk := make(jwt.MapClaims)
-
-	// a, _ := json.Marshal(token)
-	// var b DataToken
-	// err := json.Unmarshal(a, &b)
-	// if err != nil {
-	// 	fmt.Print(err)
-	// }
-	fmt.Fprint(w, token)
-
+	db := connect.Connect()
+	userId := r.Context().Value("user_id")
+	var bill Bill
+	err := json.NewDecoder(r.Body).Decode(&bill)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+	// convert interface to string
+	str := fmt.Sprintf("%v", userId)
+	// convert string str to unit to update in struct
+	userid, _ := strconv.ParseUint(str, 10, 64)
+	bill.UserID = userid
+	result := db.Create(&bill)
+	if result.Error != nil {
+		fmt.Fprintf(w, "Create bill have error: %v", bill)
+		return
+	} else {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, "Create bill successfull")
+	}
 }

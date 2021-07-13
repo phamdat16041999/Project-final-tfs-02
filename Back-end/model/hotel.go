@@ -21,7 +21,7 @@ type Hotel struct {
 	Latitude    string       `gorm:"type:varchar(100);" json:"latitude" `
 	UserID      uint         `json:"userID"`
 	ImageHotel  []ImageHotel `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Room        []Room       `gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	Room        []Room       `json:"room" gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 	Rate        []Rate       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 	Bill        []Bill       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 }
@@ -71,7 +71,7 @@ func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	// vars["address"]
 	var hotels []Hotel
-	db.Where("address LIKE ?", vars["address"]).Find(&hotels)
+	db.Debug().Joins("JOIN rates on rates.hotel_id = hotels.id AND rates.rate = ?", vars["rate"]).Where("address LIKE ?", vars["address"]).Find(&hotels)
 	b, _ := json.Marshal(hotels)
 	fmt.Fprintln(w, string(b))
 }
@@ -166,4 +166,69 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	b1, _ := json.Marshal(hotelInformation)
 	fmt.Fprintln(w, string(b1))
 
+}
+func CreateHotel(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	w.Header().Set("Content-Type", "application/json")
+	userid := r.Context().Value("user_id")
+	str := fmt.Sprintf("%v", userid)
+	userID, _ := strconv.ParseUint(str, 10, 64)
+
+	var Data Hotel
+	err := json.NewDecoder(r.Body).Decode(&Data)
+	if err != nil {
+		fmt.Fprintln(w, err)
+	}
+	hotel := Hotel{
+		Name:        Data.Name,
+		Address:     Data.Address,
+		Description: Data.Description,
+		Image:       Data.Image,
+		Longitude:   Data.Longitude,
+		Latitude:    Data.Latitude,
+		UserID:      uint(userID),
+	}
+	result := db.Create(&hotel)
+	if result.Error != nil {
+		fmt.Fprint(w, result.Error)
+	}
+	// create each room
+	for i := 0; i < len(Data.Room); i++ {
+		room := Room{
+			Name:        Data.Room[i].Name,
+			Description: Data.Room[i].Description,
+			HotelID:     hotel.ID,
+		}
+		result := db.Create(&room)
+		if result.Error != nil {
+			fmt.Fprint(w, result.Error)
+			continue
+		}
+		// create each image for each room
+		for j := 0; j < len(Data.Room[i].ImageRoom); j++ {
+			imagerRoom := ImageRoom{
+				Image:  Data.Room[i].ImageRoom[j].Image,
+				RoomID: room.ID,
+			}
+			result := db.Create(&imagerRoom)
+			if result.Error != nil {
+				fmt.Fprint(w, result.Error)
+				continue
+			}
+		}
+		for k := 0; k < len(Data.Room[i].Price); k++ {
+			price := Price{
+				Price:    Data.Room[i].Price[k].Price,
+				OptionID: Data.Room[i].Price[k].OptionID,
+				RoomID:   room.ID,
+			}
+			result := db.Create(&price)
+			if result.Error != nil {
+				fmt.Fprint(w, result.Error)
+				continue
+			}
+
+		}
+
+	}
 }
