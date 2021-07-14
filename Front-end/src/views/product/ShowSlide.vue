@@ -1,11 +1,11 @@
 <template>
   <div class="slider">
     <div class="slides">
-      <div v-bind:id="'slide-' + data.ID" v-for="(data, index) in image" :key="index" class="showSlide">
+      <div v-bind:id="'slide-' + data.ID" v-for="(data, index) in imageLink" :key="index" class="showSlide">
           <img v-bind:src="data.image" alt="" />
       </div>
     </div>
-    <a v-bind:href="'#slide-' + data.ID" v-for="(data, index) in image" :key="index"  class="carosel">
+    <a v-bind:href="'#slide-' + data.ID" v-for="(data, index) in imageLink" :key="index"  class="carosel">
       <img v-bind:src="data.image" alt="" />
     </a>
   </div>
@@ -13,23 +13,18 @@
 <script>
 export default {
   created() {
-    let room = this.hotel.room
-    for(var i = 0; i < room.length; i++){
-      var image = this.hotel.room[i].Img
-      for(var j = 0; j < image.length; j++){
-        this.image.push(image[j])
-      }
-  
-    }
+    console.log("aaaaaaaaa")
+      console.log(this.imageLink)
   },
   props: {
-    hotel: Object,
+    imageLink: Object,
   },
   data() {
     return {
       image: [
 
       ],
+      data:{}
     };
   },
 };
