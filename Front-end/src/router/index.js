@@ -22,6 +22,11 @@ const routes = [
     name: "active",
     component: () => import("../views/activeAccount/active.vue"),
   },
+  {
+    path: "/filter",
+    name: "filter",
+    component: () => import("../views/filterHotel/main.vue"),
+  },
 ];
 
 const router = createRouter({
