@@ -38,12 +38,8 @@ import { mapState } from "vuex";
 export default {
   name: "hello-world",
   computed: mapState(["topHotel"]),
-  created() {
-    this.$store.dispatch("setTopHotel");
-  },
  methods: {
     product(ID){
-       this.$router.push('/product?id='+ID);
        this.$router.push('/hotel?id='+ID);
     }
   },

@@ -71,20 +71,21 @@ func DataHomePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(b))
 
 }
-func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
+func SeachHotelAddress(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
 	vars := mux.Vars(r)
+	rate, _ := strconv.ParseFloat(vars["rate"], 64)
 	var hotels []Hotel
-	address := "%" + string(vars["address"]) + "%"
-	result := db.Where("address LIKE ?", address).Find(&hotels)
-	if result.Error != nil {
-		fmt.Fprintln(w, "Error: ", result.Error)
-		return
-	} else {
-		w.WriteHeader(http.StatusOK)
-		b, _ := json.Marshal(hotels)
-		fmt.Fprintln(w, string(b))
+	var resulthotels []Hotel
+	db.Debug().Where("address LIKE ?", "%"+vars["address"]+"%").Find(&hotels)
+	for i := 0; i < len(hotels); i++ {
+		if int64(hotels[i].AverageRate) == int64(rate) {
+			resulthotels = append(resulthotels, hotels[i])
+		}
 	}
+	b, _ := json.Marshal(resulthotels)
+	fmt.Fprintln(w, string(b))
 }
 
 func GetTopHotel(w http.ResponseWriter, r *http.Request) {
