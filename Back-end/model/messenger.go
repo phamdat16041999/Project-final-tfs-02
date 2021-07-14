@@ -9,9 +9,9 @@ import (
 
 type Messenger struct {
 	gorm.Model
-	UserID         uint   `json:"userID"`
-	Messenger      string `gorm:"type:text;" json:"messenger"`
-	ConversationID uint   `json:"conversationID"`
+	UserID         uint   `json:"userID,omitempty"`
+	Messenger      string `gorm:"type:text;" json:"messenger,omitempty"`
+	ConversationID uint   `json:"conversationID,omitempty"`
 }
 
 func CreateMessenger(UserID, messenger string, conversationID uint) []Messenger {

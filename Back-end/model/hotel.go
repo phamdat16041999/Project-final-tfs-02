@@ -6,7 +6,6 @@ import (
 	"hotel/connect"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -15,19 +14,19 @@ import (
 
 type Hotel struct {
 	gorm.Model
-	Name        string       `gorm:"type:varchar(100);" json:"name" `
-	Address     string       `gorm:"type:varchar(100);" json:"address" `
-	Description string       `gorm:"type:varchar(100);" json:"description" `
-	Image       string       `gorm:"type:varchar(100);" json:"image" `
-	Longitude   string       `gorm:"type:varchar(100);" json:"longitude" `
-	Latitude    string       `gorm:"type:varchar(100);" json:"latitude" `
-	UserID      uint         `json:"userID"`
-	AverageRate float64      `gorm:"default:0.0;" json:"averagerate"`
-	NumberRate  float64      `gorm:"default:0;" json:"numberrate"`
-	ImageHotel  []ImageHotel `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Room        []Room       `gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Rate        []Rate       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
-	Bill        []Bill       `json:"authentication omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	Name        string       `gorm:"type:varchar(100);" json:"name,omitempty" `
+	Address     string       `gorm:"type:varchar(100);" json:"address,omitempty" `
+	Description string       `gorm:"type:varchar(100);" json:"description,omitempty" `
+	Image       string       `gorm:"type:varchar(100);" json:"image,omitempty" `
+	Longitude   string       `gorm:"type:varchar(100);" json:"longitude,omitempty" `
+	Latitude    string       `gorm:"type:varchar(100);" json:"latitude,omitempty" `
+	UserID      uint         `json:"userID,omitempty"`
+	AverageRate float64      `gorm:"default:0.0;" json:"averagerate,omitempty"`
+	NumberRate  float64      `gorm:"default:0;" json:"numberrate,omitempty"`
+	ImageHotel  []ImageHotel `json:"imagehotel,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	Room        []Room       `json:"room,omitempty" gorm:"constraint:OnUpdate:CASCADE, OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	Rate        []Rate       `json:"rate,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
+	Bill        []Bill       `json:"bill,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:HotelID;associationForeignKey:ID"`
 }
 
 type TopHotel struct {
@@ -59,9 +58,9 @@ type RoomInformation struct {
 }
 
 type HotelRate struct {
-	HotelID uint `json: "hotelID"`
-	UserID  uint `json: "userID"`
-	Rate    int  `json: "rate"`
+	HotelID uint `json:"hotelID"`
+	UserID  uint `json:"userID"`
+	Rate    int  `json:"rate"`
 }
 
 func DataHomePage(w http.ResponseWriter, r *http.Request) {
@@ -225,26 +224,26 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 func inTimeSpan(start, end, check time.Time) bool {
 	return check.After(start) && check.Before(end)
 }
-func ConvertsTime(time string) []int {
-	a := strings.Split(time, "T")
-	x := strings.Split(a[1], ":")
-	var s []int
-	for i := 0; i < len(x); i++ {
-		x, _ := strconv.Atoi(x[i])
-		s = append(s, x)
-	}
-	return s
-}
-func ConvertsDate(time string) []int {
-	a := strings.Split(time, "T")
-	x := strings.Split(a[0], "-")
-	var s []int
-	for i := 0; i < len(x); i++ {
-		x, _ := strconv.Atoi(x[i])
-		s = append(s, x)
-	}
-	return s
-}
+
+// func Converts(time string) int {
+// 	a := strings.Split(time, "T")
+// 	x1 := strings.Split(a[1], ":")
+// 	x2 := strings.Split(a[0], "-")
+// 	var s1, s2 []int
+// 	for i := 0; i < len(x1); i++ {
+// 		x1, _ := strconv.Atoi(x1[i])
+// 		s1 = append(s1, x1)
+// 	}
+// 	for j := 0; j < len(x2); j++ {
+// 		x2, _ := strconv.Atoi(x2[j])
+// 		s2 = append(s2, x2)
+// 	}
+// 	hashtime := (s1[0]-00)*3600 + (s1[1]-00)*60
+// 	hashdate := (s2[1]-7)*30 + (s2[1]-01)*1
+// 	hash := hashtime + hashdate
+// 	return hash
+// }
+
 func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var checkTime Times
@@ -253,8 +252,6 @@ func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// b3, _ := json.Marshal(a)
-	// fmt.Fprintln(w, string(b3))
 	db := connect.Connect()
 	var times []Times
 	result := db.Where("room_id = ?", checkTime.RoomID).Find(&times)
@@ -264,55 +261,29 @@ func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
 	}
 	available := 1
 	for i := 0; i < len(times); i++ {
-		b, _ := json.Marshal(&checkTime.StartTime)
-		checkStartTime := ConvertsTime(string(b))
-		checkStartDate := ConvertsDate(string(b))
-		b3, _ := json.Marshal(&checkTime.EndTime)
-		checkEndTime := ConvertsTime(string(b3))
-		checkEndDate := ConvertsDate(string(b3))
-		b1, _ := json.Marshal(&times[i].StartTime)
-		start := ConvertsTime(string(b1))
-		startDate := ConvertsDate(string(b1))
-		b2, _ := json.Marshal(&times[i].EndTime)
-		end := ConvertsTime(string(b2))
-		endDate := ConvertsDate(string(b2))
-		fmt.Fprintln(w, "check start hour: ", checkStartTime[0], checkStartDate[2], "check end hour: ", checkEndTime[0], checkEndDate[1], "start: ", start[0], startDate[1], "end: ", end[0], endDate[2])
-		if checkStartDate[1] == startDate[1] {
-			if checkStartDate[2] == endDate[2] {
-				if checkStartTime[0] > start[0] && checkStartTime[0] < end[0] || checkEndTime[0] > start[0] && checkEndTime[0] < end[0] {
-					available--
-					break
-				} else if checkStartTime[0] == start[0] && checkEndTime[0] == end[0] {
-					if checkStartTime[1] > start[1] || checkEndTime[1] < end[1] {
-						available--
-						break
-					}
-				} else if checkStartTime[0] == end[0] || checkEndTime[0] == start[0] {
-					if checkStartTime[0] == end[0] {
-						if checkStartTime[1] >= end[1] {
-							available--
-							break
-						}
-					} else if checkEndTime[0] == start[0] {
-						if checkEndTime[1] <= start[1] {
-							available--
-							break
-						}
-					}
-				} else if checkStartTime[0] < start[0] && checkEndTime[0] > end[0] {
-					available--
-					break
-				}
-			} else if checkStartDate[1] > startDate[1] && checkStartDate[1] < endDate[1] || checkEndDate[1] > startDate[1] && checkEndDate[1] < endDate[1] {
-				available--
-				break
-			} else if checkStartDate[2] > startDate[2] && checkStartDate[2] < endDate[2] || checkEndDate[2] > startDate[2] && checkEndDate[2] < endDate[2] {
-				available--
-				break
-			}
+		if inTimeSpan(times[i].StartTime, times[i].EndTime, checkTime.StartTime) {
+			available--
+			break
+		} else if inTimeSpan(times[i].StartTime, times[i].EndTime, checkTime.EndTime) {
+			available--
+			break
 		}
+		// b, _ := json.Marshal(&checkTime.StartTime)
+		// checkStart := Converts(string(b))
+		// b3, _ := json.Marshal(&checkTime.EndTime)
+		// checkEnd := Converts(string(b3))
+		// b1, _ := json.Marshal(&times[i].StartTime)
+		// start := Converts(string(b1))
+		// b2, _ := json.Marshal(&times[i].EndTime)
+		// end := Converts(string(b2))
+		// if checkStart >= start && checkStart <= end {
+		// 	available--
+		// 	break
+		// } else if checkEnd <= end && checkEnd >= start {
+		// 	available--
+		// 	break
+		// }
 	}
-	fmt.Fprintln(w, available)
 	if available != 1 {
 		fmt.Fprintln(w, "Room has been booked")
 	} else {

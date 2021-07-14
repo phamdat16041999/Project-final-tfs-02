@@ -12,11 +12,11 @@ import (
 
 type Bill struct {
 	gorm.Model
-	UserID  uint64 `json:"userID"`
-	HotelID uint   `json:"hotelID"`
-	RoomID  uint   `json:"roomID"`
-	TimeID  uint   `json:"timeID"`
-	Total   int    `json:"total"`
+	UserID  uint64 `json:"userID,omitempty"`
+	HotelID uint   `json:"hotelID,omitempty"`
+	RoomID  uint   `json:"roomID,omitempty"`
+	TimeID  uint   `json:"timeID,omitempty"`
+	Total   int    `json:"total,omitempty"`
 }
 
 func Createbill(w http.ResponseWriter, r *http.Request) {

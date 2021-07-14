@@ -9,9 +9,9 @@ import (
 
 type Conversation struct {
 	gorm.Model
-	User1ID   uint        `json:"user1ID"`
-	User2ID   uint        `json:"user2ID"`
-	Messenger []Messenger `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:ConversationID;associationForeignKey:ID"`
+	User1ID   uint        `json:"user1ID,omitempty"`
+	User2ID   uint        `json:"user2ID,omitempty"`
+	Messenger []Messenger `json:"messenger,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:ConversationID;associationForeignKey:ID"`
 }
 
 func CheckConvsersation(userID1, userID2 string) uint {

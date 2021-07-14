@@ -8,10 +8,10 @@ import (
 
 type Times struct {
 	gorm.Model
-	StartTime time.Time `json:"startTime"`
-	EndTime   time.Time `json:"endTime"`
-	Date      time.Time `json:"date"`
-	Active    *bool     `json:"active"`
-	RoomID    uint      `json:"roomID"`
+	StartTime time.Time `json:"startTime,omitempty"`
+	EndTime   time.Time `json:"endTime,omitempty"`
+	Date      time.Time `json:"date,omitempty"`
+	Active    *bool     `json:"active,omitempty"`
+	RoomID    uint      `json:"roomID,omitempty"`
 	Bill      []Bill    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:TimeID;associationForeignKey:ID"`
 }

@@ -26,16 +26,16 @@ import (
 
 type User struct {
 	gorm.Model
-	FirstName          string            `gorm:"type:varchar(100);" json:"firstName"`
-	LastName           string            `gorm:"type:varchar(100);" json:"lastName"`
-	Address            string            `gorm:"type:varchar(100);" json:"address"`
-	DOB                string            `json:"dob"`
-	Phone              string            `json:"phone"`
-	Email              string            `gorm:"type:varchar(100);unique;" json:"email"`
-	CodeAuthentication string            `gorm:"type:varchar(20);unique;" json:"codeAuthentication"`
-	UserName           string            `gorm:"type:varchar(100);unique;" json:"userName"`
-	Password           string            `gorm:"type:varchar(100); default: 123;" json:"password"`
-	Active             *bool             `gorm:"default: false;" json:"active"`
+	FirstName          string            `gorm:"type:varchar(100);" json:"firstName,omitempty"`
+	LastName           string            `gorm:"type:varchar(100);" json:"lastName,omitempty"`
+	Address            string            `gorm:"type:varchar(100);" json:"address,omitempty"`
+	DOB                string            `json:"dob,omitempty"`
+	Phone              string            `json:"phone,omitempty"`
+	Email              string            `gorm:"type:varchar(100);unique;" json:"email,omitempty"`
+	CodeAuthentication string            `gorm:"type:varchar(20);unique;" json:"codeAuthentication,omitempty"`
+	UserName           string            `gorm:"type:varchar(100);unique;" json:"userName,omitempty"`
+	Password           string            `gorm:"type:varchar(100); default: 123;" json:"password,omitempty"`
+	Active             *bool             `gorm:"default: false;" json:"active,omitempty"`
 	Authentication     []*Authentication `json:"authentication,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:UserID;associationForeignKey:ID"`
 	Conversation1      []Conversation    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User1ID; associationForeignKey:ID"`
 	Conversation2      []Conversation    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL; foreignKey:User2ID; associationForeignKey:ID"`
