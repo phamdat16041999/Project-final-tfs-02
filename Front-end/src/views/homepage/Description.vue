@@ -29,7 +29,7 @@ export default {};
 
 <style scoped>
 .description{
-    padding-top: 80px;
+    padding-top: 200px;
     padding-bottom: 80px;
 }
 .content{

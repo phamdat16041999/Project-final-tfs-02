@@ -2,7 +2,11 @@
   <div class="container-xl" style="margin-top: 10px">
     <div class="row">
       <div class="col-xl-8 col-12" style="text-align: center">
-        <h3>{{hotel[0].address}} Hotels</h3>
+        <h3 v-if="isEmpty">
+          Sorry, we are currently unable to accommodate your request. Please try
+          again with another search
+        </h3>
+        <h3 v-else>{{ address }} Hotels</h3>
       </div>
       <div class="col-xl-2 col-12"></div>
       <div class="col-xl-8 col-12">
@@ -70,14 +74,23 @@ export default {
   async created() {
     console.log(this.$store.state.topHotel);
     let hotelFilter = await axios.get(
-      "http://localhost:8080/hotel/" + this.$route.query.name,
+      "http://localhost:8080/hotel/" +
+        this.$route.query.name +
+        "/" +
+        this.$route.query.rate,
       this.hotel
     );
-    this.hotel = hotelFilter.data;
+    if (hotelFilter.data != null) {
+      this.address = hotelFilter.data[0].address;
+      this.hotel = hotelFilter.data;
+      this.isEmpty = false;
+    }
   },
   data() {
     return {
       hotel: [],
+      address: "",
+      isEmpty: true,
     };
   },
   methods: {
