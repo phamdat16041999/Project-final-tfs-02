@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"hotel/connect"
+	"hotel/pkg"
 	"net/http"
 	"strconv"
 	"time"
@@ -69,16 +70,19 @@ func DataHomePage(w http.ResponseWriter, r *http.Request) {
 	db.Model(&Hotel{}).Distinct().Pluck("address", &results)
 	b, _ := json.Marshal(results)
 	fmt.Fprintln(w, string(b))
+}
+
+func SearchByName(w http.ResponseWriter, r *http.Request) {
 
 }
-func SeachHotelAddress(w http.ResponseWriter, r *http.Request) {
+func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
 	vars := mux.Vars(r)
 	rate, _ := strconv.ParseFloat(vars["rate"], 64)
 	var hotels []Hotel
 	var resulthotels []Hotel
-	db.Debug().Where("address LIKE ?", "%"+vars["address"]+"%").Find(&hotels)
+	db.Where("address LIKE ?", "%"+vars["address"]+"%").Find(&hotels)
 	for i := 0; i < len(hotels); i++ {
 		if int64(hotels[i].AverageRate) == int64(rate) {
 			resulthotels = append(resulthotels, hotels[i])
@@ -94,9 +98,24 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	var hotel []Hotel
 	db.Limit(2).Order("average_rate desc").Find(&hotel)
 	b, _ := json.Marshal(hotel)
+	pkg.ServeJQueryWithCache(w, "tophotel", string(b))
+}
+func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	db := connect.Connect()
+	vars := mux.Vars(r)
+	rate, _ := strconv.ParseFloat(vars["rate"], 64)
+	var hotels []Hotel
+	var resulthotels []Hotel
+	db.Debug().Where("address LIKE ?", "%"+vars["address"]+"%").Find(&hotels)
+	for i := 0; i < len(hotels); i++ {
+		if int64(hotels[i].AverageRate) == int64(rate) {
+			resulthotels = append(resulthotels, hotels[i])
+		}
+	}
+	b, _ := json.Marshal(resulthotels)
 	fmt.Fprintln(w, string(b))
 }
-
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
@@ -162,6 +181,8 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 }
 
 func Rating(w http.ResponseWriter, r *http.Request) {
+	pkg.DeleteRemoteCache(w, "tophotel")
+	pkg.DeleteLocalCache(w, "tophotel")
 	w.Header().Set("Content-Type", "application/json")
 	var hotelrate HotelRate
 	var rate Rate
@@ -176,6 +197,7 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 	b1, _ := json.Marshal(&rate.HotelID)
 	ID, _ := strconv.ParseUint(string(b1), 10, 32)
 	b, _ := json.Marshal(&rate.Rate)
+
 	var Rate = Rate{
 		UserID:  hotelrate.UserID,
 		HotelID: hotelrate.HotelID,
@@ -209,9 +231,11 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 		b2, _ := json.Marshal(&hotelrate.Rate)
 		NewRate, _ := strconv.ParseUint(string(b2), 10, 64)
 		OldRate, _ := strconv.ParseUint(string(b3), 10, 64)
-		fmt.Fprintln(w, NewRate, OldRate)
+		fmt.Fprintln(w, "NewRate = ", NewRate, "\nOldRate = ", OldRate)
 		AverageRate, _ := strconv.ParseFloat(string(b1), 64)
 		AverageRate = (AverageRate*NumberRate - float64(OldRate) + float64(NewRate)) / NumberRate
+		AverageRate = float64(int(AverageRate*10)) / 10 //chuyển thành số thập phân có 2 chữ số
+		fmt.Fprintln(w, "AverageRate = ", AverageRate)
 		db.Model(Hotel{}).Where("id = ?", hotelrate.HotelID).Updates(Hotel{AverageRate: AverageRate})
 		if result.Error != nil {
 			fmt.Fprintln(w, "Update rating error: ", result.Error)
@@ -269,21 +293,6 @@ func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
 			available--
 			break
 		}
-		// b, _ := json.Marshal(&checkTime.StartTime)
-		// checkStart := Converts(string(b))
-		// b3, _ := json.Marshal(&checkTime.EndTime)
-		// checkEnd := Converts(string(b3))
-		// b1, _ := json.Marshal(&times[i].StartTime)
-		// start := Converts(string(b1))
-		// b2, _ := json.Marshal(&times[i].EndTime)
-		// end := Converts(string(b2))
-		// if checkStart >= start && checkStart <= end {
-		// 	available--
-		// 	break
-		// } else if checkEnd <= end && checkEnd >= start {
-		// 	available--
-		// 	break
-		// }
 	}
 	if available != 1 {
 		fmt.Fprintln(w, "Room has been booked")

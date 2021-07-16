@@ -1,9 +1,7 @@
 package auth
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -38,12 +36,4 @@ func ExtractToken(r *http.Request) string {
 		return strings.Split(bearerToken, " ")[1]
 	}
 	return ""
-}
-func Pretty(data interface{}) string {
-	b, err := json.MarshalIndent(data, "", " ")
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	return string(b)
 }

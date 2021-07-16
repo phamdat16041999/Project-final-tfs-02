@@ -75,3 +75,6 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 
 	// result := db.Create(&bill)
 }
+func GetBill(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "aaaaaaaaaa")
+}
