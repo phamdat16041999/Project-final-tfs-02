@@ -36,117 +36,23 @@
               >keyboard_arrow_up</i
             >
           </span>
-          <div class="action_menu">
-            <ul>
-              <li><i class="fas fa-user-circle"></i> View profile</li>
-              <li><i class="fas fa-users"></i> Add to close friends</li>
-              <li><i class="fas fa-plus"></i> Add to group</li>
-              <li><i class="fas fa-ban"></i> Block</li>
-            </ul>
-          </div>
         </div>
-        <div class="card-body msg_card_body">
-          <div class="d-flex justify-content-start mb-4">
-            <div class="img_cont_msg">
-              <img
-                src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
-                class="rounded-circle user_img_msg"
-              />
-            </div>
-            <div class="msg_cotainer">
-              Hi, how are you samim?
-              <span class="msg_time">8:40 AM, Today</span>
-            </div>
-          </div>
-          <div class="d-flex justify-content-end mb-4">
-            <div class="msg_cotainer_send">
-              Hi Khalid i am good tnx how about you?
-              <span class="msg_time_send">8:55 AM, Today</span>
-            </div>
-            <div class="img_cont_msg">
-              <img
-                src="https://s.luyengame.net/games/mario/mario.png"
-                class="rounded-circle user_img_msg"
-              />
-            </div>
-          </div>
-          <div class="d-flex justify-content-start mb-4">
-            <div class="img_cont_msg">
-              <img
-                src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
-                class="rounded-circle user_img_msg"
-              />
-            </div>
-            <div class="msg_cotainer">
-              I am good too, thank you for your chat template
-              <span class="msg_time">9:00 AM, Today</span>
-            </div>
-          </div>
-          <div class="d-flex justify-content-end mb-4">
-            <div class="msg_cotainer_send">
-              You are welcome
-              <span class="msg_time_send">9:05 AM, Today</span>
-            </div>
-            <div class="img_cont_msg">
-              <img
-                src="https://s.luyengame.net/games/mario/mario.png"
-                class="rounded-circle user_img_msg"
-              />
-            </div>
-          </div>
-          <div class="d-flex justify-content-start mb-4">
-            <div class="img_cont_msg">
-              <img
-                src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
-                class="rounded-circle user_img_msg"
-              />
-            </div>
-            <div class="msg_cotainer">
-              I am looking for your next templates
-              <span class="msg_time">9:07 AM, Today</span>
-            </div>
-          </div>
-          <div class="d-flex justify-content-end mb-4">
-            <div class="msg_cotainer_send">
-              Ok, thank you have a good day
-              <span class="msg_time_send">9:10 AM, Today</span>
-            </div>
-            <div class="img_cont_msg">
-              <img
-                src="https://s.luyengame.net/games/mario/mario.png"
-                class="rounded-circle user_img_msg"
-              />
-            </div>
-          </div>
-          <div class="d-flex justify-content-start mb-4">
-            <div class="img_cont_msg">
-              <img
-                src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
-                class="rounded-circle user_img_msg"
-              />
-            </div>
-            <div class="msg_cotainer">
-              Bye, see you
-              <span class="msg_time">9:12 AM, Today</span>
-            </div>
-          </div>
+        <div class="card-body msg_card_body" v-html="chatContent" id="chat-messages">
         </div>
         <div class="card-footer">
           <div class="input-group">
-            <!-- <div class="input-group-append">
-                <span class="input-group-text attach_btn"
-                  ><i class="fas fa-paperclip"></i
-                ></span>
-              </div> -->
             <textarea
               name=""
               class="form-control type_msg"
               placeholder="Type your message..."
+              @keyup.enter ="send"
+              v-model="newMsg"
             ></textarea>
             <div class="input-group-append">
               <span class="input-group-text send_btn"
-                ><i class="fa fa-send" style="font-size: 25px; color: white"></i
+                ><i class="fa fa-send" style="font-size: 25px; color: white" @click="send"></i
               ></span>
+              <button @click="loadmess">loadmess</button>
             </div>
           </div>
         </div>
@@ -159,8 +65,35 @@ export default {
   data() {
     return {
       show: true,
-      boxChat:"card cardShow"
+      boxChat:"card cardShow",
+      ws: null, // Our websocket
+      newMsg: '', // Holds new messages to be sent to the server
+      chatContent: '', // A running list of chat messages displayed on the screen
+      userid1: "10", // Our userid1
+      userid2: "13",
     };
+  },
+  created: function() {
+      var self = this;
+      this.ws = new WebSocket('ws://' + "localhost:8080" + '/ws');
+      this.ws.addEventListener('message', function(e) {
+          var msg = JSON.parse(e.data);
+          console.log(msg);
+          // self.chatContent = ""
+          if (msg.userid == parseInt(self.userid1)) {
+              self.chatContent += ' <div class="d-flex justify-content-start mb-4">'+ '<div class="img_cont_msg" style="height: 40px; width: 40px;">' +
+                  ' <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg" style=" height: 40px; width: 40px; border: 1.5px solid #f5f6fa;"/>' // Avatar
+                  + '</div>'+
+                  '<div class="msg_cotainer">' +msg.message + '</div>' + '</div>';
+          } else {
+              self.chatContent += '<div class="d-flex justify-content-end mb-4">'+' <div class="msg_cotainer_send">' +
+                  msg.message
+                  + '</div>' +
+                  '<div class="img_cont_msg" style="height: 40px; width: 40px;">' + '<img src="https://s.luyengame.net/games/mario/mario.png" class="rounded-circle user_img_msg" style=" height: 40px; width: 40px; border: 1.5px solid #f5f6fa;"/>' + '</div>' + '</div>';
+          }
+          var element = document.getElementById('chat-messages');
+          element.scrollTop = element.scrollHeight; // Auto scroll to the bottom
+      });
   },
   methods: {
     hideBoxChat() {
@@ -171,6 +104,27 @@ export default {
       this.show = true;
       this.boxChat = "card cardShow";
     },
+    send: function() {
+        if (this.newMsg != '') {
+            this.ws.send(
+                JSON.stringify({
+                    userid1: this.userid1,
+                    userid2: this.userid2,
+                    message: this.newMsg// Strip out html
+                }));
+            this.newMsg = ''; // Reset newMsg
+        }
+    },
+    loadmess: function() {
+        this.ws.send(
+            JSON.stringify({
+                userid1: this.userid1,
+                userid2: this.userid2,
+                // Strip out html
+            }));
+            console.log("aaaa");
+    },
+    
   },
 };
 </script>

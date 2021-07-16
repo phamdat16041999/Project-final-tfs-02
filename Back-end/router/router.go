@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"hotel/middlewares"
 	"hotel/model"
+	"hotel/pkg/websocket"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -36,6 +37,8 @@ func Run() {
 	http.Handle("/", r)
 	//methoddelete
 	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
+	// chat API
+	r.HandleFunc("/ws", websocket.HandleConnections)
 
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},
