@@ -90,8 +90,8 @@ export default {
     validate() {
       this.err = true;
     },
-    reject() {  
-      this.msg = ""
+    reject() {
+      this.msg = "";
       this.err = false;
     },
     async login() {
@@ -100,16 +100,19 @@ export default {
           "http://localhost:8080/login",
           this.loginData
         );
-        if (users.data.split("\n")[3] == "Username not created yet!") {
-          console.log(users.data.split("\n")[3]);
+        if (users.data == "Username not created yet!") {
           this.msg = "Username not created yet!";
-        } else if (users.data.split("\n")[3] == "Wrong Password!") {
+        } else if (users.data == "Wrong Password!") {
           this.msg = "Wrong Password!";
         } else {
-          localStorage.setItem("token", users.data.split("\n")[3]);
-          this.$router.push('/');
+          // var data = { token: users.data};
+          this.$store.dispatch("login");
+          localStorage.setItem("token", users.data);
+          this.$router.push("/");
         }
       }
+      // var payload = {'key1': 'value1', 'key2': 'value2'}
+      // this.$store.dispatch("setUser", payload);
     },
   },
 };
