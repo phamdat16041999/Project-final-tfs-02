@@ -14,10 +14,8 @@ import (
 func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		Token := auth.TokenValid(r)
-
 		if Token == nil {
-			fmt.Fprint(w, "Phải đăng nhập trước khi đến trang web này")
-			fmt.Fprint(w, "Render tới trang web")
+			fmt.Fprint(w, "401")
 			return
 		} else {
 			v := jwt.MapClaims{

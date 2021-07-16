@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"hotel/middlewares"
 	"hotel/model"
+	"hotel/pkg/websocket"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -26,23 +27,25 @@ func Run() {
 	//get method
 	get := r.Methods(http.MethodGet).Subrouter()
 	get.Path("/homepage").HandlerFunc(model.DataHomePage)
-	get.Path("/hotel/{address}").HandlerFunc(model.GetHotelAddress)
+	get.Path("/hotel/{address}/{rate}").HandlerFunc(model.SeachHotelAddress)
 	get.Path("/tophotel").HandlerFunc(model.GetTopHotel)
 	get.Path("/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
 	get.Path("/search/{name}").HandlerFunc(model.SearchByName)
 
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
-	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
+	r.HandleFunc("/CheckLogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
 	http.Handle("/", r)
 	//methoddelete
 	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
+	// chat API
+	r.HandleFunc("/ws", websocket.HandleConnections)
 
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},
 	}).Handler(r)
 	http.ListenAndServe(":8080", handler)
 }
-func Test(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "test")
+func CheckLogin(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "ok")
 }

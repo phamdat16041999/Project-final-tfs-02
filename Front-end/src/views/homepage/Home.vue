@@ -3,6 +3,7 @@
     <background/>
     <description/>
     <topHotel/>
+    <boxChat/>
   </div>
 </template>
 
@@ -10,12 +11,14 @@
 import background from "./Background.vue";
 import description from "./Description.vue";
 import topHotel from "./TopHotel.vue";
+import boxChat from "../BoxChat.vue"
 export default {
   name: "Home",
   components: {
     background,
     description,
-    topHotel
+    topHotel,
+    boxChat
   },
 };
 </script>
@@ -23,10 +26,10 @@ export default {
 .parent {
   background-image: url("https://preview.colorlib.com/theme/redplanet/images/hero_5.jpg.webp");
   background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover;
+  /* background-attachment: fixed;
+  background-size: cover; */
   background-position: 64% 0px;
-  height: 110vh;
+
 }
 .topHotelTitle {
   text-align: center;

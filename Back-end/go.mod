@@ -3,21 +3,10 @@ module hotel
 go 1.16
 
 require (
-	github.com/badoux/checkmail v1.2.1
-	github.com/cosmtrek/air v1.27.3 // indirect
-	github.com/creack/pty v1.1.13 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/fatih/color v1.12.0 // indirect
-	github.com/gin-gonic/gin v1.7.2
-	github.com/go-errors/errors v1.4.0 // indirect
-	github.com/go-redis/redis/v8 v8.11.0 // indirect
+	github.com/go-redis/redis/v8 v8.11.0
 	github.com/gorilla/mux v1.8.0
-	github.com/hhkbp2/go-logging v0.3.6 // indirect
-	github.com/mattn/go-isatty v0.0.13 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/pelletier/go-toml v1.9.3 // indirect
-	github.com/plutov/paypal v2.0.5+incompatible // indirect
+	github.com/gorilla/websocket v1.4.2
 	github.com/rs/cors v1.7.0
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420
