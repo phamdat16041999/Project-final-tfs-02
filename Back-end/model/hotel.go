@@ -94,11 +94,16 @@ func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 
 func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	db := connect.Connect()
-	var hotel []Hotel
-	db.Limit(2).Order("average_rate desc").Find(&hotel)
-	b, _ := json.Marshal(hotel)
-	pkg.ServeJQueryWithCache(w, "tophotel", string(b))
+	if pkg.ServeJQueryWithCache(w, "tophotel") == "No data in remote cache" {
+		db := connect.Connect()
+		var hotel []Hotel
+		db.Limit(2).Order("average_rate desc").Find(&hotel)
+		b, _ := json.Marshal(hotel)
+		// pkg.InsertData("tophotel", string(b))
+		fmt.Fprintf(w, pkg.InsertData("tophotel", string(b)))
+	} else {
+		fmt.Fprintln(w, pkg.ServeJQueryWithCache(w, "tophotel"))
+	}
 }
 func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
