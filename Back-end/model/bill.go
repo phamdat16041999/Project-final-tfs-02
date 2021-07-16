@@ -38,17 +38,9 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
-	// convert interface to string
 	str := fmt.Sprintf("%v", userId)
-	// convert string str to unit to update in struct
 	userid, _ := strconv.ParseUint(str, 10, 64)
-	// b, err := json.Marshal(bill)
-	// if err != nil {
-	// 	fmt.Println("error:", err)
-	// }
 	fmt.Fprintln(w, userid)
-	// fmt.Fprintln(w, string(b))
-	// Tao time
 	time.StartTime = createBill.StartTime
 	time.EndTime = createBill.EndTime
 	time.RoomID = createBill.RoomID
