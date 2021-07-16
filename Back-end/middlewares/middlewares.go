@@ -26,10 +26,8 @@ func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
 			r = r.WithContext(ctxUserId)
 			data := Pretty(r.Context().Value("data"))
 			fmt.Fprintln(w, data)
-			// 	return data
 		}
 		next(w, r)
-
 		// r.Header.Set("user_id", "1")
 	}
 }
