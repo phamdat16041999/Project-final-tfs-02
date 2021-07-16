@@ -17,8 +17,8 @@ func Run() {
 	post.Path("/account").HandlerFunc(model.CreateAccount)
 	post.Path("/login").HandlerFunc(model.LoginAcount)
 	post.Path("/forgotpassword").HandlerFunc(model.ForgotPassword)
-	post.Path("/changepassword").HandlerFunc(model.ChangePassword)
-	post.Path("/active").HandlerFunc(model.ActiveAccount)
+	post.Path("/changepassword").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ChangePassword))
+	post.Path("/active").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ActiveAccount))
 	post.Path("/createbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Createbill))
 	post.Path("/rating").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Rating))
 	post.Path("/checkroomstatus").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Checkroomstatus))
@@ -31,6 +31,7 @@ func Run() {
 	get.Path("/tophotel").HandlerFunc(model.GetTopHotel)
 	get.Path("/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
 	get.Path("/getbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.GetBill))
+	get.Path("/search/{name}").HandlerFunc(model.SearchByName)
 
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
