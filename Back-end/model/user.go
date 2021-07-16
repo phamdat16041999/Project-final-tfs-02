@@ -215,15 +215,15 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(query.UserName)
 	// b1, _ := json.Marshal(query.ID)
 	// b2, _ := json.Marshal(queryAuth.RoleID)
-	// b3, _ := json.Marshal(queryRole.Name)
+	b3, _ := json.Marshal(queryRole.Name)
 	userName := string(b)
 	// userId := string(b1)
 	// roleId := string(b2)
-	// roleName := string(b3)
+	roleName := string(b3)
 
 	// fmt.Fprintln(w, userId)
 	// fmt.Fprintln(w, roleId)
-	// fmt.Fprintln(w, roleName)
+	fmt.Fprintln(w, roleName)
 
 	if len(userName) == 2 {
 		fmt.Fprint(w, "Username not created yet!")
@@ -235,7 +235,7 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 
 		if CheckPasswordHash(user.Password, password[1]) {
 			b, _ := json.Marshal(query.ID)
-			b1, _ := json.Marshal(query.ID)
+			b1, _ := json.Marshal(queryAuth.RoleID)
 			userid, _ := strconv.ParseUint(string(b), 10, 64)
 			roleid, _ := strconv.ParseUint(string(b1), 10, 64)
 			if x == "true" {

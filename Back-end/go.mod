@@ -10,6 +10,7 @@ require (
 	github.com/fatih/color v1.12.0 // indirect
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-errors/errors v1.4.0 // indirect
+	github.com/go-redis/redis/v8 v8.11.0 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hhkbp2/go-logging v0.3.6 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
