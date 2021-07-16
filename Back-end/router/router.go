@@ -27,7 +27,7 @@ func Run() {
 	//get method
 	get := r.Methods(http.MethodGet).Subrouter()
 	get.Path("/homepage").HandlerFunc(model.DataHomePage)
-	get.Path("/hotel/{address}/{rate}").HandlerFunc(model.SeachHotelAddress)
+	get.Path("/hotel/{address}/{rate}").HandlerFunc(model.SearchHotelAddress)
 	get.Path("/tophotel").HandlerFunc(model.GetTopHotel)
 	get.Path("/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
 	get.Path("/getbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.GetBill))
@@ -36,6 +36,7 @@ func Run() {
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
 	r.HandleFunc("/CheckLogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
+	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
 	http.Handle("/", r)
 	//methoddelete
 	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
@@ -49,4 +50,7 @@ func Run() {
 }
 func CheckLogin(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "ok")
+}
+func Test(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "test")
 }

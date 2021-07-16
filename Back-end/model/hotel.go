@@ -100,7 +100,22 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(hotel)
 	pkg.ServeJQueryWithCache(w, "tophotel", string(b))
 }
-
+func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	db := connect.Connect()
+	vars := mux.Vars(r)
+	rate, _ := strconv.ParseFloat(vars["rate"], 64)
+	var hotels []Hotel
+	var resulthotels []Hotel
+	db.Debug().Where("address LIKE ?", "%"+vars["address"]+"%").Find(&hotels)
+	for i := 0; i < len(hotels); i++ {
+		if int64(hotels[i].AverageRate) == int64(rate) {
+			resulthotels = append(resulthotels, hotels[i])
+		}
+	}
+	b, _ := json.Marshal(resulthotels)
+	fmt.Fprintln(w, string(b))
+}
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
