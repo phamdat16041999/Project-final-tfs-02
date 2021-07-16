@@ -46,6 +46,7 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("error:", err)
 	}
 	fmt.Println(userid)
+	//aaa
 	// fmt.Fprintln(w, string(b))
 	// Tao time
 	time.StartTime = createBill.StartTime
