@@ -189,8 +189,9 @@ export default {
                 ":00+07:00",
               Total: this.output.totalPrice,
             };
+            // const token = localStorage.getItem('token');
             const token =
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MjY0Mjc0ODYsInJvbGVzX2lkIjoxNCwidXNlcl9pZCI6MTR9.J9XZb6jQ-pwIQSWb-wTvzDFvyXk3aO6ker74FoTZ4dg";
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MjY0NjQ5OTUsInJvbGVzX2lkIjowLCJ1c2VyX2lkIjoxNH0.-zekWUWZm5QSTfVX3v2Yq_4Sl_2Xj_khcSa8hw2F9_E";
             const url = "http://localhost:8080/createbill";
             let bill = await axios.post(url, dataBill, {
               headers: {
