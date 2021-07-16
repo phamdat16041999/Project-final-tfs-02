@@ -39,6 +39,7 @@ func Run() {
 
 	handler := cors.New(cors.Options{
 		AllowedMethods: []string{"GET", "POST", "DELETE", "PATCH", "OPTIONS", "PUT"},
+		AllowedHeaders: []string{"*"},
 	}).Handler(r)
 	http.ListenAndServe(":8080", handler)
 }

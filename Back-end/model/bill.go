@@ -6,6 +6,7 @@ import (
 	"hotel/connect"
 	"net/http"
 	"strconv"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -18,12 +19,22 @@ type Bill struct {
 	TimeID  uint   `json:"timeID,omitempty"`
 	Total   int    `json:"total,omitempty"`
 }
+type CreateBill struct {
+	UserID    uint64    `json:"userID,omitempty"`
+	HotelID   uint      `json:"hotelID,omitempty"`
+	RoomID    uint      `json:"roomID,omitempty"`
+	StartTime time.Time `json:"startTime,omitempty"`
+	EndTime   time.Time `json:"endTime,omitempty"`
+	Total     int       `json:"total,omitempty"`
+}
 
 func Createbill(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	userId := r.Context().Value("user_id")
+	var createBill CreateBill
+	var time Times
 	var bill Bill
-	err := json.NewDecoder(r.Body).Decode(&bill)
+	err := json.NewDecoder(r.Body).Decode(&createBill)
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
@@ -31,13 +42,36 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 	str := fmt.Sprintf("%v", userId)
 	// convert string str to unit to update in struct
 	userid, _ := strconv.ParseUint(str, 10, 64)
-	bill.UserID = userid
-	result := db.Create(&bill)
+	// b, err := json.Marshal(bill)
+	// if err != nil {
+	// 	fmt.Println("error:", err)
+	// }
+	fmt.Fprintln(w, userid)
+	// fmt.Fprintln(w, string(b))
+	// Tao time
+	time.StartTime = createBill.StartTime
+	time.EndTime = createBill.EndTime
+	time.RoomID = createBill.RoomID
+	result := db.Create(&time)
 	if result.Error != nil {
-		fmt.Fprintf(w, "Create bill have error: %v", bill)
+		fmt.Fprintf(w, "Create time have error: %v", result)
 		return
 	} else {
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "Create bill successfull")
+		db.Last(&time)
+		bill.UserID = userid
+		bill.HotelID = createBill.HotelID
+		bill.RoomID = createBill.RoomID
+		bill.TimeID = time.ID
+		bill.Total = createBill.Total
+		result := db.Create(&bill)
+		if result.Error != nil {
+			fmt.Fprintf(w, "Create bill have error: %v", result)
+			return
+		} else {
+			fmt.Fprintf(w, "Create bill have successfully")
+		}
+
 	}
+
+	// result := db.Create(&bill)
 }

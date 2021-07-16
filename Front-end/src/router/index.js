@@ -27,6 +27,11 @@ const routes = [
     name: "filter",
     component: () => import("../views/filterHotel/main.vue"),
   },
+  {
+    path: "/testPaypal",
+    name: "testPaypal",
+    component: () => import("../views/product/testPaypal.vue"),
+  },
 ];
 
 const router = createRouter({
