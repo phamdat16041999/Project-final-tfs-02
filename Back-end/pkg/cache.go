@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -17,15 +16,16 @@ func init() {
 }
 
 func ServeJQueryWithCache(w http.ResponseWriter, key, data string) {
-	start := time.Now()
+	// start := time.Now()
 	if v, ok := m[key]; ok {
-		fmt.Fprintln(w, "There are data in local cache")
-		fmt.Fprintln(w, fmt.Sprintf("Cache hit \n %v \n %v", time.Since(start), v))
+		// fmt.Fprintln(w, "There are data in local cache")
+		// fmt.Fprintln(w, fmt.Sprintf("Cache hit \n %v \n %v", time.Since(start), v))
+		fmt.Fprintln(w, v)
 		return
 	} else {
-		fmt.Fprintln(w, "No data in local cache")
+		fmt.Fprintln(w, ServeJQueryWithRemoteCache(w, key, data))
 	}
-	fmt.Fprintln(w, ServeJQueryWithRemoteCache(w, key, data))
+	// fmt.Fprintln(w, ServeJQueryWithRemoteCache(w, key, data))
 }
 func ServeJQueryWithRemoteCache(w http.ResponseWriter, key, data string) string {
 	rdb := redis.NewClient(&redis.Options{
@@ -35,13 +35,14 @@ func ServeJQueryWithRemoteCache(w http.ResponseWriter, key, data string) string 
 	})
 	val2, err := rdb.Get(ctx, key).Result()
 	if err == redis.Nil {
-		fmt.Fprintln(w, "No data in remote cache")
-		fmt.Fprintln(w, "Data in database: ", data)
+		// fmt.Fprintln(w, "No data in remote cache")
+		// fmt.Fprintln(w, "Data in database: ", data)
 		return InsertData(key, data)
 	} else if err != nil {
-		panic(err)
+		// Neu Docker chua run thi goi den database
+		return InsertData(key, data)
 	} else {
-		fmt.Fprintln(w, "There are data in remote cache")
+		// fmt.Fprintln(w, "There are data in remote cache")
 		m[key] = string(val2)
 		return val2
 	}
