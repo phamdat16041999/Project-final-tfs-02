@@ -30,6 +30,7 @@ func Run() {
 	get.Path("/hotel/{address}/{rate}").HandlerFunc(model.SeachHotelAddress)
 	get.Path("/tophotel").HandlerFunc(model.GetTopHotel)
 	get.Path("/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
+	get.Path("/getbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.GetBill))
 
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")

@@ -41,3 +41,6 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Create bill successfull")
 	}
 }
+func GetBill(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "aaaaaaaaaa")
+}
