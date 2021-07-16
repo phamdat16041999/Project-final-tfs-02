@@ -15,7 +15,6 @@ func init() {
 	m = make(map[string]string)
 }
 
-// Vẫn gặp lỗi có thể Dữ liệu chưa vào local cache, về xem lại
 func ServeJQueryWithCache(w http.ResponseWriter, key string) string {
 	// start := time.Now()
 	if v, ok := m[key]; ok {
