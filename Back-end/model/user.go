@@ -7,6 +7,7 @@ import (
 	"hotel/auth"
 	"hotel/connect"
 	"hotel/gmail"
+	"hotel/middlewares"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -15,7 +16,6 @@ import (
 
 	// "github.com/badoux/checkmail"
 
-	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -95,6 +95,12 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 // }
 // }
 func UpdateAccount(w http.ResponseWriter, r *http.Request) {
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -106,12 +112,10 @@ func UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	randomCode := codeAuthentication()
 	var query User
 	var query1 User
-	params := mux.Vars(r)
-	id := params["id"]
-	db.Where("id = ?", id).Find(&query1)
+	db.Where("id = ?", userid).Find(&query1)
 	b, _ := json.Marshal(query1.ID)
 	if string(b) != "0" {
-		db.Model(query).Where("id = ?", id).Updates(User{
+		db.Model(query).Where("id = ?", userid).Updates(User{
 			FirstName:          user.FirstName,
 			LastName:           user.LastName,
 			DOB:                user.DOB,
@@ -131,14 +135,18 @@ func UpdateAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteAccount(w http.ResponseWriter, r *http.Request) {
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
 	db := connect.Connect()
 	var query User
-	params := mux.Vars(r)
-	id := params["id"]
-	db.Where("id = ?", id).Find(&query)
+	db.Where("id = ?", userid).Find(&query)
 	b, _ := json.Marshal(query.ID)
 	if string(b) != "0" {
-		db.Where("id = ?", id).Delete(&query)
+		db.Where("id = ?", userid).Delete(&query)
 		fmt.Fprintln(w, "Delete successfull!")
 	} else {
 		fmt.Fprintln(w, "Can not find ID")
