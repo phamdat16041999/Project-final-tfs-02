@@ -15,19 +15,19 @@ func init() {
 	m = make(map[string]string)
 }
 
-func ServeJQueryWithCache(w http.ResponseWriter, key, data string) {
+func ServeJQueryWithCache(w http.ResponseWriter, key string) string {
 	// start := time.Now()
 	if v, ok := m[key]; ok {
 		// fmt.Fprintln(w, "There are data in local cache")
 		// fmt.Fprintln(w, fmt.Sprintf("Cache hit \n %v \n %v", time.Since(start), v))
-		fmt.Fprintln(w, v)
-		return
+		// fmt.Fprintln(w, v)
+		return v
 	} else {
-		fmt.Fprintln(w, ServeJQueryWithRemoteCache(w, key, data))
+		return ServeJQueryWithRemoteCache(w, key)
 	}
 	// fmt.Fprintln(w, ServeJQueryWithRemoteCache(w, key, data))
 }
-func ServeJQueryWithRemoteCache(w http.ResponseWriter, key, data string) string {
+func ServeJQueryWithRemoteCache(w http.ResponseWriter, key string) string {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "", // no password set
@@ -37,10 +37,10 @@ func ServeJQueryWithRemoteCache(w http.ResponseWriter, key, data string) string 
 	if err == redis.Nil {
 		// fmt.Fprintln(w, "No data in remote cache")
 		// fmt.Fprintln(w, "Data in database: ", data)
-		return InsertData(key, data)
+		return "No data in remote cache"
 	} else if err != nil {
 		// Neu Docker chua run thi goi den database
-		return InsertData(key, data)
+		return "No data in remote cache"
 	} else {
 		// fmt.Fprintln(w, "There are data in remote cache")
 		m[key] = string(val2)
@@ -55,9 +55,9 @@ func InsertData(key, data string) string {
 	})
 	err1 := rdb.Set(ctx, key, data, 0).Err()
 	if err1 != nil {
-		panic(err1)
+		return data
 	}
-	return "Insert seccessfully!"
+	return data
 }
 func DeleteLocalCache(w http.ResponseWriter, key string) {
 	rdb := redis.NewClient(&redis.Options{
