@@ -76,7 +76,7 @@ func SearchByName(w http.ResponseWriter, r *http.Request) {
 
 }
 func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+
 	db := connect.Connect()
 	vars := mux.Vars(r)
 	rate, _ := strconv.ParseFloat(vars["rate"], 64)
@@ -93,7 +93,7 @@ func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetTopHotel(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+
 	db := connect.Connect()
 	var hotel []Hotel
 	db.Limit(2).Order("average_rate desc").Find(&hotel)
@@ -101,7 +101,7 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	pkg.ServeJQueryWithCache(w, "tophotel", string(b))
 }
 func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+
 	db := connect.Connect()
 	vars := mux.Vars(r)
 	rate, _ := strconv.ParseFloat(vars["rate"], 64)
@@ -117,7 +117,6 @@ func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(b))
 }
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	var hotel Hotel
@@ -183,7 +182,7 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 func Rating(w http.ResponseWriter, r *http.Request) {
 	pkg.DeleteRemoteCache(w, "tophotel")
 	pkg.DeleteLocalCache(w, "tophotel")
-	w.Header().Set("Content-Type", "application/json")
+
 	var hotelrate HotelRate
 	var rate Rate
 	var hotel Hotel
@@ -270,7 +269,7 @@ func inTimeSpan(start, end, check time.Time) bool {
 // }
 
 func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+
 	var checkTime Times
 	err := json.NewDecoder(r.Body).Decode(&checkTime)
 	if err != nil {

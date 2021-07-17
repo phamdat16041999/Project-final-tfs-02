@@ -31,8 +31,13 @@ type CreateBill struct {
 
 func Createbill(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
-	userId := r.Context().Value("data")
-	UserID := middlewares.ConvertDataToken(userId, "user_id")
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+
 	var createBill CreateBill
 	var time Times
 	var bill Bill
@@ -41,13 +46,7 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 	}
 	// convert string str to unit to update in struct
-	userid, err := strconv.ParseUint(UserID, 10, 64)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
 	fmt.Println(userid)
-	//aaa
-	// fmt.Fprintln(w, string(b))
 	// Tao time
 	time.StartTime = createBill.StartTime
 	time.EndTime = createBill.EndTime
@@ -74,6 +73,44 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 
 	// result := db.Create(&bill)
 }
+
+type ListBill struct {
+	NameHotel  string    `json:"namehotel"`
+	NameRoom   string    `json:"nameroom"`
+	StartTime  time.Time `json:"startTime"`
+	EndTime    time.Time `json:"endTime"`
+	TotalPrice int
+}
+
 func GetBill(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "aaaaaaaaaa")
+	db := connect.Connect()
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var bills []ListBill
+	var listbill []Bill
+	db.Where("user_id =?", userid).Find(&listbill)
+	for i := 0; i < len(listbill); i++ {
+		var hotel Hotel
+		var roomID Room
+		var time Times
+		db.Debug().Where("id = ?", listbill[i].HotelID).Find(&hotel)
+		db.Where("id = ?", listbill[i].RoomID).Find(&roomID)
+		db.Where("id = ?", listbill[i].TimeID).Find(&time)
+		bills = append(bills, ListBill{
+			NameHotel:  hotel.Name,
+			NameRoom:   roomID.Name,
+			StartTime:  time.StartTime,
+			EndTime:    time.EndTime,
+			TotalPrice: listbill[i].Total,
+		})
+	}
+	b, err := json.Marshal(&bills)
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Fprint(w, string(b))
 }
