@@ -28,9 +28,9 @@ const routes = [
     component: () => import("../views/filterHotel/main.vue"),
   },
   {
-    path: "/testPaypal",
-    name: "testPaypal",
-    component: () => import("../views/product/testPaypal.vue"),
+    path: "/bill",
+    name: "showbill",
+    component: () => import("../views/product/Bill.vue"),
   },
 ];
 

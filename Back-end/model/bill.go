@@ -28,6 +28,19 @@ type CreateBill struct {
 	EndTime   time.Time `json:"endTime,omitempty"`
 	Total     int       `json:"total,omitempty"`
 }
+type ShowBill struct {
+	FirstName string    `json:"firstName,omitempty"`
+	LastName  string    `json:"lastName,omitempty"`
+	Address   string    `json:"address,omitempty"`
+	Phone     string    `json:"phone,omitempty"`
+	Email     string    `json:"email,omitempty"`
+	Hotel     string    `json:"hotel,omitempty"`
+	HotelID   uint      `json:"hotelID,omitempty"`
+	Room      string    `json:"room,omitempty"`
+	StartTime time.Time `json:"startTime,omitempty"`
+	EndTime   time.Time `json:"endTime,omitempty"`
+	Total     int       `json:"total,omitempty"`
+}
 
 func Createbill(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
@@ -36,6 +49,10 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 	var createBill CreateBill
 	var time Times
 	var bill Bill
+	var showBill ShowBill
+	var user User
+	var hotel Hotel
+	var room Room
 	err := json.NewDecoder(r.Body).Decode(&createBill)
 	if err != nil {
 		fmt.Fprint(w, err)
@@ -67,7 +84,25 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Create bill have error: %v", result)
 
 		} else {
-			fmt.Fprintf(w, "Create bill have successfully")
+			db.First(&user, "id = ?", userid)
+			db.First(&hotel, "id = ?", createBill.HotelID)
+			db.First(&room, "id = ?", createBill.RoomID)
+			showBill.FirstName = user.FirstName
+			showBill.LastName = user.LastName
+			showBill.Address = user.Address
+			showBill.Email = user.Email
+			showBill.Phone = user.Phone
+			showBill.Hotel = hotel.Name
+			showBill.HotelID = createBill.HotelID
+			showBill.Room = room.Name
+			showBill.StartTime = createBill.StartTime
+			showBill.EndTime = createBill.EndTime
+			showBill.Total = createBill.Total
+			b, err := json.Marshal(showBill)
+			if err != nil {
+				fmt.Println("error:", err)
+			}
+			fmt.Fprintf(w, string(b))
 		}
 
 	}

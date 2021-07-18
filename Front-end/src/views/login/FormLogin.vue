@@ -100,14 +100,16 @@ export default {
           "http://localhost:8080/login",
           this.loginData
         );
-        if (users.data == "Username not created yet!") {
+        if (users.data.split("\n")[1] == "Username not created yet!") {
           this.msg = "Username not created yet!";
-        } else if (users.data == "Wrong Password!") {
+        } else if (users.data.split("\n")[1] == "Wrong Password!") {
           this.msg = "Wrong Password!";
         } else {
           // var data = { token: users.data};
           this.$store.dispatch("login");
-          localStorage.setItem("token", users.data);
+          localStorage.setItem("token", (users.data.split("\n")[1]));
+          localStorage.setItem("role", (users.data.split("\n")[0]));
+          this.$store.dispatch("setUser");
           this.$router.push("/");
         }
       }
