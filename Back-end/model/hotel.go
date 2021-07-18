@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"hotel/connect"
+	"hotel/middlewares"
 	"hotel/pkg"
 	"net/http"
 	"strconv"
@@ -73,10 +74,16 @@ func DataHomePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func SearchByName(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	db := connect.Connect()
+	var hotels []Hotel
+	db.Debug().Raw("SELECT * FROM hotels WHERE MATCH (name,address,description) AGAINST (? IN NATURAL LANGUAGE MODE)", "Ninh Binh").Scan(&hotels)
+	b, _ := json.Marshal(hotels)
+	fmt.Fprintln(w, string(b))
 
 }
 func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+
 	db := connect.Connect()
 	vars := mux.Vars(r)
 	rate, _ := strconv.ParseFloat(vars["rate"], 64)
@@ -106,7 +113,7 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+
 	db := connect.Connect()
 	vars := mux.Vars(r)
 	rate, _ := strconv.ParseFloat(vars["rate"], 64)
@@ -122,7 +129,6 @@ func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(b))
 }
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	db := connect.Connect()
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	var hotel Hotel
@@ -188,7 +194,13 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 func Rating(w http.ResponseWriter, r *http.Request) {
 	pkg.DeleteRemoteCache(w, "tophotel")
 	pkg.DeleteLocalCache(w, "tophotel")
-	w.Header().Set("Content-Type", "application/json")
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+
 	var hotelrate HotelRate
 	var rate Rate
 	var hotel Hotel
@@ -198,13 +210,13 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	db := connect.Connect()
-	db.Where("user_id = ? AND hotel_id = ?", hotelrate.UserID, hotelrate.HotelID).Find(&rate)
+	db.Where("user_id = ? AND hotel_id = ?", userid, hotelrate.HotelID).Find(&rate)
 	b1, _ := json.Marshal(&rate.HotelID)
 	ID, _ := strconv.ParseUint(string(b1), 10, 32)
 	b, _ := json.Marshal(&rate.Rate)
 
 	var Rate = Rate{
-		UserID:  hotelrate.UserID,
+		UserID:  uint(userid),
 		HotelID: hotelrate.HotelID,
 		Rate:    hotelrate.Rate,
 	}
@@ -275,7 +287,7 @@ func inTimeSpan(start, end, check time.Time) bool {
 // }
 
 func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+
 	var checkTime Times
 	err := json.NewDecoder(r.Body).Decode(&checkTime)
 	if err != nil {

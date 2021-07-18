@@ -28,6 +28,7 @@ func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
 			// data := Pretty(r.Context().Value("data"))
 			// fmt.Fprintln(w, data)
 		}
+		w.Header().Set("Content-Type", "application/json")
 		next(w, r)
 		// r.Header.Set("user_id", "1")
 	}
