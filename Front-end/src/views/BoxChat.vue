@@ -69,7 +69,7 @@ export default {
       ws: null, // Our websocket
       newMsg: '', // Holds new messages to be sent to the server
       chatContent: '', // A running list of chat messages displayed on the screen
-      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MjY3MDQwNTQsInJvbGVzX2lkIjowLCJ1c2VyX2lkIjoyNH0.bJXnNVnG6UbwTUA4xor6B4xA9ZOLvVTOttz0XRsuMn0", // Our userid1
+      token: localStorage.getItem("token").split('"')[1], // Our userid1
       userid2: "2",
     };
   },

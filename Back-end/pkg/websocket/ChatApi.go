@@ -58,17 +58,12 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 		var msg Message
 		// Read in a new message as JSON and map it to a Message object
 		err := ws.ReadJSON(&msg)
-		if err != nil {
-			fmt.Print(err)
-		}
 		DecodeToken := auth.DecodeToken(msg.Token)
 		if DecodeToken == nil {
 			fmt.Fprint(w, "Can't not decode token")
 		}
 		resultID := DecodeToken["user_id"]
 		UserID1 := fmt.Sprintf("%v", resultID)
-		fmt.Print(UserID1)
-		fmt.Print(msg.UserID2)
 		roomid = UserID1 + "+" + msg.UserID2
 		roomid1 = msg.UserID2 + "+" + UserID1
 		clientRooms[roomid] = ws
