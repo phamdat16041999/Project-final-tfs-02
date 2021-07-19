@@ -18,7 +18,7 @@ func Run() {
 	post.Path("/login").HandlerFunc(model.LoginAcount)
 	post.Path("/forgotpassword").HandlerFunc(model.ForgotPassword)
 	post.Path("/changepassword").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ChangePassword))
-	post.Path("/active").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ActiveAccount))
+	post.Path("/active").HandlerFunc(model.ActiveAccount)
 	post.Path("/createbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Createbill))
 	post.Path("/rating").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Rating))
 	post.Path("/checkroomstatus").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Checkroomstatus))
@@ -35,8 +35,7 @@ func Run() {
 
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
-	r.HandleFunc("/CheckLogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
-	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
+	r.HandleFunc("/checklogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
 	http.Handle("/", r)
 	//methoddelete
 	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
@@ -51,7 +50,4 @@ func Run() {
 }
 func CheckLogin(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "ok")
-}
-func Test(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "test")
 }

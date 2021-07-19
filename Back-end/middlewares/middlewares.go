@@ -7,6 +7,8 @@ import (
 	"hotel/auth"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -15,7 +17,8 @@ func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		Token := auth.TokenValid(r)
 		if Token == nil {
-			fmt.Fprint(w, "401")
+			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprintln(w, "Ném mã xác thực vào!")
 			return
 		} else {
 			v := jwt.MapClaims{
@@ -33,13 +36,21 @@ func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
 		// r.Header.Set("user_id", "1")
 	}
 }
-func Pretty(data interface{}) string {
+func Pretty(data interface{}) [2]uint64 {
+	var arr [2]uint64
 	b, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
 		log.Println(err)
-		return ""
 	}
-	return string(b)
+	b1 := strings.Split(string(b), ",")
+	b2 := strings.Split(string(b1[0]), ": ")
+	b3 := strings.Split(string(b1[1]), ": ")
+	b4 := strings.Split(string(b3[1]), "\n")
+	i, _ := strconv.ParseUint(b2[1], 10, 64)
+	i1, _ := strconv.ParseUint(b4[0], 10, 64)
+	arr[0] = i
+	arr[1] = i1
+	return arr
 }
 func ConvertDataToken(DataToken interface{}, data string) string {
 	str := fmt.Sprintf("%v", DataToken)
