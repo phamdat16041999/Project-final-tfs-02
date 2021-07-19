@@ -6,9 +6,6 @@ import (
 	"hotel/connect"
 	"hotel/middlewares"
 	"net/http"
-
-	//"strconv"
-	"hotel/middlewares"
 	"strconv"
 	"time"
 
@@ -47,7 +44,6 @@ type ShowBill struct {
 
 func Createbill(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
-	data := middlewares.Pretty(r.Context().Value("data"))
 	data := r.Context().Value("data")
 	UserID := middlewares.ConvertDataToken(data, "user_id")
 	userid, err1 := strconv.ParseUint(UserID, 10, 64)
@@ -65,10 +61,6 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
-	//convert interface to string
-
-	bill.UserID = data[0]
-	result := db.Create(&bill)
 	// convert string str to unit to update in struct
 	fmt.Println(userid)
 	// Tao time
