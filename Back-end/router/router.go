@@ -18,7 +18,7 @@ func Run() {
 	post.Path("/login").HandlerFunc(model.LoginAcount)
 	post.Path("/forgotpassword").HandlerFunc(model.ForgotPassword)
 	post.Path("/changepassword").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ChangePassword))
-	post.Path("/active").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ActiveAccount))
+	post.Path("/active").HandlerFunc(model.ActiveAccount)
 	post.Path("/createbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Createbill))
 	post.Path("/rating").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Rating))
 	post.Path("/checkroomstatus").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Checkroomstatus))
