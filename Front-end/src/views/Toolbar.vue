@@ -94,7 +94,7 @@ export default {
   async created() {
     if (localStorage.getItem("token") != null) {
       const token = localStorage.getItem("token").split('"')[1];
-      const url = "http://localhost:8080/CheckLogin";
+      const url = "http://localhost:8080/checklogin";
       let user = await axios.get(url, {
         headers: {
           Authorization: `bearer ${token}`,
