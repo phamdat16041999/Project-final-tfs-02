@@ -34,8 +34,7 @@ func Run() {
 
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
-	r.HandleFunc("/CheckLogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
-	r.HandleFunc("/test", middlewares.SetMiddlewareAuthentication(Test)).Methods("PUT")
+	r.HandleFunc("/checklogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
 	http.Handle("/", r)
 	//methoddelete
 	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
@@ -49,7 +48,4 @@ func Run() {
 }
 func CheckLogin(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "ok")
-}
-func Test(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "test")
 }

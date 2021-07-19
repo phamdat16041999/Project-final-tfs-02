@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"hotel/connect"
 	"net/http"
-	"strconv"
+
+	//"strconv"
+	"hotel/middlewares"
 
 	"gorm.io/gorm"
 )
@@ -21,17 +23,15 @@ type Bill struct {
 
 func Createbill(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
-	userId := r.Context().Value("user_id")
+	data := middlewares.Pretty(r.Context().Value("data"))
 	var bill Bill
 	err := json.NewDecoder(r.Body).Decode(&bill)
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
-	// convert interface to string
-	str := fmt.Sprintf("%v", userId)
-	// convert string str to unit to update in struct
-	userid, _ := strconv.ParseUint(str, 10, 64)
-	bill.UserID = userid
+	//convert interface to string
+
+	bill.UserID = data[0]
 	result := db.Create(&bill)
 	if result.Error != nil {
 		fmt.Fprintf(w, "Create bill have error: %v", bill)

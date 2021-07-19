@@ -129,7 +129,6 @@ func UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-
 func DeleteAccount(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	var query User
@@ -236,10 +235,10 @@ func LoginAcount(w http.ResponseWriter, r *http.Request) {
 		if CheckPasswordHash(user.Password, password[1]) {
 			b, _ := json.Marshal(query.ID)
 			b1, _ := json.Marshal(queryAuth.RoleID)
-			userid, _ := strconv.ParseUint(string(b), 10, 64)
-			roleid, _ := strconv.ParseUint(string(b1), 10, 64)
+			userId, _ := strconv.ParseUint(string(b), 10, 64)
+			roleId, _ := strconv.ParseUint(string(b1), 10, 64)
 			if x == "true" {
-				token, err := auth.CreateToken(userid, roleid)
+				token, err := auth.CreateToken(userId, roleId)
 				if err != nil {
 					fmt.Fprint(w, err.Error())
 					return

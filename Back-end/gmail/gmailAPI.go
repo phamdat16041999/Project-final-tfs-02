@@ -131,7 +131,7 @@ func SendEmail(Email, Content string) string {
 
 	_, err = srv.Users.Messages.Send("me", &message).Do()
 	if err != nil {
-		// log.Fatalf("Unable to send. %v", err)
+		log.Fatalf("Unable to send. %v", err)
 		a = "Unable to send."
 		return a
 	}
