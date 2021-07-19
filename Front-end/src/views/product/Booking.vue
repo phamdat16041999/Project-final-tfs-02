@@ -53,11 +53,14 @@
 </template>
 <script>
 import axios from "axios";
+import { mapState } from "vuex";
 export default {
   props: {
     hotel: Object,
   },
   computed: {
+    ...mapState(["login"]),
+    ...mapState(["billBuy"]),
     msToTime() {
       const date1 = this.output.checkOutData + " " + this.output.timeCheckOut;
       const date2 = this.output.checkInData + " " + this.output.timeCheckInt;
@@ -144,22 +147,26 @@ export default {
       this.output.IDHotel = IDHotel;
     },
     async checkIn() {
-      if (String(Number(this.$refs.totalPrice.innerText)) != "NaN") {
-        this.output.totalPrice = Number(this.$refs.totalPrice.innerText);
-        this.order.amount.value = Number(this.$refs.totalPrice.innerText);
-        if (
-          this.output.chooseRoom != null &&
-          this.output.checkInData != null &&
-          this.output.checkOutData != null &&
-          this.output.timeCheckOut != null &&
-          this.output.timeCheckInt != null
-        ) {
-          this.$refs.errorCode.innerText = "";
-          this.payPal = "showPaypal";
-        }
+      if (this.login.login == false) {
+        this.$router.push("/login");
       } else {
-        this.$refs.errorCode.innerText =
-          "Sorry the time you selected is not valid. Please try again";
+        if (String(Number(this.$refs.totalPrice.innerText)) != "NaN") {
+          this.output.totalPrice = Number(this.$refs.totalPrice.innerText);
+          this.order.amount.value = Number(this.$refs.totalPrice.innerText);
+          if (
+            this.output.chooseRoom != null &&
+            this.output.checkInData != null &&
+            this.output.checkOutData != null &&
+            this.output.timeCheckOut != null &&
+            this.output.timeCheckInt != null
+          ) {
+            this.$refs.errorCode.innerText = "";
+            this.payPal = "showPaypal";
+          }
+        } else {
+          this.$refs.errorCode.innerText =
+            "Sorry the time you selected is not valid. Please try again";
+        }
       }
     },
     setLoaded: function () {
@@ -172,7 +179,8 @@ export default {
           },
           onApprove: async (data, actions) => {
             const order = await actions.order.capture();
-            alert(order);
+            if(order.status == "COMPLETED")
+            {
             // ajax request
             let dataBill = {
               HotelID: this.output.IDHotel,
@@ -190,15 +198,16 @@ export default {
               Total: this.output.totalPrice,
             };
             // const token = localStorage.getItem('token');
-            const token =
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MjY0NjQ5OTUsInJvbGVzX2lkIjowLCJ1c2VyX2lkIjoxNH0.-zekWUWZm5QSTfVX3v2Yq_4Sl_2Xj_khcSa8hw2F9_E";
+            const token = localStorage.getItem("token").split('"')[1];
             const url = "http://localhost:8080/createbill";
             let bill = await axios.post(url, dataBill, {
               headers: {
                 Authorization: `Basic ${token}`,
               },
             });
-            console.log(bill.data);
+            this.$store.dispatch("setBill", bill.data);
+            this.$router.push("/bill");
+          }
           },
           onError: (err) => {
             console.log(err);

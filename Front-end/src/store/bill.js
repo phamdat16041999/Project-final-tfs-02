@@ -8,24 +8,17 @@ Vue.use(Vuex);
 Vue.use(VueAxios, axios);
 export default {
   state: {
-    login: false,
+    bill: []
   },
   actions: {
-    setUser({commit}) {
-        commit("setUser")
+    setBill({commit}, data) {
+        commit("setBill", data)
     },
-    delUser({commit}) {
-        console.log("acacacac")
-        commit("delUser")
-    }
   },
   mutations: {
-    setUser(state) {
-      state.login = true;
-    },
-    delUser(state) {
-        console.log("acacacac")
-      state.login = false;
+    setBill(state, data) {
+      console.log(data)
+      state.bill = data;
     },
   },
   modules: {},

@@ -53,6 +53,7 @@ func InsertData(key, data string) string {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
+	m[key] = string(data)
 	err1 := rdb.Set(ctx, key, data, 0).Err()
 	if err1 != nil {
 		return data

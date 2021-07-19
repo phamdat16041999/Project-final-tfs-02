@@ -45,10 +45,10 @@
                 </form>
               </li>
             </ul>
-            <div class="nav-item" v-if="user == false">
-              <a class="nav-link toolbarText" @click="login">Login</a>
+            <div class="nav-item" v-if="login.login == false">
+              <a class="nav-link toolbarText" @click="loginPage">Login</a>
             </div>
-            <div class="nav-item dropdown user" v-if="user">
+            <div class="nav-item dropdown user" v-if="login.login">
               <a
                 class="nav-link dropdown-toggle toolbarText"
                 href="#"
@@ -74,33 +74,45 @@
   </div>
 </template>
 <script>
+import axios from "axios";
+import { mapState } from "vuex";
 export default {
+  computed: mapState(["login"]),
   methods: {
     homePage() {
       this.$router.push("/");
     },
-    login() {
+    loginPage() {
       this.$router.push("/login");
     },
     logOut() {
+      this.$store.dispatch("delUser");
       localStorage.removeItem("token");
       this.$router.push("/");
-      this.user = false;
     },
   },
-  created() {
-    const cat = localStorage.getItem("token");
-    if (cat != null) {
-      this.user = true;
-    } else {
-      this.user = false;
+  async created() {
+    if (localStorage.getItem("token") != null) {
+      const token = localStorage.getItem("token").split('"')[1];
+      const url = "http://localhost:8080/CheckLogin";
+      let user = await axios.get(url, {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      });
+      console.log(user.data);
+      if (user.data == "ok") {
+        this.$store.dispatch("setUser");
+      } else {
+        this.$store.dispatch("delUser");
+      }
     }
   },
-  data() {
-    return {
-      user: null,
-    };
-  },
+  // data() {
+  //   return {
+  //     user: false,
+  //   };
+  // },
 };
 </script>
 <style scoped>
@@ -123,8 +135,8 @@ export default {
   background-color: black;
   opacity: 0.7;
 }
-.menu{
-    width: 35px;
+.menu {
+  width: 35px;
   height: 5px;
   background-color: white;
   margin: 6px 0;
