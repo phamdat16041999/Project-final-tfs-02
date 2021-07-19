@@ -37,7 +37,6 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 	if err1 != nil {
 		fmt.Println("error:", err1)
 	}
-
 	var createBill CreateBill
 	var time Times
 	var bill Bill
