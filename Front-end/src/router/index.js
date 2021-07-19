@@ -27,6 +27,11 @@ const routes = [
     name: "filter",
     component: () => import("../views/filterHotel/main.vue"),
   },
+  {
+    path: "/bill",
+    name: "showbill",
+    component: () => import("../views/product/Bill.vue"),
+  },
 ];
 
 const router = createRouter({

@@ -74,11 +74,11 @@ export default {
     };
   },
   created: function() {
+    // c, _, err := websocket.DefaultDialer.Dial(*addr, http.Header{"Authorization": {"Bearer " + *token}})
       var self = this;
       this.ws = new WebSocket('ws://' + "localhost:8080" + '/ws');
       this.ws.addEventListener('message', function(e) {
           var msg = JSON.parse(e.data);
-          console.log(msg);
           // self.chatContent = ""
           if (msg.userid == parseInt(self.userid1)) {
               self.chatContent += ' <div class="d-flex justify-content-start mb-4">'+ '<div class="img_cont_msg" style="height: 40px; width: 40px;">' +

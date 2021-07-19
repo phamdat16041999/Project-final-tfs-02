@@ -25,10 +25,13 @@ func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
 				"user_id":  Token["user_id"],
 				"roles_id": Token["roles_id"],
 			}
-			ctxUserId := context.WithValue(r.Context(), "data", v)
+			data := Pretty(v)
+			ctxUserId := context.WithValue(r.Context(), "data", data)
 			r = r.WithContext(ctxUserId)
-
+			// data := Pretty(r.Context().Value("data"))
+			// fmt.Fprintln(w, data)
 		}
+		w.Header().Set("Content-Type", "application/json")
 		next(w, r)
 		// r.Header.Set("user_id", "1")
 	}
@@ -48,4 +51,13 @@ func Pretty(data interface{}) [2]uint64 {
 	arr[0] = i
 	arr[1] = i1
 	return arr
+}
+func ConvertDataToken(DataToken interface{}, data string) string {
+	str := fmt.Sprintf("%v", DataToken)
+	sec := map[string]interface{}{}
+	if err := json.Unmarshal([]byte(str), &sec); err != nil {
+		fmt.Print(err)
+	}
+	str1 := fmt.Sprintf("%v", sec[data])
+	return str1
 }

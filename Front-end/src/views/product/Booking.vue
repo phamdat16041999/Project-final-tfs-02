@@ -1,64 +1,66 @@
 <template>
-    <div>
-        <h3>
-          {{ hotel.name }}
-        </h3>
-        <p>Choose a room</p>
-        <div style="display: flex">
-          <div
-            class="room"
-            v-for="(data, index) in hotel.room"
-            :key="index"
-            @click="setPrice(data.priceHrs, data.priceDay, data.extraPrice, data.name)"
-          >
-            {{ data.name }}
-          </div>
-        </div>
-        <p>Room: {{ output.chooseRoom }}</p>
-
-        <div class="row">
-          <div class="col-xl-6 col-12">
-            <label>Check in</label>
-            <input
-              type="time"
-              class="form-control"
-              v-model="output.timeCheckInt"
-            />
-            <input
-              type="date"
-              class="form-control"
-              v-model="output.checkInData"
-            />
-          </div>
-          <div class="col-xl-6 col-12">
-            <label>Check out</label>
-            <input
-              type="time"
-              class="form-control"
-              v-model="output.timeCheckOut"
-            />
-            <input
-              type="date"
-              class="form-control"
-              v-model="output.checkOutData"
-            />
-          </div>
-        </div>
-        
-        <br />
-        <p>Total price: ${{ totalPrice }}</p>
-        <p @click="goToMaps" class="goToMaps">See address --></p>
-        <button type="button" class="btn btn-danger" @click="checkIn">
-          Booking
-        </button>
+  <div>
+    <h3>
+      {{ hotel.name }}
+    </h3>
+    <p @click="goToMaps" class="goToMaps">See address --></p>
+    <p>Choose a room</p>
+    <div style="display: flex">
+      <div
+        class="room"
+        v-for="(data, index) in hotel.room"
+        :key="index"
+        @click="
+          setPrice(
+            data.priceHrs,
+            data.priceDay,
+            data.extraPrice,
+            data.name,
+            data.id,
+            hotel.id
+          )
+        "
+      >
+        {{ data.name }}
+      </div>
     </div>
+    <p>Room: {{ output.chooseRoom }}</p>
+
+    <div class="row">
+      <div class="col-xl-6 col-12">
+        <label>Check in</label>
+        <input type="time" class="form-control" v-model="output.timeCheckInt" />
+        <input type="date" class="form-control" v-model="output.checkInData" />
+      </div>
+      <div class="col-xl-6 col-12">
+        <label>Check out</label>
+        <input type="time" class="form-control" v-model="output.timeCheckOut" />
+        <input type="date" class="form-control" v-model="output.checkOutData" />
+      </div>
+    </div>
+
+    <br />
+    <p>
+      Total price: $
+      <span id="totalPrice" ref="totalPrice">{{ totalPrice }}</span>
+    </p>
+    <button type="button" class="btn btn-danger" @click="checkIn">
+      Booking
+    </button>
+    <p style="color: red" id="errorCode" ref="errorCode"></p>
+    <div><div ref="paypal" v-bind:class="payPal"></div></div>
+  </div>
 </template>
 <script>
+import axios from "axios";
+import { mapState } from "vuex";
 export default {
   props: {
     hotel: Object,
   },
-    computed: {
+  computed: {
+    ...mapState(["login"]),
+    ...mapState(["billBuy"]),
     msToTime() {
       const date1 = this.output.checkOutData + " " + this.output.timeCheckOut;
       const date2 = this.output.checkInData + " " + this.output.timeCheckInt;
@@ -73,33 +75,30 @@ export default {
       else if (hours < 24) return hours + " Hrs";
       else return days + " Days";
     },
-    totalPrice(){
-      let time = this.msToTime
-      console.log(this.msToTime)
-      time = time.split(" ")
-      if(time[1] == "Sec"){
-        return "Sorry we are unable to serve with the above time. Please book more than 2 hours"
-      }
-      else if(time[1] == "Min"){
-        return "Sorry we are unable to serve with the above time. Please book more than 2 hours"
-      }
-      else if(time[1] == "Hrs"){
-        if(time[0] < 2){
-          return "Sorry we are unable to serve with the above time. Please book more than 2 hours"
+    totalPrice() {
+      let time = this.msToTime;
+      console.log(this.msToTime);
+      time = time.split(" ");
+      if (time[1] == "Sec") {
+        return "Sorry we are unable to serve with the above time. Please book more than 2 hours";
+      } else if (time[1] == "Min") {
+        return "Sorry we are unable to serve with the above time. Please book more than 2 hours";
+      } else if (time[1] == "Hrs") {
+        if (time[0] < 2) {
+          return "Sorry we are unable to serve with the above time. Please book more than 2 hours";
+        } else {
+          return this.output.priceHrs + this.output.extraPrice * (time[0] - 2);
         }
-        else{
-          return (this.output.priceHrs + this.output.extraPrice*(time[0] - 2))
-        }
+      } else {
+        return time[0] * this.output.priceDay;
       }
-      else{
-          return time[0]*this.output.priceDay
-      }
-    }
+    },
   },
   data() {
     return {
+      payPal: "hidePaypal",
       output: {
-        chooseRoom:null,
+        chooseRoom: null,
         priceHrs: null,
         priceDay: null,
         extraPrice: null,
@@ -108,8 +107,25 @@ export default {
         timeCheckOut: null,
         timeCheckInt: null,
         totalPrice: null,
-      }
+        IDRoom: null,
+        IDHotel: null,
+      },
+      order: {
+        description: "Booking hotel",
+        amount: {
+          currency_code: "USD",
+          value: 0,
+        },
+      },
     };
+  },
+  mounted: function () {
+    const script = document.createElement("script");
+    const ClientID =
+      "Aa6Rlkn9R-8IVOUQ2nog6MLZ-STb9kNB66o-6mEvk9IyrnXs7stvSudBOgwP0puc7Moa6gflZAmjSQU9";
+    script.src = `https://www.paypal.com/sdk/js?client-id=${ClientID}`;
+    script.addEventListener("load", this.setLoaded);
+    document.body.appendChild(script);
   },
   methods: {
     goToMaps() {
@@ -122,19 +138,95 @@ export default {
         "_blank"
       );
     },
-    setPrice(priceHrs, priceDay, extraPrice, chooseRoom) {
+    setPrice(priceHrs, priceDay, extraPrice, chooseRoom, IDRoom, IDHotel) {
       this.output.priceHrs = priceHrs;
       this.output.priceDay = priceDay;
       this.output.extraPrice = extraPrice;
       this.output.chooseRoom = chooseRoom;
+      this.output.IDRoom = IDRoom;
+      this.output.IDHotel = IDHotel;
     },
-        checkIn() {
-      alert(this.output.priceHrs);
+    async checkIn() {
+      if (this.login.login == false) {
+        this.$router.push("/login");
+      } else {
+        if (String(Number(this.$refs.totalPrice.innerText)) != "NaN") {
+          this.output.totalPrice = Number(this.$refs.totalPrice.innerText);
+          this.order.amount.value = Number(this.$refs.totalPrice.innerText);
+          if (
+            this.output.chooseRoom != null &&
+            this.output.checkInData != null &&
+            this.output.checkOutData != null &&
+            this.output.timeCheckOut != null &&
+            this.output.timeCheckInt != null
+          ) {
+            this.$refs.errorCode.innerText = "";
+            this.payPal = "showPaypal";
+          }
+        } else {
+          this.$refs.errorCode.innerText =
+            "Sorry the time you selected is not valid. Please try again";
+        }
+      }
+    },
+    setLoaded: function () {
+      window.paypal
+        .Buttons({
+          createOrder: (data, actions) => {
+            return actions.order.create({
+              purchase_units: [this.order],
+            });
+          },
+          onApprove: async (data, actions) => {
+            const order = await actions.order.capture();
+            if(order.status == "COMPLETED")
+            {
+            // ajax request
+            let dataBill = {
+              HotelID: this.output.IDHotel,
+              RoomID: this.output.IDRoom,
+              StartTime:
+                this.output.checkInData +
+                "T" +
+                this.output.timeCheckInt +
+                ":00+07:00",
+              EndTime:
+                this.output.checkOutData +
+                "T" +
+                this.output.timeCheckOut +
+                ":00+07:00",
+              Total: this.output.totalPrice,
+            };
+            // const token = localStorage.getItem('token');
+            const token = localStorage.getItem("token").split('"')[1];
+            const url = "http://localhost:8080/createbill";
+            let bill = await axios.post(url, dataBill, {
+              headers: {
+                Authorization: `Basic ${token}`,
+              },
+            });
+            this.$store.dispatch("setBill", bill.data);
+            this.$router.push("/bill");
+          }
+          },
+          onError: (err) => {
+            console.log(err);
+          },
+        })
+        .render(this.$refs.paypal);
     },
   },
-}
+};
 </script>
 <style scoped>
+.hidePaypal {
+  display: none;
+  margin-top: 10px;
+}
+.showPaypal {
+  display: block;
+  margin-top: 10px;
+}
 .room {
   display: flex;
   width: 2.5rem;
