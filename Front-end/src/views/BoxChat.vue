@@ -73,7 +73,7 @@ export default {
       newMsg: '', // Holds new messages to be sent to the server
       chatContent: '', // A running list of chat messages displayed on the screen
       token: localStorage.getItem("token").split('"')[1], // Our userid1
-      userid2: "",
+      userid2: "1",
     };
   },
   // beforeCreate(){
@@ -122,6 +122,7 @@ export default {
         }
     },
     loadmess: function() {
+      console.log(this.userid2);
         this.ws.send(
             JSON.stringify({
                 token: this.token,
