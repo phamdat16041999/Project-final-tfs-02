@@ -67,10 +67,6 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 		if UserID1 != "" && msg.UserID2 != "" {
 			roomid = UserID1 + "+" + msg.UserID2
 			roomid1 = msg.UserID2 + "+" + UserID1
-			fmt.Println(UserID1)
-			fmt.Println("-------------")
-			fmt.Println(msg.UserID2)
-			fmt.Println("-------------")
 			clientRooms[roomid] = ws
 			if err != nil {
 				log.Printf("error: %v", err)
@@ -89,7 +85,6 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 						UserID:  arrmess[i].UserID,
 						Message: arrmess[i].Messenger,
 					}
-					fmt.Println("-------11--")
 					broadcast <- a
 				}
 				continue

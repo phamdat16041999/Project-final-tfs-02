@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"hotel/connect"
 	"strconv"
 
@@ -19,8 +18,6 @@ func CheckConvsersation(userID1, userID2 string) uint {
 	db := connect.Connect()
 	id1, _ := strconv.ParseUint(userID1, 10, 64)
 	id2, _ := strconv.ParseUint(userID2, 10, 64)
-	fmt.Printf("aaaaaaaaa %v", id1)
-	fmt.Printf(" aaaaaaaaa %v", id2)
 	var checkConv1 Conversation
 	var checkConv2 Conversation
 	db.Debug().Where("user1_id = ? AND user2_id = ?", id1, id2).Find(&checkConv1)
