@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="container-xl">
       <div class="row">
           <div class="col-12" style="text-align:center;">
               <h3>Your hotel list</h3>
           </div>
           <div class="col-12" style="text-align: right;margin-bottom: 10px;}">
-              <i class="material-icons" style="font-size:48px;color:#3498db; cursor: pointer;" @click="$emit('addHotel')">add_box</i>
+              <i class="material-icons" style="font-size:48px;color:#3498db; cursor: pointer;" @click="addHotel">add_box</i>
           </div>
       </div>
     <table class="table table-striped table-bordered">
@@ -23,7 +23,7 @@
           <td>{{hotel.name}}</td>
           <td>{{hotel.address}}</td>
           <td>{{hotel.description}}</td>
-          <td class="icon"><i class="fa fa-edit" style="font-size:26px;color:#e74c3c" @click="$emit('editHotel', Number(hotel.ID))"></i></td>
+          <td class="icon"><i class="fa fa-edit" style="font-size:26px;color:#e74c3c" @click="editHotel(hotel.ID)"></i></td>
           <td class="icon"><i class="material-icons" style="font-size:30px;color:#e74c3c">delete</i></td>
         </tr>
       </tbody>
@@ -54,10 +54,14 @@ export default {
     }
   },
   methods:{
-    edit(data)
+    editHotel(data)
     {
-      alert(data)
+      console.log(data)
+      this.$router.push("/EditHotel");
     },
+    addHotel(){
+      this.$router.push("/AddHotel");
+    }
   },
 };
 </script>

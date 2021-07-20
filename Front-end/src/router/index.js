@@ -35,12 +35,17 @@ const routes = [
   {
     path: "/Hotelier",
     name: "Hotelier",
-    component: () => import("../views/Hotelier/Homepage/index.vue"),
+    component: () => import("../views/Hotelier/HotelManage/index.vue"),
   },
   {
-    path: "/test",
-    name: "test",
-    component: () => import("../views/Hotelier/Homepage/hotelManage/index.vue"),
+    path: "/AddHotel",
+    name: "AddHotel",
+    component: () => import("../views/Hotelier/HotelManage/addHotel.vue"),
+  },
+  {
+    path: "/EditHotel",
+    name: "EditHotel",
+    component: () => import("../views/Hotelier/HotelManage/editHotel.vue"),
   },
 ];
 
