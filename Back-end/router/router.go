@@ -32,7 +32,7 @@ func Run() {
 	get.Path("/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
 	get.Path("/getbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.GetBill))
 	get.Path("/search/{name}").HandlerFunc(model.SearchByName)
-
+	get.Path("/essearch/{name}").HandlerFunc(model.EsSearchByName)
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
 	r.HandleFunc("/checklogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")

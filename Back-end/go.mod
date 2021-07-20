@@ -7,6 +7,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.4.2
+	github.com/olivere/elastic/v7 v7.0.26 // indirect
 	github.com/rs/cors v1.7.0
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420

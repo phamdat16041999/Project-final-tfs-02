@@ -1,16 +1,19 @@
 package model
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"hotel/connect"
 	"hotel/middlewares"
-	"hotel/pkg"
+	"hotel/pkg/cache"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
+	elastic "github.com/olivere/elastic/v7"
 	"gorm.io/gorm"
 )
 
@@ -80,10 +83,121 @@ func SearchByName(w http.ResponseWriter, r *http.Request) {
 	db.Debug().Raw("SELECT * FROM hotels WHERE MATCH (name,address,description) AGAINST (? IN NATURAL LANGUAGE MODE)", "Ninh Binh").Scan(&hotels)
 	b, _ := json.Marshal(hotels)
 	fmt.Fprintln(w, string(b))
-
 }
-func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 
+type ESClient struct {
+	*elastic.Client
+}
+type BookManager struct {
+	esClient *ESClient
+}
+
+func NewHotelManager(es *ESClient) *BookManager {
+	return &BookManager{esClient: es}
+}
+func (bm *BookManager) SearchHotels(name string) []*Hotel {
+	ctx := context.Background()
+	if bm.esClient == nil {
+		fmt.Println("Nil es client")
+		return nil
+	}
+	// build query to search for title
+	query := elastic.NewSearchSource()
+	query.Query(elastic.NewMatchQuery("name", name))
+	// get search's service
+	searchService := bm.esClient.
+		Search().
+		Index("hotels").
+		SearchSource(query)
+	// perform search query
+	searchResult, err := searchService.Do(ctx)
+	if err != nil {
+		fmt.Println("Cannot perform search with ES", err)
+		return nil
+	}
+	// get result
+	var hotels []*Hotel
+	for _, hit := range searchResult.Hits.Hits {
+		var hotel Hotel
+		err := json.Unmarshal(hit.Source, &hotel)
+		if err != nil {
+			fmt.Println("Get data error: ", err)
+			continue
+		}
+		hotels = append(hotels, &hotel)
+	}
+	return hotels
+}
+func EsSearchByName(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := string(vars["name"])
+	url := "http://localhost:9200"
+	esclient, _ := NewESClient(url)
+	// search
+	bm := NewHotelManager((*ESClient)(esclient))
+	productGotten := bm.SearchHotels(name)
+	JSON(w, http.StatusOK, productGotten)
+}
+
+func NewESClient(url string) (*ESClient, error) {
+	if len(url) == 0 {
+		return nil, errors.New("empty url connection")
+	}
+	client, err := elastic.NewClient(elastic.SetURL(url),
+		elastic.SetSniff(false),
+		elastic.SetHealthcheck(false))
+
+	fmt.Println("ES initialized...")
+
+	return &ESClient{client}, err
+}
+func JSON(w http.ResponseWriter, status int, object interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(object)
+}
+
+// func EsSearchByName(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "application/json")
+// 	//vars := mux.Vars(r)
+// 	//title := string(vars["name"])
+// 	ctx := context.Background()
+// 	var bm *HotelManager
+// 	if bm.esClient == nil {
+// 		fmt.Println(w, "Nil es client: ", nil)
+// 	}
+// 	// build query to search for title
+// 	query := elastic.NewSearchSource()
+// 	query.Query(elastic.NewMatchQuery("title", "a"))
+
+// 	// get search's service
+// 	searchService := bm.esClient.
+// 		Search().
+// 		Index("hotel").
+// 		SearchSource(query)
+
+// 	// perform search query
+// 	searchResult, err := searchService.Do(ctx)
+// 	if err != nil {
+// 		fmt.Println("Cannot perform search with ES", err)
+// 	}
+// 	// get result
+// 	var hotels []*Hotel
+
+// 	for _, hit := range searchResult.Hits.Hits {
+// 		var hotel Hotel
+// 		err := json.Unmarshal(hit.Source, &hotel)
+// 		if err != nil {
+// 			fmt.Println("Get data error: ", err)
+// 			continue
+// 		}
+// 		fmt.Println(&hotel)
+// 		hotels = append(hotels, &hotel)
+// 	}
+// 	fmt.Fprintln(w, hotels)
+
+// }
+func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	vars := mux.Vars(r)
 	rate, _ := strconv.ParseFloat(vars["rate"], 64)
@@ -101,19 +215,18 @@ func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 
 func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if pkg.ServeJQueryWithCache(w, "tophotel") == "No data in remote cache" {
+	if cache.ServeJQueryWithCache(w, "tophotel") == "No data in remote cache" {
 		db := connect.Connect()
 		var hotel []Hotel
 		db.Limit(2).Order("average_rate desc").Find(&hotel)
 		b, _ := json.Marshal(hotel)
-		// pkg.InsertData("tophotel", string(b))
-		fmt.Fprintf(w, pkg.InsertData("tophotel", string(b)))
+		// cache.InsertData("tophotel", string(b))
+		fmt.Fprintf(w, cache.InsertData("tophotel", string(b)))
 	} else {
-		fmt.Fprintln(w, pkg.ServeJQueryWithCache(w, "tophotel"))
+		fmt.Fprintln(w, cache.ServeJQueryWithCache(w, "tophotel"))
 	}
 }
 func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
-
 	db := connect.Connect()
 	vars := mux.Vars(r)
 	rate, _ := strconv.ParseFloat(vars["rate"], 64)
@@ -192,8 +305,8 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 }
 
 func Rating(w http.ResponseWriter, r *http.Request) {
-	pkg.DeleteRemoteCache(w, "tophotel")
-	pkg.DeleteLocalCache(w, "tophotel")
+	cache.DeleteRemoteCache(w, "tophotel")
+	cache.DeleteLocalCache(w, "tophotel")
 	data := r.Context().Value("data")
 	UserID := middlewares.ConvertDataToken(data, "user_id")
 	userid, err1 := strconv.ParseUint(UserID, 10, 64)
