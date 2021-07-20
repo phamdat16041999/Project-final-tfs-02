@@ -64,8 +64,9 @@
               role="tabpanel"
               aria-labelledby="v-pills-home-tab"
             >
-              <hotel class="col-12" v-if="hotelManager.index" @addHotel="addHotel()"></hotel>
-              <addHotel class="col-12" v-show="hotelManager.addHotel" :hotelManager="hotelManager" @indexPage="indexPage()"></addHotel>
+              <hotel class="col-12" v-if="hotelManager.index" @addHotel="addHotel()" @editHotel="editHotel($event)"></hotel>
+              <addHotel class="col-12" v-if="hotelManager.addHotel" @indexPage="indexPage()"></addHotel>
+              <editHotel class="col-12" v-if="hotelManager.editHotel" @indexPage="indexPage()"></editHotel>
             </div>
             <div
               class="tab-pane fade"
@@ -100,16 +101,19 @@
 <script>
 import hotel from "./hotelManage/index.vue";
 import addHotel from "./hotelManage/addHotel.vue";
+import editHotel from "./hotelManage/editHotel.vue"
 export default {
   components: {
     hotel,
     addHotel,
+    editHotel,
   },
   data() {
     return {
         hotelManager:{
             addHotel: false,
             index: true,
+            editHotel:false,
         }
     };
   },
@@ -121,7 +125,13 @@ export default {
     indexPage(){
       this.hotelManager.addHotel = false,
       this.hotelManager.index = true
+      this.hotelManager.editHotel = false
     },
+    editHotel(id){
+      alert(id)
+      this.hotelManager.editHotel = true
+      this.hotelManager.index = false
+    }
   },
 };
 </script>

@@ -37,6 +37,11 @@ const routes = [
     name: "Hotelier",
     component: () => import("../views/Hotelier/Homepage/index.vue"),
   },
+  {
+    path: "/test",
+    name: "test",
+    component: () => import("../views/Hotelier/Homepage/hotelManage/index.vue"),
+  },
 ];
 
 const router = createRouter({

@@ -11,7 +11,7 @@
     <table class="table table-striped table-bordered">
       <thead>
         <tr class="title">
-          <th>Hotel name</th>
+          <th >Hotel name</th>
           <th>Address</th>
           <th>Description</th>
           <th>Update</th>
@@ -23,7 +23,7 @@
           <td>{{hotel.name}}</td>
           <td>{{hotel.address}}</td>
           <td>{{hotel.description}}</td>
-          <td class="icon"><i class="fa fa-edit" style="font-size:26px;color:#e74c3c"></i></td>
+          <td class="icon"><i class="fa fa-edit" style="font-size:26px;color:#e74c3c" @click="$emit('editHotel', Number(hotel.ID))"></i></td>
           <td class="icon"><i class="material-icons" style="font-size:30px;color:#e74c3c">delete</i></td>
         </tr>
       </tbody>
@@ -36,7 +36,7 @@ import axios from "axios";
 export default {
   data() {
     return {
-      hotels:[]
+      hotels:[],
     }
   },
   setup() {},
@@ -52,7 +52,13 @@ export default {
       ;
      
     }
-  }
+  },
+  methods:{
+    edit(data)
+    {
+      alert(data)
+    },
+  },
 };
 </script>
 <style scoped>
