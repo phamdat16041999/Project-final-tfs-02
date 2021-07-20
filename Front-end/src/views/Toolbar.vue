@@ -35,10 +35,12 @@
                     type="search"
                     placeholder="Search"
                     aria-label="Search"
+                    v-model="searchData"
                   />
                   <button
                     class="btn btn-outline-success my-2 my-sm-0"
-                    type="submit"
+                    type="button"
+                    @click="search"
                   >
                     Search
                   </button>
@@ -79,6 +81,9 @@ import { mapState } from "vuex";
 export default {
   computed: mapState(["login"]),
   methods: {
+    search(){
+      this.$router.push("/search?name="+this.searchData);
+    },
     homePage() {
       this.$router.push("/");
     },
@@ -108,11 +113,11 @@ export default {
       }
     }
   },
-  // data() {
-  //   return {
-  //     user: false,
-  //   };
-  // },
+  data() {
+    return {
+      searchData: "",
+    };
+  },
 };
 </script>
 <style scoped>
