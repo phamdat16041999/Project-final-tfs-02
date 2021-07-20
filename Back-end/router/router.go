@@ -36,13 +36,10 @@ func Run() {
 	get.Path("/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
 	get.Path("/getbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.GetBill))
 	get.Path("/search/{name}").HandlerFunc(model.SearchByName)
-<<<<<<< HEAD
 	get.Path("/essearch/{name}").HandlerFunc(model.EsSearchByName)
-=======
 	get.Path("/hotelier").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Hotelier))
 	get.Path("/option").HandlerFunc(model.OptionforHotel)
 
->>>>>>> 5de66718c2e9947c8787a5d53d7e9aabe3bd7539
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
 	r.HandleFunc("/checklogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
