@@ -128,6 +128,20 @@ func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
 	b, _ := json.Marshal(resulthotels)
 	fmt.Fprintln(w, string(b))
 }
+func Hotelier(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var hotel []Hotel
+	db.Where("user_id = ?", userid).Find(&hotel)
+	b1, _ := json.Marshal(&hotel)
+	fmt.Fprintln(w, string(b1))
+
+}
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
