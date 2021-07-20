@@ -2,7 +2,7 @@
   <div style="height: 100vh;">
     <toolbar></toolbar>
     <router-view />
-    <footers></footers>
+    <footers style="margin-top:200px;"></footers>
   </div>
 </template>
 <script>
