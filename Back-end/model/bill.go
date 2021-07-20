@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
 
@@ -131,7 +132,7 @@ func GetBill(w http.ResponseWriter, r *http.Request) {
 		var hotel Hotel
 		var roomID Room
 		var time Times
-		db.Debug().Where("id = ?", listbill[i].HotelID).Find(&hotel)
+		db.Where("id = ?", listbill[i].HotelID).Find(&hotel)
 		db.Where("id = ?", listbill[i].RoomID).Find(&roomID)
 		db.Where("id = ?", listbill[i].TimeID).Find(&time)
 		bills = append(bills, ListBill{
@@ -147,4 +148,64 @@ func GetBill(w http.ResponseWriter, r *http.Request) {
 		fmt.Print(err)
 	}
 	fmt.Fprint(w, string(b))
+}
+func Delltilebill(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	idbill, _ := strconv.Atoi(mux.Vars(r)["id"])
+	var bill Bill
+	db.Where("id =?", idbill).Find(&bill)
+}
+
+type Listbillofmanager struct {
+	NameCustomer string    `json:"nameCustomer"`
+	Address      string    `json:"address"`
+	Mail         string    `json:"mail"`
+	Phone        string    `json:"phone"`
+	NameHotel    string    `json:"namehotel"`
+	NameRoom     string    `json:"nameroom"`
+	StartTime    time.Time `json:"startTime"`
+	EndTime      time.Time `json:"endTime"`
+	TotalPrice   int
+}
+
+func Allbillofmanagerhotel(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var listbillofmanager []Listbillofmanager
+	var hotels []Hotel
+	var bill []Bill
+	db.Where("user_id = ?", userid).Find(&hotels)
+	for _, hotel := range hotels {
+		db.Where("hotel_id =?", hotel.ID).Find(&bill)
+		for _, bills := range bill {
+			var roomID Room
+			var time Times
+			var customer User
+			db.Where("id = ?", bills.RoomID).Find(&roomID)
+			db.Where("id = ?", bills.TimeID).Find(&time)
+			db.Where("id = ?", bills.UserID).Find(&customer)
+			listbillofmanager = append(listbillofmanager, Listbillofmanager{
+				NameCustomer: customer.FirstName + ` ` + customer.LastName,
+				Address:      customer.Address,
+				Mail:         customer.Email,
+				Phone:        customer.Phone,
+				NameHotel:    hotel.Name,
+				NameRoom:     roomID.Name,
+				StartTime:    time.StartTime,
+				EndTime:      time.EndTime,
+				TotalPrice:   bills.Total,
+			})
+		}
+	}
+	b, err := json.Marshal(&listbillofmanager)
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Fprint(w, string(b))
+
 }

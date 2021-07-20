@@ -38,6 +38,8 @@ func Run() {
 	get.Path("/search/{name}").HandlerFunc(model.SearchByName)
 	get.Path("/hotelier").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Hotelier))
 	get.Path("/option").HandlerFunc(model.OptionforHotel)
+	get.Path("/deltilebillofmanagerhotel").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Allbillofmanagerhotel))
+	get.Path("/deltilebill/{id}").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Delltilebill))
 
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
