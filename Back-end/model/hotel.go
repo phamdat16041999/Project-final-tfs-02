@@ -52,6 +52,8 @@ type HotelInformation struct {
 	Longitude   string            `json:"longitude"`
 	Latitude    string            `json:"latitude"`
 	Description string            `json:"description"`
+	Address     string            `json:"address"`
+	UserID      uint              `json:"userid"`
 }
 type RoomInformation struct {
 	ID         int    `json:"id"`
@@ -218,7 +220,7 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	if cache.ServeJQueryWithCache(w, "tophotel") == "No data in remote cache" {
 		db := connect.Connect()
 		var hotel []Hotel
-		db.Limit(2).Order("average_rate desc").Find(&hotel)
+		db.Limit(9).Order("average_rate desc").Find(&hotel)
 		b, _ := json.Marshal(hotel)
 		// cache.InsertData("tophotel", string(b))
 		fmt.Fprintf(w, cache.InsertData("tophotel", string(b)))
@@ -240,6 +242,20 @@ func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
 	}
 	b, _ := json.Marshal(resulthotels)
 	fmt.Fprintln(w, string(b))
+}
+func Hotelier(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var hotel []Hotel
+	db.Where("user_id = ?", userid).Find(&hotel)
+	b1, _ := json.Marshal(&hotel)
+	fmt.Fprintln(w, string(b1))
+
 }
 func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
@@ -267,12 +283,14 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	// 	}
 	// }
 	hotelInformation := HotelInformation{
-		ID:   int(hotel.ID),
-		Name: hotel.Name,
+		ID:      int(hotel.ID),
+		Name:    hotel.Name,
+		Address: hotel.Address,
 		// room       : []RoomInformation
 		Longitude:   hotel.Latitude,
 		Latitude:    hotel.Longitude,
 		Description: hotel.Description,
+		UserID:      hotel.UserID,
 	}
 	db.Where("hotel_id = ?", hotel.ID).Find(&rooms)
 	for i := 0; i < len(rooms); i++ {
@@ -429,4 +447,72 @@ func Checkroomstatus(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprintln(w, "Room avaliable")
 	}
+}
+func CreateHotel(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	data := r.Context().Value("data")
+	DataUser := middlewares.ConvertDataToken(data, "user_id")
+	userID, err1 := strconv.ParseUint(DataUser, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var Data Hotel
+	err := json.NewDecoder(r.Body).Decode(&Data)
+	if err != nil {
+		fmt.Fprintln(w, err)
+	}
+	hotel := Hotel{
+		Name:        Data.Name,
+		Address:     Data.Address,
+		Description: Data.Description,
+		Image:       Data.Image,
+		Longitude:   Data.Longitude,
+		Latitude:    Data.Latitude,
+		UserID:      uint(userID),
+	}
+	result := db.Create(&hotel)
+	if result.Error != nil {
+		fmt.Fprint(w, result.Error)
+	}
+	// create each room
+	for i := 0; i < len(Data.Room); i++ {
+		room := Room{
+			Name:        Data.Room[i].Name,
+			Description: Data.Room[i].Description,
+			HotelID:     hotel.ID,
+		}
+		result := db.Create(&room)
+		if result.Error != nil {
+			fmt.Fprint(w, result.Error)
+			continue
+		}
+		// create each image for each room
+		for j := 0; j < len(Data.Room[i].ImageRoom); j++ {
+			imagerRoom := ImageRoom{
+				Image:  Data.Room[i].ImageRoom[j].Image,
+				RoomID: room.ID,
+			}
+			result := db.Create(&imagerRoom)
+			if result.Error != nil {
+				fmt.Fprint(w, result.Error)
+				continue
+			}
+		}
+		for k := 0; k < len(Data.Room[i].Price); k++ {
+			price := Price{
+				Price:    Data.Room[i].Price[k].Price,
+				OptionID: Data.Room[i].Price[k].OptionID,
+				RoomID:   room.ID,
+			}
+			result := db.Create(&price)
+			if result.Error != nil {
+				fmt.Fprint(w, result.Error)
+				continue
+			}
+
+		}
+
+	}
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, "Create successfull")
 }

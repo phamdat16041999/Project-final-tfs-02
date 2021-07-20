@@ -1,6 +1,6 @@
 <template>
     <div>
-         {{ hotel.description }}
+         {{ hotel.ID }}
     </div>
 </template>
 <script>

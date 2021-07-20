@@ -26,6 +26,6 @@ func CreateMessenger(UserID, messenger string, conversationID uint) []Messenger 
 		db.Create(&messeng)
 	}
 	var mess []Messenger
-	db.Debug().Where("conversation_id = ?", conversationID).Find(&mess)
+	db.Where("conversation_id = ?", conversationID).Find(&mess)
 	return mess
 }

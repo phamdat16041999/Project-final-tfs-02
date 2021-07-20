@@ -12,7 +12,7 @@
               <span class="online_icon"></span>
             </div>
             <div class="user_info">
-              <span>Chat with Khalid</span>
+              <span>Chat with Khalid {{hotel.userid}}</span>
               <p>1767 Messages</p>
             </div>
             <!-- <div class="video_cam">
@@ -62,17 +62,23 @@
 </template>
 <script>
 export default {
+  props: {
+    hotel: Object,
+  },
   data() {
     return {
-      show: true,
-      boxChat:"card cardShow",
+      show: false,
+      boxChat:"card cardHide",
       ws: null, // Our websocket
       newMsg: '', // Holds new messages to be sent to the server
       chatContent: '', // A running list of chat messages displayed on the screen
-      userid1: "10", // Our userid1
-      userid2: "13",
+      token: localStorage.getItem("token").split('"')[1], // Our userid1
+      userid2: "",
     };
   },
+  // beforeCreate(){
+  //   this.userid2 = this.hotel.userid
+  // },
   created: function() {
     // c, _, err := websocket.DefaultDialer.Dial(*addr, http.Header{"Authorization": {"Bearer " + *token}})
       var self = this;
@@ -108,7 +114,7 @@ export default {
         if (this.newMsg != '') {
             this.ws.send(
                 JSON.stringify({
-                    userid1: this.userid1,
+                    token: this.token,
                     userid2: this.userid2,
                     message: this.newMsg// Strip out html
                 }));
@@ -118,11 +124,10 @@ export default {
     loadmess: function() {
         this.ws.send(
             JSON.stringify({
-                userid1: this.userid1,
+                token: this.token,
                 userid2: this.userid2,
                 // Strip out html
             }));
-            console.log("aaaa");
     },
     
   },

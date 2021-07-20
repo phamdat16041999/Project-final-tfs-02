@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"hotel/middlewares"
 	"hotel/model"
+
+	// "hotel/pkg"
 	"hotel/pkg/websocket"
 	"net/http"
 
@@ -12,6 +14,7 @@ import (
 )
 
 func Run() {
+	// go pkg.RunRmq()
 	r := mux.NewRouter().StrictSlash(true)
 	post := r.Methods(http.MethodPost).Subrouter()
 	post.Path("/account").HandlerFunc(model.CreateAccount)
@@ -22,6 +25,7 @@ func Run() {
 	post.Path("/createbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Createbill))
 	post.Path("/rating").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Rating))
 	post.Path("/checkroomstatus").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Checkroomstatus))
+	post.Path("/createhotel").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.CreateHotel))
 	// post.Path("/payment").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Payment))
 
 	//get method
@@ -32,7 +36,13 @@ func Run() {
 	get.Path("/detailhotel/{id}").HandlerFunc(model.GetDetailHotel)
 	get.Path("/getbill").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.GetBill))
 	get.Path("/search/{name}").HandlerFunc(model.SearchByName)
+<<<<<<< HEAD
 	get.Path("/essearch/{name}").HandlerFunc(model.EsSearchByName)
+=======
+	get.Path("/hotelier").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Hotelier))
+	get.Path("/option").HandlerFunc(model.OptionforHotel)
+
+>>>>>>> 5de66718c2e9947c8787a5d53d7e9aabe3bd7539
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
 	r.HandleFunc("/checklogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")

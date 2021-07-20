@@ -1,6 +1,8 @@
 package websocket
 
 import (
+	"fmt"
+	"hotel/auth"
 	"hotel/model"
 	"log"
 	"net/http"
@@ -30,7 +32,7 @@ type MessageForEachPeople struct {
 
 // Define our message object
 type Message struct {
-	UserID1 string `json:"userid1"`
+	Token   string `json:"token"`
 	UserID2 string `json:"userid2"`
 	Message string `json:"message"`
 }
@@ -56,18 +58,24 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 		var msg Message
 		// Read in a new message as JSON and map it to a Message object
 		err := ws.ReadJSON(&msg)
-		roomid = msg.UserID1 + "+" + msg.UserID2
-		roomid1 = msg.UserID2 + "+" + msg.UserID1
+		DecodeToken := auth.DecodeToken(msg.Token)
+		if DecodeToken == nil {
+			fmt.Fprint(w, "Can't not decode token")
+		}
+		resultID := DecodeToken["user_id"]
+		UserID1 := fmt.Sprintf("%v", resultID)
+		roomid = UserID1 + "+" + msg.UserID2
+		roomid1 = msg.UserID2 + "+" + UserID1
 		clientRooms[roomid] = ws
 		if err != nil {
 			log.Printf("error: %v", err)
 			delete(clientRooms, roomid)
-			break
+			continue
 		}
 		// tao conversation
-		conversationID := model.CheckConvsersation(msg.UserID1, msg.UserID2)
+		conversationID := model.CheckConvsersation(UserID1, msg.UserID2)
 		// tao mess trong conversation
-		arrmess := model.CreateMessenger(msg.UserID1, msg.Message, conversationID)
+		arrmess := model.CreateMessenger(UserID1, msg.Message, conversationID)
 		//hien thi toan bo tin nhan sau chuyen vao broadcast
 		// hien thi toan bo tin nhan cu
 		if msg.Message == "" {
@@ -80,7 +88,7 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 			}
 			continue
 		} else {
-			id1, _ := strconv.ParseUint(msg.UserID1, 10, 64)
+			id1, _ := strconv.ParseUint(UserID1, 10, 64)
 			newMess := MessageForEachPeople{
 				UserID:  uint(id1),
 				Message: msg.Message,
