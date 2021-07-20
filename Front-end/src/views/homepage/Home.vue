@@ -3,7 +3,6 @@
     <background/>
     <description/>
     <topHotel/>
-    <boxChat/>
   </div>
 </template>
 
@@ -11,14 +10,14 @@
 import background from "./Background.vue";
 import description from "./Description.vue";
 import topHotel from "./TopHotel.vue";
-import boxChat from "../BoxChat.vue"
+
 export default {
   name: "Home",
   components: {
     background,
     description,
     topHotel,
-    boxChat
+
   },
 };
 </script>

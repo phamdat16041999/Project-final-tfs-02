@@ -11,6 +11,9 @@
         <hotel-description :hotel="hotel"></hotel-description>
       </div>
     </div>
+    <div>
+      <boxChat :hotel="hotel"></boxChat>
+    </div>
   </div>
 </template>
 <script>
@@ -18,11 +21,13 @@ import axios from "axios";
 import SetBooking from "./Booking.vue";
 import ShowSlide from "./ShowSlide.vue";
 import HotelDescription from "./HotelDescription.vue";
+import boxChat from "../BoxChat.vue"
 export default {
   components: {
     ShowSlide,
     SetBooking,
     HotelDescription,
+    boxChat,
   },
   async created() {
     let hotelDetal = await axios.get(

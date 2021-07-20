@@ -56,8 +56,7 @@ export default {
   methods:{
     editHotel(data)
     {
-      console.log(data)
-      this.$router.push("/EditHotel");
+      this.$router.push("/EditHotel?id="+data);
     },
     addHotel(){
       this.$router.push("/AddHotel");

@@ -49,6 +49,8 @@ type HotelInformation struct {
 	Longitude   string            `json:"longitude"`
 	Latitude    string            `json:"latitude"`
 	Description string            `json:"description"`
+	Address     string            `json:"address"`
+	UserID      uint              `json:"userid"`
 }
 type RoomInformation struct {
 	ID         int    `json:"id"`
@@ -104,7 +106,7 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	if pkg.ServeJQueryWithCache(w, "tophotel") == "No data in remote cache" {
 		db := connect.Connect()
 		var hotel []Hotel
-		db.Limit(2).Order("average_rate desc").Find(&hotel)
+		db.Limit(9).Order("average_rate desc").Find(&hotel)
 		b, _ := json.Marshal(hotel)
 		// pkg.InsertData("tophotel", string(b))
 		fmt.Fprintf(w, pkg.InsertData("tophotel", string(b)))
@@ -168,12 +170,14 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 	// 	}
 	// }
 	hotelInformation := HotelInformation{
-		ID:   int(hotel.ID),
-		Name: hotel.Name,
+		ID:      int(hotel.ID),
+		Name:    hotel.Name,
+		Address: hotel.Address,
 		// room       : []RoomInformation
 		Longitude:   hotel.Latitude,
 		Latitude:    hotel.Longitude,
 		Description: hotel.Description,
+		UserID:      hotel.UserID,
 	}
 	db.Where("hotel_id = ?", hotel.ID).Find(&rooms)
 	for i := 0; i < len(rooms); i++ {
