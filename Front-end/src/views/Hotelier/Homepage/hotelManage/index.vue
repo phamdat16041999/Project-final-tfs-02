@@ -19,26 +19,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>John</td>
-          <td>Doe</td>
-          <td>john@example.com</td>
+        <tr v-for="hotel, id in hotels" :key="id">
+          <td>{{hotel.name}}</td>
+          <td>{{hotel.address}}</td>
+          <td>{{hotel.description}}</td>
           <td class="icon"><i class="fa fa-edit" style="font-size:26px;color:#e74c3c"></i></td>
           <td class="icon"><i class="material-icons" style="font-size:30px;color:#e74c3c">delete</i></td>
-        </tr>
-        <tr>
-          <td>Mary</td>
-          <td>Moe</td>
-          <td>mary@example.com</td>
-          <td class="icon"><i class="fa fa-edit" style="font-size:26px;"></i></td>
-          <td class="icon"><i class="material-icons" style="font-size:30px;">delete</i></td>
-        </tr>
-        <tr>
-          <td>July</td>
-          <td>Dooley</td>
-          <td>july@example.com</td>
-          <td class="icon"><i class="fa fa-edit" style="font-size:26px;"></i></td>
-          <td class="icon"><i class="material-icons" style="font-size:30px;">delete</i></td>
         </tr>
       </tbody>
     </table>
@@ -46,8 +32,27 @@
   </div>
 </template>
 <script>
+import axios from "axios";
 export default {
+  data() {
+    return {
+      hotels:[]
+    }
+  },
   setup() {},
+  created() {
+    if (localStorage.getItem("token") != null) {
+      const token = localStorage.getItem("token").split('"')[1];
+      const url = "http://localhost:8080/hotelier";
+      axios.get(url, {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      }).then((res) => this.hotels = res.data)
+      ;
+     
+    }
+  }
 };
 </script>
 <style scoped>
