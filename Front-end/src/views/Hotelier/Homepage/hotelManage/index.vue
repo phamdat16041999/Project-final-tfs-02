@@ -5,7 +5,7 @@
               <h3>Your hotel list</h3>
           </div>
           <div class="col-12" style="text-align: right;margin-bottom: 10px;}">
-              <i class="material-icons" style="font-size:48px;color:#3498db; cursor: pointer;">add_box</i>
+              <i class="material-icons" style="font-size:48px;color:#3498db; cursor: pointer;" @click="$emit('addHotel')">add_box</i>
           </div>
       </div>
     <table class="table table-striped table-bordered">

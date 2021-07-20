@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%;">
+  <div style="height: 100vh;">
     <toolbar></toolbar>
     <router-view />
     <footers></footers>
