@@ -73,12 +73,12 @@ export default {
       newMsg: '', // Holds new messages to be sent to the server
       chatContent: '', // A running list of chat messages displayed on the screen
       token: localStorage.getItem("token").split('"')[1], // Our userid1
-      userid2: "1",
+      userid2: null,
     };
   },
-  // beforeCreate(){
-  //   this.userid2 = this.hotel.userid
-  // },
+  beforeCreate(){
+    this.userid2 = this.hotel.userid
+  },
   created: function() {
     // c, _, err := websocket.DefaultDialer.Dial(*addr, http.Header{"Authorization": {"Bearer " + *token}})
       var self = this;
