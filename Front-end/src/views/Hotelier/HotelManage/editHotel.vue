@@ -53,7 +53,7 @@
         </div>
         <div class="col-xl-3 col-12">
           <label class="form-label">Image</label>
-          <input type="file" class="form-control-file border" />
+          <input type="file" class="form-control-file border" @change="onFileChange"/>
         </div>
         <div class="col-xl-6 col-12">
           <div class="row">
@@ -104,6 +104,28 @@ export default {
     createHotel()
     {
       console.log(this.hotel.room)
+    },
+    onFileChange(e) {
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length){
+        console.log(files[0])
+        return; 
+      }
+      this.createImage(files[0]);
+    },
+    createImage(file) {
+      // var image = new Image();
+      var reader = new FileReader();
+      // var vm = this;
+
+      reader.onload = (e) => {
+        // vm.image = e.target.result;
+        console.log(e.target.result)
+      };
+      reader.readAsDataURL(file);
+    },
+    eventFile(e){
+      return e
     }
   },
 
