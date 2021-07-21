@@ -106,11 +106,20 @@ export default {
           this.msg = "Wrong Password!";
         } else {
           // var data = { token: users.data};
-          this.$store.dispatch("login");
+          // this.$store.dispatch("login");
+          let Role = users.data.split("\n")[0];
           localStorage.setItem("token", (users.data.split("\n")[1]));
-          localStorage.setItem("role", (users.data.split("\n")[0]));
+          localStorage.setItem("role", Role);
           this.$store.dispatch("setUser");
-          this.$router.push("/");
+          if(Role == "User"){
+              this.$router.push("/");
+          }
+          if(Role == "\"HotelOwner\""){
+            this.$router.push("/Hotelier");
+          }
+          else{
+            this.$router.push("/");
+          }
         }
       }
       // var payload = {'key1': 'value1', 'key2': 'value2'}

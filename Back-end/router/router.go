@@ -5,7 +5,6 @@ import (
 	"hotel/middlewares"
 	"hotel/model"
 
-	// "hotel/pkg"
 	"hotel/pkg/websocket"
 	"net/http"
 

@@ -66,6 +66,12 @@ const routes = [{
         component: () =>
             import ("../views/seach/index.vue"),
     },
+    {
+        path: "/messenger",
+        name: "messenger",
+        component: () =>
+            import ("../views/messenger/index.vue"),
+    },
 ];
 
 const router = createRouter({
