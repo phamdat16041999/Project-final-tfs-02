@@ -53,12 +53,12 @@ type HotelInformation struct {
 	Latitude    string            `json:"latitude"`
 	Description string            `json:"description"`
 	Address     string            `json:"address"`
-	UserID      uint              `json:"userid"`
 }
 type RoomInformation struct {
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
 	Img        []ImageRoom
+	Decription string `json:"decription"`
 	PriceHrs   string `json:"priceHrs"`
 	PriceDay   string `json:"priceDay"`
 	ExtraPrice string `json:"extraPrice"`
@@ -290,7 +290,6 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 		Longitude:   hotel.Latitude,
 		Latitude:    hotel.Longitude,
 		Description: hotel.Description,
-		UserID:      hotel.UserID,
 	}
 	db.Where("hotel_id = ?", hotel.ID).Find(&rooms)
 	for i := 0; i < len(rooms); i++ {
@@ -312,6 +311,7 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 			ID:         int(rooms[i].ID),
 			Name:       rooms[i].Name,
 			Img:        imageRoom,
+			Decription: rooms[i].Description,
 			PriceHrs:   priceHrs.Price,
 			PriceDay:   priceDay.Price,
 			ExtraPrice: extraPrice.Price,
@@ -331,7 +331,6 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 	if err1 != nil {
 		fmt.Println("error:", err1)
 	}
-
 	var hotelrate HotelRate
 	var rate Rate
 	var hotel Hotel
@@ -458,8 +457,6 @@ func CreateHotel(w http.ResponseWriter, r *http.Request) {
 	}
 	var Data Hotel
 	err := json.NewDecoder(r.Body).Decode(&Data)
-	b, _ := json.Marshal(&Data)
-	fmt.Fprint(w, string(b))
 	if err != nil {
 		fmt.Println(w, err)
 	}
@@ -517,4 +514,79 @@ func CreateHotel(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Create successfull")
+}
+func UpdateHotel(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	datatoken := r.Context().Value("data")
+	DataUser := middlewares.ConvertDataToken(datatoken, "user_id")
+	userID, err1 := strconv.ParseUint(DataUser, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var data HotelInformation
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		fmt.Println("errr", err)
+	}
+	// fmt.Println(string(b))
+	// take older rate
+	var option []Option
+	db.Find(&option)
+	var hotelOdler Hotel
+	var rooms []Room
+	var imageroom []ImageRoom
+	for _, room := range data.Room {
+		for _, image := range room.Img {
+			imageroom = append(imageroom, ImageRoom{
+				Model: gorm.Model{
+					ID: image.ID,
+				},
+				Image:  image.Image,
+				RoomID: uint(room.ID),
+			})
+		}
+		db.Debug().Model(&Price{}).Where("room_id = ? AND option_id = ?", room.ID, option[0].ID).Update("price", room.PriceDay)
+		db.Debug().Model(&Price{}).Where("room_id = ? AND option_id = ?", room.ID, option[1].ID).Update("price", room.PriceHrs)
+		db.Debug().Model(&Price{}).Where("room_id = ? AND option_id = ?", room.ID, option[2].ID).Update("price", room.ExtraPrice)
+		rooms = append(rooms, Room{
+			Model: gorm.Model{
+				ID: uint(room.ID),
+			},
+			Name:        room.Name,
+			Description: room.Decription,
+			HotelID:     uint(room.ID),
+			ImageRoom:   imageroom,
+		})
+	}
+	db.Where("id =?", data.ID).Find(&hotelOdler)
+	hotel := Hotel{
+		Model: gorm.Model{
+			ID: uint(data.ID),
+		},
+		Name:        data.Name,
+		Address:     data.Address,
+		Description: data.Description,
+		Image:       "",
+		Longitude:   data.Longitude,
+		Latitude:    data.Latitude,
+		UserID:      uint(userID),
+		AverageRate: hotelOdler.AverageRate,
+		NumberRate:  hotelOdler.NumberRate,
+		Room:        rooms,
+	}
+	// b, _ := json.Marshal(&hotel)
+	// fmt.Println(string(b))
+	// fmt.Println(hotel)
+	result := db.Save(&hotel)
+	if result.Error != nil {
+		fmt.Fprintln(w, "Rating error: ", result.Error)
+	}
+	result1 := db.Save(&rooms)
+	if result1.Error != nil {
+		fmt.Fprintln(w, "Rating error: ", result1.Error)
+	}
+	result2 := db.Save(&imageroom)
+	if result2.Error != nil {
+		fmt.Fprintln(w, "Rating error: ", result2.Error)
+	}
 }

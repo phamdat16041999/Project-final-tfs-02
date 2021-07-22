@@ -43,6 +43,7 @@ func Run() {
 
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
+	r.HandleFunc("/updatehotel", middlewares.SetMiddlewareAuthentication(model.UpdateHotel)).Methods("PUT")
 	r.HandleFunc("/checklogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
 	http.Handle("/", r)
 	//methoddelete
