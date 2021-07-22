@@ -1,7 +1,11 @@
 package model
 
 import (
+	"encoding/json"
+	"fmt"
 	"hotel/connect"
+	"hotel/middlewares"
+	"net/http"
 	"strconv"
 
 	"gorm.io/gorm"
@@ -37,5 +41,30 @@ func CheckConvsersation(userID1, userID2 string) uint {
 		}
 
 	}
-
+}
+func ListConversation(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	db := connect.Connect()
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var conversation []Conversation
+	db.Where("user1_id =? OR user2_id =?", userid, userid).Find(&conversation)
+	var users []User
+	for _, conversations := range conversation {
+		if userid == uint64(conversations.User1ID) {
+			var userss User
+			db.Where("id =?", conversations.User2ID).Find(&userss)
+			users = append(users, userss)
+		} else {
+			var userss User
+			db.Where("id =?", conversations.User1ID).Find(&userss)
+			users = append(users, userss)
+		}
+	}
+	b, _ := json.Marshal(&users)
+	fmt.Fprint(w, string(b))
 }

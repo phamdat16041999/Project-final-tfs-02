@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"encoding/json"
 	"fmt"
 	"hotel/auth"
 	"hotel/model"
@@ -96,7 +97,10 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 				}
 				broadcast <- newMess
 			}
+		} else {
+			fmt.Print("Userid Is not correct")
 		}
+
 	}
 }
 func handleMessages() {
@@ -104,8 +108,12 @@ func handleMessages() {
 		// Grab the next message from the broadcast channel
 		msg := <-broadcast
 		// Send it out to every client that is currently connected
+		b, _ := json.Marshal(clientRooms)
+		fmt.Println(string(b))
+		fmt.Println("---------")
 		for key := range clientRooms {
 			if clientRooms[key] == clientRooms[roomid] {
+				// fmt.Println("user1", roomid)
 				err := clientRooms[roomid].WriteJSON(msg)
 				if err != nil {
 					log.Printf("error: %v", err)
@@ -114,6 +122,7 @@ func handleMessages() {
 				}
 			}
 			if clientRooms[key] == clientRooms[roomid1] {
+				// fmt.Println("user2", roomid1)
 				err := clientRooms[roomid1].WriteJSON(msg)
 				if err != nil {
 					log.Printf("error: %v", err)

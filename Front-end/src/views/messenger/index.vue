@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid" style="height: 100%; margin-top:10px;">
+  <div class="container-fluid" style="height: 100%; margin-top: 80px">
     <div class="row" style="height: 100%">
       <div class="col-xl-2 col-md-4 chat" style="height: 100%">
         <div class="card mb-sm-3 mb-md-0 contacts_card">
@@ -20,7 +20,7 @@
           </div>
           <div class="card-body contacts_body">
             <ui class="contacts">
-              <li class="active">
+              <li class="active" v-for="conver in conversaition" :key="conver">
                 <div class="d-flex bd-highlight">
                   <div class="img_cont">
                     <img
@@ -30,68 +30,10 @@
                     <span class="online_icon"></span>
                   </div>
                   <div class="user_info">
-                    <span>Khalid</span>
+                    <span @click="addchat(conver.ID)"
+                      >{{ conver.firstName }} {{ conver.lastName }}</span
+                    >
                     <p>Kalid is online</p>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="d-flex bd-highlight">
-                  <div class="img_cont">
-                    <img
-                      src="https://2.bp.blogspot.com/-8ytYF7cfPkQ/WkPe1-rtrcI/AAAAAAAAGqU/FGfTDVgkcIwmOTtjLka51vineFBExJuSACLcBGAs/s320/31.jpg"
-                      class="rounded-circle user_img"
-                    />
-                    <span class="online_icon offline"></span>
-                  </div>
-                  <div class="user_info">
-                    <span>Taherah Big</span>
-                    <p>Taherah left 7 mins ago</p>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="d-flex bd-highlight">
-                  <div class="img_cont">
-                    <img
-                      src="https://i.pinimg.com/originals/ac/b9/90/acb990190ca1ddbb9b20db303375bb58.jpg"
-                      class="rounded-circle user_img"
-                    />
-                    <span class="online_icon"></span>
-                  </div>
-                  <div class="user_info">
-                    <span>Sami Rafi</span>
-                    <p>Sami is online</p>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="d-flex bd-highlight">
-                  <div class="img_cont">
-                    <img
-                      src="http://profilepicturesdp.com/wp-content/uploads/2018/07/sweet-girl-profile-pictures-9.jpg"
-                      class="rounded-circle user_img"
-                    />
-                    <span class="online_icon offline"></span>
-                  </div>
-                  <div class="user_info">
-                    <span>Nargis Hawa</span>
-                    <p>Nargis left 30 mins ago</p>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="d-flex bd-highlight">
-                  <div class="img_cont">
-                    <img
-                      src="https://static.turbosquid.com/Preview/001214/650/2V/boy-cartoon-3D-model_D.jpg"
-                      class="rounded-circle user_img"
-                    />
-                    <span class="online_icon offline"></span>
-                  </div>
-                  <div class="user_info">
-                    <span>Rashid Samim</span>
-                    <p>Rashid left 50 mins ago</p>
                   </div>
                 </div>
               </li>
@@ -115,10 +57,6 @@
                 <span>Chat with Khalid</span>
                 <p>1767 Messages</p>
               </div>
-              <!-- <div class="video_cam">
-                                <span><i class="fas fa-video"></i></span>
-                                <span><i class="fas fa-phone"></i></span>
-                            </div> -->
             </div>
             <span id="action_menu_btn"
               ><i class="material-icons" style="font-size: 25px; color: white"
@@ -134,68 +72,11 @@
               </ul>
             </div>
           </div>
-          <div class="card-body msg_card_body">
-            <div class="d-flex justify-content-start mb-4">
-              <div class="img_cont_msg">
-                <img
-                  src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
-                  class="rounded-circle user_img_msg"
-                />
-              </div>
-              <div class="msg_cotainer">
-                Hi, how are you samim?
-                <span class="msg_time">8:40 AM, Today</span>
-              </div>
-            </div>
-            <div class="d-flex justify-content-end mb-4">
-              <div class="msg_cotainer_send">
-                Hi Khalid i am good tnx how about you?
-                <span class="msg_time_send">8:55 AM, Today</span>
-              </div>
-              <div class="img_cont_msg">
-                <img
-                  src="https://www.mariospielespielen.com/wp-content/uploads/2016/12/mario.jpg"
-                  class="rounded-circle user_img_msg"
-                />
-              </div>
-            </div>
-            <div class="d-flex justify-content-start mb-4">
-              <div class="img_cont_msg">
-                <img
-                  src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
-                  class="rounded-circle user_img_msg"
-                />
-              </div>
-              <div class="msg_cotainer">
-                I am looking for your next templates
-                <span class="msg_time">9:07 AM, Today</span>
-              </div>
-            </div>
-            <div class="d-flex justify-content-end mb-4">
-              <div class="msg_cotainer_send">
-                Ok, thank you have a good day
-                <span class="msg_time_send">9:10 AM, Today</span>
-              </div>
-              <div class="img_cont_msg">
-                <img
-                  src="https://www.mariospielespielen.com/wp-content/uploads/2016/12/mario.jpg"
-                  class="rounded-circle user_img_msg"
-                />
-              </div>
-            </div>
-            <div class="d-flex justify-content-start mb-4">
-              <div class="img_cont_msg">
-                <img
-                  src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
-                  class="rounded-circle user_img_msg"
-                />
-              </div>
-              <div class="msg_cotainer">
-                Bye, see you
-                <span class="msg_time">9:12 AM, Today</span>
-              </div>
-            </div>
-          </div>
+          <div
+            class="card-body msg_card_body"
+            v-html="chatContent"
+            id="chat-messages"
+          ></div>
           <div class="card-footer">
             <div class="input-group">
               <div class="input-group-append">
@@ -207,12 +88,15 @@
                 name=""
                 class="form-control type_msg"
                 placeholder="Type your message..."
+                @keyup.enter ="send"
+                v-model="newMsg"
               ></textarea>
               <div class="input-group-append">
                 <span class="input-group-text send_btn"
                   ><i
                     class="fa fa-send"
                     style="font-size: 25px; color: white"
+                    @click="send"
                   ></i
                 ></span>
               </div>
@@ -224,7 +108,96 @@
   </div>
 </template>
 <script>
-export default {};
+import axios from "axios";
+export default {
+  data() {
+    return {
+      conversaition: [],
+      show: false,
+      boxChat: "card cardHide",
+      ws: null, // Our websocket
+      newMsg: "", // Holds new messages to be sent to the server
+      chatContent: "", // A running list of chat messages displayed on the screen
+      token: localStorage.getItem("token").split('"')[1], // Our userid1
+      userID2: "",
+    };
+  },
+  created: function () {
+    // c, _, err := websocket.DefaultDialer.Dial(*addr, http.Header{"Authorization": {"Bearer " + *token}})
+    var self = this;
+    this.ws = new WebSocket("ws://" + "localhost:8080" + "/ws");
+    this.ws.addEventListener("message", function (e) {
+      var msg = JSON.parse(e.data);
+      // self.chatContent = ""
+      if (msg.userid != parseInt(self.userID2)) {
+        self.chatContent +=
+          ' <div class="d-flex justify-content-start mb-4">' +
+          '<div class="img_cont_msg">' +
+          ' <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg" style=" height: 40px; width: 40px; border: 1.5px solid #f5f6fa;"/>' + // Avatar
+          "</div>" +
+          '<div class="msg_cotainer">'+
+          msg.message +
+          "</div>" +
+          "</div>";
+      } else {
+        self.chatContent +=
+          '<div class="d-flex justify-content-end mb-4">' +
+          ' <div class="msg_cotainer_send">'+
+          msg.message +
+          "</div>" +
+          '<div class="img_cont_msg" style="height: 40px; width: 40px;">' +
+          '<img src="https://s.luyengame.net/games/mario/mario.png" class="rounded-circle user_img_msg" style=" height: 40px; width: 40px; border: 1.5px solid #f5f6fa;"/>' +
+          "</div>" +
+          "</div>";
+      }
+      var element = document.getElementById("chat-messages");
+      element.scrollTop = element.scrollHeight; // Auto scroll to the bottom
+    });
+  },
+  methods: {
+    addchat(userID) {
+      this.chatContent = "";
+      this.userID2 = userID.toString();
+      console.log(this.userID2);
+      this.ws.send(
+        JSON.stringify({
+          token: this.token,
+          userid2: this.userID2,
+          // Strip out html
+        })
+      );
+    },
+    send: function () {
+      if (this.newMsg != "") {
+        this.ws.send(
+          JSON.stringify({
+            token: this.token,
+            userid2: this.userID2,
+            message: this.newMsg, // Strip out html
+          })
+        );
+        this.newMsg = ""; // Reset newMsg
+      }
+    },
+  },
+  mounted() {
+    if (localStorage.getItem("token") != null) {
+      const token = localStorage.getItem("token").split('"')[1];
+      const url = "http://localhost:8080/listConversation";
+      axios
+        .get(url, {
+          headers: {
+            Authorization: `bearer ${token}`,
+          },
+        })
+        .then((res) =>
+          res.data.forEach((element) => {
+            this.conversaition.push(element);
+          })
+        );
+    }
+  },
+};
 </script>
 <style scoped>
 .chat {

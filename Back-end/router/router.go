@@ -41,6 +41,8 @@ func Run() {
 	get.Path("/option").HandlerFunc(model.OptionforHotel)
 	get.Path("/detailbillofmanagerhotel").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Allbillofmanagerhotel))
 	get.Path("/detailbill/{id}").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Detailbill))
+	get.Path("/listConversation").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ListConversation))
+
 	// delete method
 	detelte := r.Methods(http.MethodDelete).Subrouter()
 	detelte.Path("/hotel/{id}").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.DeleteHotel))
