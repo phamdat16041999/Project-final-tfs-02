@@ -1,5 +1,6 @@
 <template>
-  <div class="container-xl">
+  <div class="hotel">
+      <div class="container-xl">
      <div class="row">
 
     <div class="col-12" style="text-align: center">
@@ -49,11 +50,11 @@
       <div class="row">
         <div class="col-xl-3 col-12">
           <label class="form-label">{{index}}</label>
-          <input type="text" class="form-control" required v-model="hotel.room[index].name"/>
+          <input type="text" class="form-control" required v-model="data.name"/>
         </div>
         <div class="col-xl-3 col-12">
           <label class="form-label">Image</label>
-          <input type="file" class="form-control-file border" />
+          <input type="file" class="form-control-file border" @change="onFileChange($event, index)"/>
         </div>
         <div class="col-xl-6 col-12">
           <div class="row">
@@ -80,6 +81,7 @@
     </div>
   </div>
   </div>
+  </div>
 </template>
 <script>
 import axios from "axios";
@@ -95,16 +97,38 @@ export default {
   data() {
     return {
       hotel: {},
-      room:{"id":11,"name":"room1","Img":[{"ID":15,"CreatedAt":"2021-07-12T16:34:27.068+07:00","UpdatedAt":"2021-07-12T16:34:27.068+07:00","DeletedAt":null,"image":"https://lh3.googleusercontent.com/proxy/dLbB85FhF1ANCdY6amxE3RAQKhgky3-0DgMjplkDZVpjiCbj5UVRG4-ky9Wm","roomID":11},{"ID":16,"CreatedAt":"2021-07-12T16:34:27.16+07:00","UpdatedAt":"2021-07-12T16:34:27.16+07:00","DeletedAt":null,"image":"https://lh3.googleusercontent.com/proxy/dLbB85FhF1ANCdY6amxE3RAQKhgky3-0DgMjplkDZVpjiCbj5UVRG4-ky9Wm","roomID":11}],"priceHrs":5,"priceDay":12,"extraPrice":1},
     };
   },
   methods: {
     AddRoom(){
-      this.hotel.room.push(this.room)
+      this.hotel.room.push({"id":null,"name":"","Img":[{"ID":null,"CreatedAt":"","UpdatedAt":"","DeletedAt":null,"image":"","roomID":null}],"priceHrs":null,"priceDay":null,"extraPrice":null},)
     },
     createHotel()
     {
       console.log(this.hotel.room)
+    },
+    onFileChange(e, index) {
+      console.log(index)
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length){
+        console.log(files[0])
+        return; 
+      }
+      this.createImage(files[0], index);
+    },
+    createImage(file, index) {
+      // var image = new Image();
+      var reader = new FileReader();
+      // var vm = this;
+
+      reader.onload = (e) => {
+        // vm.image = e.target.result;
+        this.hotel.room[index].Img[0].image = e.target.result
+      };
+      reader.readAsDataURL(file);
+    },
+    eventFile(e){
+      return e
     }
   },
 
@@ -114,4 +138,11 @@ export default {
 hr {
   width: 100%;
 }
+.hotel {
+  background-color: rgb(236, 240, 241);
+}
+  .container-xl{
+        padding-bottom: 250px;
+    padding-top: 100px;
+  }
 </style>

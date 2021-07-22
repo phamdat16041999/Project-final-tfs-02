@@ -25,8 +25,11 @@
                   >Home <span class="sr-only">(current)</span></a
                 >
               </li>
-              <li class="nav-item">
-                <a class="nav-link toolbarText" href="#">Link</a>
+              <li class="nav-item" v-if="HotelOwner == true">
+                <a class="nav-link toolbarText" href="/Hotelier">Hotel manage</a>
+              </li>
+              <li class="nav-item" v-if="login.login == true">
+                <a class="nav-link toolbarText" href="/listBill">Your bill</a>
               </li>
               <li class="nav-item">
                 <form class="form-inline my-2 my-lg-0">
@@ -47,10 +50,13 @@
                 </form>
               </li>
             </ul>
-            <div class="nav-item" v-if="login.login == false">
+            <div class="nav-item" v-if="login.login == true">
+             <i class='fab fa-facebook-messenger' style='font-size:30px;color:#2980b9;cursor: pointer;' @click="messenger"></i>
+            </div>
+            <div class="nav-item" v-if="login.login == false" style="margin-left:10px;">
               <a class="nav-link toolbarText" @click="loginPage">Login</a>
             </div>
-            <div class="nav-item dropdown user" v-if="login.login">
+            <div class="nav-item dropdown user" v-if="login.login" style="margin-left:10px;">
               <a
                 class="nav-link dropdown-toggle toolbarText"
                 href="#"
@@ -63,8 +69,8 @@
                 User
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Setting</a>
+                <a class="dropdown-item" href="#">View profile</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" @click="logOut">LogOut</a>
               </div>
@@ -90,13 +96,21 @@ export default {
     loginPage() {
       this.$router.push("/login");
     },
+    messenger(){
+      this.$router.push("/messenger");
+    },
     logOut() {
       this.$store.dispatch("delUser");
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      this.HotelOwner = false;
       this.$router.push("/");
     },
   },
   async created() {
+    if(localStorage.getItem("role") == "\"HotelOwner\""){
+        this.HotelOwner = true
+    }
     if (localStorage.getItem("token") != null) {
       const token = localStorage.getItem("token").split('"')[1];
       const url = "http://localhost:8080/checklogin";
@@ -116,6 +130,7 @@ export default {
   data() {
     return {
       searchData: "",
+      HotelOwner : false,
     };
   },
 };
@@ -126,24 +141,25 @@ export default {
   cursor: pointer;
 }
 .user {
-  border-radius: 46px;
-  border-color: white;
-  border-width: 2px;
-  border-style: solid;
   width: 60px;
-  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .toolbar {
-  background-color: black;
-  opacity: 0.7;
+  background-color: #474849;
+  position: absolute;
+  top:0;
+  width: 100%;
+  z-index: 1;
 }
 .menu {
   width: 35px;
   height: 5px;
   background-color: white;
   margin: 6px 0;
+}
+.nav-item{
+   margin-left: 20px;
 }
 </style>

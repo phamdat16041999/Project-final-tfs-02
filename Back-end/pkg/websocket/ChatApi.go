@@ -64,38 +64,39 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 		}
 		resultID := DecodeToken["user_id"]
 		UserID1 := fmt.Sprintf("%v", resultID)
-		roomid = UserID1 + "+" + msg.UserID2
-		roomid1 = msg.UserID2 + "+" + UserID1
-		clientRooms[roomid] = ws
-		if err != nil {
-			log.Printf("error: %v", err)
-			delete(clientRooms, roomid)
-			continue
-		}
-		// tao conversation
-		conversationID := model.CheckConvsersation(UserID1, msg.UserID2)
-		// tao mess trong conversation
-		arrmess := model.CreateMessenger(UserID1, msg.Message, conversationID)
-		//hien thi toan bo tin nhan sau chuyen vao broadcast
-		// hien thi toan bo tin nhan cu
-		if msg.Message == "" {
-			for i := 0; i < len(arrmess); i++ {
-				a := MessageForEachPeople{
-					UserID:  arrmess[i].UserID,
-					Message: arrmess[i].Messenger,
+		if UserID1 != "" && msg.UserID2 != "" {
+			roomid = UserID1 + "+" + msg.UserID2
+			roomid1 = msg.UserID2 + "+" + UserID1
+			clientRooms[roomid] = ws
+			if err != nil {
+				log.Printf("error: %v", err)
+				delete(clientRooms, roomid)
+				continue
+			}
+			// tao conversation
+			conversationID := model.CheckConvsersation(UserID1, msg.UserID2)
+			// tao mess trong conversation
+			arrmess := model.CreateMessenger(UserID1, msg.Message, conversationID)
+			//hien thi toan bo tin nhan sau chuyen vao broadcast
+			// hien thi toan bo tin nhan cu
+			if msg.Message == "" {
+				for i := 0; i < len(arrmess); i++ {
+					a := MessageForEachPeople{
+						UserID:  arrmess[i].UserID,
+						Message: arrmess[i].Messenger,
+					}
+					broadcast <- a
 				}
-				broadcast <- a
+				continue
+			} else {
+				id1, _ := strconv.ParseUint(UserID1, 10, 64)
+				newMess := MessageForEachPeople{
+					UserID:  uint(id1),
+					Message: msg.Message,
+				}
+				broadcast <- newMess
 			}
-			continue
-		} else {
-			id1, _ := strconv.ParseUint(UserID1, 10, 64)
-			newMess := MessageForEachPeople{
-				UserID:  uint(id1),
-				Message: msg.Message,
-			}
-			broadcast <- newMess
 		}
-
 	}
 }
 func handleMessages() {

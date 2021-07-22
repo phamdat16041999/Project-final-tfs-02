@@ -59,9 +59,9 @@ type RoomInformation struct {
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
 	Img        []ImageRoom
-	PriceHrs   int `json:"priceHrs"`
-	PriceDay   int `json:"priceDay"`
-	ExtraPrice int `json:"extraPrice"`
+	PriceHrs   string `json:"priceHrs"`
+	PriceDay   string `json:"priceDay"`
+	ExtraPrice string `json:"extraPrice"`
 }
 
 type HotelRate struct {
@@ -414,8 +414,10 @@ func CreateHotel(w http.ResponseWriter, r *http.Request) {
 	}
 	var Data Hotel
 	err := json.NewDecoder(r.Body).Decode(&Data)
+	b, _ := json.Marshal(&Data)
+	fmt.Fprint(w, string(b))
 	if err != nil {
-		fmt.Fprintln(w, err)
+		fmt.Println(w, err)
 	}
 	hotel := Hotel{
 		Name:        Data.Name,
@@ -439,8 +441,8 @@ func CreateHotel(w http.ResponseWriter, r *http.Request) {
 		}
 		result := db.Create(&room)
 		if result.Error != nil {
-			fmt.Fprint(w, result.Error)
-			continue
+			fmt.Print(result.Error)
+			return
 		}
 		// create each image for each room
 		for j := 0; j < len(Data.Room[i].ImageRoom); j++ {
@@ -450,8 +452,8 @@ func CreateHotel(w http.ResponseWriter, r *http.Request) {
 			}
 			result := db.Create(&imagerRoom)
 			if result.Error != nil {
-				fmt.Fprint(w, result.Error)
-				continue
+				fmt.Print(result.Error)
+				return
 			}
 		}
 		for k := 0; k < len(Data.Room[i].Price); k++ {
@@ -462,8 +464,8 @@ func CreateHotel(w http.ResponseWriter, r *http.Request) {
 			}
 			result := db.Create(&price)
 			if result.Error != nil {
-				fmt.Fprint(w, result.Error)
-				continue
+				fmt.Print(result.Error)
+				return
 			}
 
 		}
@@ -471,4 +473,20 @@ func CreateHotel(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Create successfull")
+}
+func DeleteHotel(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var hotel Hotel
+	hotelid, _ := strconv.Atoi(mux.Vars(r)["id"])
+	db.Where("id = ? AND user_id", hotelid, userid).Delete(&hotel)
+	var hotelInformation []Hotel
+	db.Where("user_id = ?", userid).Find(&hotel)
+	b1, _ := json.Marshal(&hotelInformation)
+	fmt.Fprintln(w, string(b1))
 }
