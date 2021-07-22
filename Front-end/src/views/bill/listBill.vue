@@ -1,4 +1,5 @@
 <template>
+<div class="bill">
   <div class="container-xl">
     <div class="row">
       <div class="col-12">
@@ -17,35 +18,62 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(hotel, id) in hotels" :key="id">
-              <td>{{ hotel.name }}</td>
-              <td>{{ hotel.address }}</td>
-              <td>{{ hotel.description }}</td>
-              <td class="icon">
-                <i
-                  class="fa fa-edit"
-                  style="font-size: 26px; color: #e74c3c"
-                  @click="editHotel(hotel.ID)"
-                ></i>
-              </td>
-              <td class="icon">
-                <i
-                  class="material-icons"
-                  style="font-size: 30px; color: #e74c3c"
-                  >delete</i
-                >
-              </td>
+            <tr v-for="(data, id) in bill" :key="id" @click="billDetail(data.id)" class="content">
+              <td>{{ data.nameCustomer }}</td>
+              <td>{{ data.address }}</td>
+              <td>{{ data.mail }}</td>
+              <td>{{ data.phone }}</td>
+              <td>{{ data.namehotel }}</td>
+              <td>{{ data.nameroom }}</td>
+              <td>{{ data.startTime }}</td>
+              <td>{{ data.endTime }}</td>
+              <td>{{ data.TotalPrice }}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
+</div>
 </template>
 <script>
+import axios from "axios";
 export default {
-  setup() {},
+  data() {
+    return {
+      bill: []
+    };
+  },
+  created(){
+      if (localStorage.getItem("token") != null) {
+      const token = localStorage.getItem("token").split('"')[1];
+      const url = "http://localhost:8080/detailbillofmanagerhotel";
+      axios.get(url, {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      }).then((res) => this.bill = res.data)
+      ;
+     
+    }
+  },
+  methods:{
+    billDetail(id){
+      this.$router.push("/detailbill?id="+id);
+    }
+  }
 };
 </script>
 <style scoped>
+  .content:hover{
+    color: #2ecc71;
+    cursor: pointer;
+  }
+  .container-xl{
+        padding-bottom: 250px;
+    padding-top: 100px;
+  }
+  .bill{
+    background-color: rgb(236, 240, 241);
+  }
 </style>

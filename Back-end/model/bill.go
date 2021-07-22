@@ -149,14 +149,40 @@ func GetBill(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprint(w, string(b))
 }
-func Delltilebill(w http.ResponseWriter, r *http.Request) {
+func Detailbill(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	idbill, _ := strconv.Atoi(mux.Vars(r)["id"])
 	var bill Bill
 	db.Where("id =?", idbill).Find(&bill)
+	var hotel Hotel
+	var room Room
+	var time Times
+	var showBill ShowBill
+	var user User
+	db.Where("id = ?", bill.HotelID).Find(&hotel)
+	db.Where("id = ?", bill.RoomID).Find(&room)
+	db.Where("id = ?", bill.TimeID).Find(&time)
+	db.Where("id = ?", bill.UserID).Find(&user)
+	showBill.FirstName = user.FirstName
+	showBill.LastName = user.LastName
+	showBill.Address = user.Address
+	showBill.Phone = user.Phone
+	showBill.Email = user.Email
+	showBill.Hotel = hotel.Name
+	showBill.Room = room.Name
+	showBill.StartTime = time.StartTime
+	showBill.EndTime = time.EndTime
+	showBill.Total = bill.Total
+
+	b, err := json.Marshal(&showBill)
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Fprint(w, string(b))
 }
 
 type Listbillofmanager struct {
+	ID           int       `json:"id"`
 	NameCustomer string    `json:"nameCustomer"`
 	Address      string    `json:"address"`
 	Mail         string    `json:"mail"`
@@ -190,6 +216,7 @@ func Allbillofmanagerhotel(w http.ResponseWriter, r *http.Request) {
 			db.Where("id = ?", bills.TimeID).Find(&time)
 			db.Where("id = ?", bills.UserID).Find(&customer)
 			listbillofmanager = append(listbillofmanager, Listbillofmanager{
+				ID:           int(bills.ID),
 				NameCustomer: customer.FirstName + ` ` + customer.LastName,
 				Address:      customer.Address,
 				Mail:         customer.Email,

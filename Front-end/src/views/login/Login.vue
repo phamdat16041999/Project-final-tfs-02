@@ -1,6 +1,6 @@
 <template>
   <div class="parent">
-    <div class="container-xl" style="padding-top: 120px">
+    <div class="container-xl" style="padding-top: 176px">
       <div
         class="row"
         style="
@@ -54,8 +54,19 @@
       <div class="row">
         <div class="col-xl-2 col-12"></div>
         <div id="formInput" v-bind:class="leftToRightData.formInput">
-          <signUpForm id="signUp" v-if="signUp"/>
-          <loginForm id="login" v-if="login"/>
+          <signUpForm id="signUp" v-if="signUp" />
+          <loginForm id="login" v-if="login" />
+          <!-- <div class="row">
+            <div class="col-2">
+
+            </div>
+            <div class="col-8">
+               
+            </div>
+            <div class="col-2">
+
+            </div>
+          </div> -->
         </div>
         <div class="col-4"></div>
         <div class="col-2"></div>
@@ -68,7 +79,7 @@
 import loginForm from "./FormLogin.vue";
 import signUpForm from "./SignUpForm.vue";
 export default {
-  components:{
+  components: {
     loginForm,
     signUpForm,
   },
@@ -77,7 +88,7 @@ export default {
       login: false,
       signUp: true,
       leftToRightData: {
-        formInput: "col-4",
+        formInput: "col-xl-4 col-12",
         login: "",
         signUp: "",
       },
@@ -85,18 +96,28 @@ export default {
   },
   methods: {
     leftToRight() {
-      (this.leftToRightData.formInput = "col-4 formInput leftToRight"),
-        (this.leftToRightData.login = "visible"),
-        (this.leftToRightData.signUp = "hidden"),
-        (this.login = true),
-        (this.signUp = false);
+      if (window.screen.availWidth > 1200) {
+        (this.leftToRightData.formInput =
+          "col-xl-4 col-12 formInput leftToRight"),
+          (this.leftToRightData.login = "visible"),
+          (this.leftToRightData.signUp = "hidden"),
+          (this.login = true),
+          (this.signUp = false);
+      } else {
+        (this.login = true), (this.signUp = false);
+      }
     },
     rightToleft() {
-      (this.leftToRightData.formInput = "col-4 formInput rightToleft"),
-        (this.leftToRightData.login = "hidden"),
-        (this.leftToRightData.signUp = "visible"),
-        (this.login = false),
-        (this.signUp = true);
+      if (window.screen.availWidth > 1200) {
+        (this.leftToRightData.formInput =
+          "col-xl-4 col-12 formInput rightToleft"),
+          (this.leftToRightData.login = "hidden"),
+          (this.leftToRightData.signUp = "visible"),
+          (this.login = false),
+          (this.signUp = true);
+      } else {
+        (this.login = false), (this.signUp = true);
+      }
     },
   },
 };
@@ -110,7 +131,7 @@ export default {
   background-attachment: fixed;
   background-size: cover;
   background-position: 64% 0px;
-  height: 100vh;
+  height: 150vh;
 }
 .sign {
   background-color: unset;
@@ -123,7 +144,7 @@ export default {
 }
 #formInput {
   height: 600px;
-  background-color:floralwhite;
+  background-color: floralwhite;
   margin-top: 176px;
   border-radius: 15px;
   position: absolute;
@@ -131,8 +152,9 @@ export default {
   /*opacity: 0.9;*/
 }
 #login {
-  position: absolute;
-  top: 100px;
+  /* position: absolute;
+  top: 100px; */
+  margin-top: 100px;
 }
 .leftToRight {
   animation: leftToRight 2s;

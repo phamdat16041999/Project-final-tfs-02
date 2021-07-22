@@ -158,47 +158,6 @@ func JSON(w http.ResponseWriter, status int, object interface{}) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(object)
 }
-
-// func EsSearchByName(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json")
-// 	//vars := mux.Vars(r)
-// 	//title := string(vars["name"])
-// 	ctx := context.Background()
-// 	var bm *HotelManager
-// 	if bm.esClient == nil {
-// 		fmt.Println(w, "Nil es client: ", nil)
-// 	}
-// 	// build query to search for title
-// 	query := elastic.NewSearchSource()
-// 	query.Query(elastic.NewMatchQuery("title", "a"))
-
-// 	// get search's service
-// 	searchService := bm.esClient.
-// 		Search().
-// 		Index("hotel").
-// 		SearchSource(query)
-
-// 	// perform search query
-// 	searchResult, err := searchService.Do(ctx)
-// 	if err != nil {
-// 		fmt.Println("Cannot perform search with ES", err)
-// 	}
-// 	// get result
-// 	var hotels []*Hotel
-
-// 	for _, hit := range searchResult.Hits.Hits {
-// 		var hotel Hotel
-// 		err := json.Unmarshal(hit.Source, &hotel)
-// 		if err != nil {
-// 			fmt.Println("Get data error: ", err)
-// 			continue
-// 		}
-// 		fmt.Println(&hotel)
-// 		hotels = append(hotels, &hotel)
-// 	}
-// 	fmt.Fprintln(w, hotels)
-
-// }
 func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	vars := mux.Vars(r)
@@ -323,14 +282,16 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 }
 
 func Rating(w http.ResponseWriter, r *http.Request) {
-	cache.DeleteRemoteCache(w, "tophotel")
-	cache.DeleteLocalCache(w, "tophotel")
+	// cache.DeleteRemoteCache(w, "tophotel")
+	// cache.DeleteLocalCache(w, "tophotel")
 	data := r.Context().Value("data")
 	UserID := middlewares.ConvertDataToken(data, "user_id")
 	userid, err1 := strconv.ParseUint(UserID, 10, 64)
 	if err1 != nil {
 		fmt.Println("error:", err1)
 	}
+	//RoleID := middlewares.ConvertDataToken(data, "roles_id")
+	//rolesid, _ := strconv.ParseUint(RoleID, 10, 64)
 	var hotelrate HotelRate
 	var rate Rate
 	var hotel Hotel
@@ -344,7 +305,6 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 	b1, _ := json.Marshal(&rate.HotelID)
 	ID, _ := strconv.ParseUint(string(b1), 10, 32)
 	b, _ := json.Marshal(&rate.Rate)
-
 	var Rate = Rate{
 		UserID:  uint(userid),
 		HotelID: hotelrate.HotelID,
@@ -370,7 +330,7 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		b3, _ := json.Marshal(&rate.Rate)
-		result := db.Model(&rate).Where("user_id = ? AND hotel_id = ?", hotelrate.UserID, hotelrate.HotelID).Update("rate", hotelrate.Rate)
+		result := db.Model(&rate).Where("user_id = ? AND hotel_id = ?", userid, hotelrate.HotelID).Update("rate", hotelrate.Rate)
 		db.Where("id = ?", ID).Find(&hotel)
 		b, _ := json.Marshal(&hotel.NumberRate)
 		NumberRate, _ := strconv.ParseFloat(string(b), 64)
@@ -378,11 +338,11 @@ func Rating(w http.ResponseWriter, r *http.Request) {
 		b2, _ := json.Marshal(&hotelrate.Rate)
 		NewRate, _ := strconv.ParseUint(string(b2), 10, 64)
 		OldRate, _ := strconv.ParseUint(string(b3), 10, 64)
-		fmt.Fprintln(w, "NewRate = ", NewRate, "\nOldRate = ", OldRate)
+		//fmt.Fprintln(w, "NewRate = ", NewRate, "\nOldRate = ", OldRate)
 		AverageRate, _ := strconv.ParseFloat(string(b1), 64)
 		AverageRate = (AverageRate*NumberRate - float64(OldRate) + float64(NewRate)) / NumberRate
 		AverageRate = float64(int(AverageRate*10)) / 10 //chuyển thành số thập phân có 2 chữ số
-		fmt.Fprintln(w, "AverageRate = ", AverageRate)
+		//fmt.Fprintln(w, "AverageRate = ", AverageRate)
 		db.Model(Hotel{}).Where("id = ?", hotelrate.HotelID).Updates(Hotel{AverageRate: AverageRate})
 		if result.Error != nil {
 			fmt.Fprintln(w, "Update rating error: ", result.Error)
@@ -589,4 +549,20 @@ func UpdateHotel(w http.ResponseWriter, r *http.Request) {
 	if result2.Error != nil {
 		fmt.Fprintln(w, "Rating error: ", result2.Error)
 	}
+}
+func DeleteHotel(w http.ResponseWriter, r *http.Request) {
+	db := connect.Connect()
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var hotel Hotel
+	hotelid, _ := strconv.Atoi(mux.Vars(r)["id"])
+	db.Where("id = ? AND user_id", hotelid, userid).Delete(&hotel)
+	var hotelInformation []Hotel
+	db.Debug().Where("user_id = ?", 6).Find(&hotelInformation)
+	b1, _ := json.Marshal(&hotelInformation)
+	fmt.Fprintln(w, string(b1))
 }

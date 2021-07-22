@@ -13,6 +13,7 @@ import (
 
 func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		Token := auth.TokenValid(r)
 		if Token == nil {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -26,11 +27,58 @@ func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
 			data := Pretty(v)
 			ctxUserId := context.WithValue(r.Context(), "data", data)
 			r = r.WithContext(ctxUserId)
-			// data := Pretty(r.Context().Value("data"))
-			// fmt.Fprintln(w, data)
+			next(w, r)
 		}
+		// r.Header.Set("user_id", "1")
+	}
+}
+func SetMiddlewareAuthenticationUser(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		next(w, r)
+		Token := auth.TokenValid(r)
+		if Token == nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprintln(w, "Ném mã xác thực vào!")
+			return
+		} else {
+			v := jwt.MapClaims{
+				"user_id":  Token["user_id"],
+				"roles_id": Token["roles_id"],
+			}
+			data := Pretty(v)
+			ctxUserId := context.WithValue(r.Context(), "data", data)
+			r = r.WithContext(ctxUserId)
+			if ConvertDataToken(data, "roles_id") != "1" {
+				fmt.Fprintln(w, "Đây phải là tài khoản của User!")
+			} else {
+				next(w, r)
+			}
+		}
+		// r.Header.Set("user_id", "1")
+	}
+}
+func SetMiddlewareAuthenticationHotelOwner(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		Token := auth.TokenValid(r)
+		if Token == nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprintln(w, "Ném mã xác thực vào!")
+			return
+		} else {
+			v := jwt.MapClaims{
+				"user_id":  Token["user_id"],
+				"roles_id": Token["roles_id"],
+			}
+			data := Pretty(v)
+			ctxUserId := context.WithValue(r.Context(), "data", data)
+			r = r.WithContext(ctxUserId)
+			if ConvertDataToken(data, "roles_id") != "2" {
+				fmt.Fprintln(w, "Đây phải là tài khoản của HotelOwner!")
+			} else {
+				next(w, r)
+			}
+		}
 		// r.Header.Set("user_id", "1")
 	}
 }
