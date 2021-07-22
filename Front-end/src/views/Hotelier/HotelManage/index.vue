@@ -38,7 +38,7 @@
             </td>
             <td class="icon">
               <i class="material-icons" style="font-size: 30px; color: #e74c3c"
-                >delete</i
+                @click="deleteHotel(hotel.ID)">delete</i
               >
             </td>
           </tr>
@@ -76,6 +76,17 @@ export default {
     addHotel() {
       this.$router.push("/AddHotel");
     },
+    deleteHotel(id){
+      const token = localStorage.getItem("token").split('"')[1];
+      const url = "http://localhost:8080/hotel/"+id;
+      axios
+        .delete(url, {
+          headers: {
+            Authorization: `bearer ${token}`,
+          },
+        })
+        .then((res) => (this.hotels = res.data));
+    }
   },
 };
 </script>

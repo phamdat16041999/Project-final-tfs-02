@@ -486,7 +486,7 @@ func DeleteHotel(w http.ResponseWriter, r *http.Request) {
 	hotelid, _ := strconv.Atoi(mux.Vars(r)["id"])
 	db.Where("id = ? AND user_id", hotelid, userid).Delete(&hotel)
 	var hotelInformation []Hotel
-	db.Where("user_id = ?", userid).Find(&hotel)
+	db.Debug().Where("user_id = ?", 6).Find(&hotelInformation)
 	b1, _ := json.Marshal(&hotelInformation)
 	fmt.Fprintln(w, string(b1))
 }
