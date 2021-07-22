@@ -11,6 +11,27 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+func SetMiddlewareAuthentication(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		Token := auth.TokenValid(r)
+		if Token == nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprintln(w, "Ném mã xác thực vào!")
+			return
+		} else {
+			v := jwt.MapClaims{
+				"user_id":  Token["user_id"],
+				"roles_id": Token["roles_id"],
+			}
+			data := Pretty(v)
+			ctxUserId := context.WithValue(r.Context(), "data", data)
+			r = r.WithContext(ctxUserId)
+			next(w, r)
+		}
+		// r.Header.Set("user_id", "1")
+	}
+}
 func SetMiddlewareAuthenticationUser(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
