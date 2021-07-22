@@ -50,7 +50,6 @@
         <div class="col-xl-3 col-12">
           <label class="form-label">{{index}}</label>
           <input type="text" class="form-control" required v-model="data.name"/>
-          
         </div>
         <div class="col-xl-3 col-12">
           <label class="form-label">Image</label>
@@ -95,20 +94,12 @@ export default {
   },
   data() {
     return {
-      hotel: {
-        name: null,
-        address: null,
-        description: null,
-        longitude: "",
-        latitude: "",
-        image: "",
-        room: [],
-      },
+      hotel: {},
     };
   },
   methods: {
     AddRoom(){
-      this.hotel.room.push({"name":"","Img":[{"ID":null,"CreatedAt":"","UpdatedAt":"","DeletedAt":null,"image":"","roomID":null}],"priceHrs":null,"priceDay":null,"extraPrice":null},)
+      this.hotel.room.push({"id":null,"name":"","Img":[{"ID":null,"CreatedAt":"","UpdatedAt":"","DeletedAt":null,"image":"","roomID":null}],"priceHrs":null,"priceDay":null,"extraPrice":null},)
     },
     createHotel()
     {
