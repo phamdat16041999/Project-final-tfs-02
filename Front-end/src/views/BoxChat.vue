@@ -12,7 +12,7 @@
               <span class="online_icon"></span>
             </div>
             <div class="user_info">
-              <span>Chat with Khalid {{hotel.userid}}</span>
+              <span>Chat with Khalid</span>
               <p>1767 Messages</p>
             </div>
             <!-- <div class="video_cam">
@@ -52,7 +52,7 @@
               <span class="input-group-text send_btn"
                 ><i class="fa fa-send" style="font-size: 25px; color: white" @click="send"></i
               ></span>
-              <button @click="loadmess">loadmess</button>
+              <!-- <button @click="loadmess">loadmess</button> -->
             </div>
           </div>
         </div>
@@ -73,12 +73,12 @@ export default {
       newMsg: '', // Holds new messages to be sent to the server
       chatContent: '', // A running list of chat messages displayed on the screen
       token: localStorage.getItem("token").split('"')[1], // Our userid1
-      userid2: null,
+      count:0
     };
   },
-  beforeCreate(){
-    this.userid2 = this.hotel.userid
-  },
+  // beforeCreate(){
+  //   this.userid2 = this.hotel.userid
+  // },
   created: function() {
     // c, _, err := websocket.DefaultDialer.Dial(*addr, http.Header{"Authorization": {"Bearer " + *token}})
       var self = this;
@@ -109,27 +109,35 @@ export default {
     showBoxChat() {
       this.show = true;
       this.boxChat = "card cardShow";
+      if(this.count == 0){
+                      this.ws.send(
+            JSON.stringify({
+                token: this.token,
+                userid2: this.$route.query.userid,
+                // Strip out html
+            }));
+            this.count++
+      }
     },
     send: function() {
         if (this.newMsg != '') {
             this.ws.send(
                 JSON.stringify({
                     token: this.token,
-                    userid2: this.userid2,
+                    userid2: this.$route.query.userid,
                     message: this.newMsg// Strip out html
                 }));
             this.newMsg = ''; // Reset newMsg
         }
     },
-    loadmess: function() {
-      console.log(this.userid2);
-        this.ws.send(
-            JSON.stringify({
-                token: this.token,
-                userid2: this.userid2,
-                // Strip out html
-            }));
-    },
+    // loadmess: function() {
+    //     this.ws.send(
+    //         JSON.stringify({
+    //             token: this.token,
+    //             userid2: this.$route.query.userid,
+    //             // Strip out html
+    //         }));
+    // },
     
   },
 };

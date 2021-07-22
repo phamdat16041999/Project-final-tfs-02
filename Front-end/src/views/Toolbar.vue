@@ -47,10 +47,13 @@
                 </form>
               </li>
             </ul>
-            <div class="nav-item" v-if="login.login == false">
+            <div class="nav-item" v-if="login.login == true">
+             <i class='fab fa-facebook-messenger' style='font-size:30px;color:#2980b9;cursor: pointer;' @click="messenger"></i>
+            </div>
+            <div class="nav-item" v-if="login.login == false" style="margin-left:10px;">
               <a class="nav-link toolbarText" @click="loginPage">Login</a>
             </div>
-            <div class="nav-item dropdown user" v-if="login.login">
+            <div class="nav-item dropdown user" v-if="login.login" style="margin-left:10px;">
               <a
                 class="nav-link dropdown-toggle toolbarText"
                 href="#"
@@ -90,9 +93,13 @@ export default {
     loginPage() {
       this.$router.push("/login");
     },
+    messenger(){
+      this.$router.push("/messenger");
+    },
     logOut() {
       this.$store.dispatch("delUser");
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
       this.$router.push("/");
     },
   },
@@ -126,12 +133,7 @@ export default {
   cursor: pointer;
 }
 .user {
-  border-radius: 46px;
-  border-color: white;
-  border-width: 2px;
-  border-style: solid;
   width: 60px;
-  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
