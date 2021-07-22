@@ -59,7 +59,7 @@ export default {
   data() {
     return {
       data: {
-        ID: parseInt(this.$route.query.id),
+        Email: this.$route.query.email,
         CodeAuthentication: "",
       },
       Msg: "",
@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     async active() {
-        alert( this.data.CodeAuthentication)
+      this.Email = this.$route.query.email
       let re = await axios
         .post("http://localhost:8080/active", this.data, {
           headers: {

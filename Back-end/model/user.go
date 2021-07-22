@@ -325,11 +325,11 @@ func ActiveAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	db := connect.Connect()
 	var query User
-	db.First(&query, user.ID)
+	db.Debug().Where("email=?", user.Email).First(&query)
 	b, _ := json.Marshal(query.CodeAuthentication)
 	code := strings.Split(string(b), "\"")
 	if code[1] == user.CodeAuthentication {
-		result := db.Model(&query).Where("ID = ?", user.ID).Update("active", true)
+		result := db.Model(&query).Where("email = ?", user.Email).Update("active", true)
 		if result.Error != nil {
 			fmt.Fprint(w, "Account activation failed")
 		} else {
