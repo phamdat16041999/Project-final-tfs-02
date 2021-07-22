@@ -148,4 +148,8 @@ export default {
   font-family: "Roboto", sans-serif;
   font-weight: bold;
 }
+  .container-xl{
+        padding-bottom: 250px;
+    padding-top: 100px;
+  }
 </style>

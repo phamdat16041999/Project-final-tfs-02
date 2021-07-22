@@ -1,14 +1,7 @@
 <template>
-  <div class="container-xl">
+  <div class="hotel">
+      <div class="container-xl">
     <div class="row">
-      <div class="col-12">
-        <i
-          class="material-icons"
-          style="font-size: 40px; color: #3498db; cursor: pointer"
-          @click="$emit('indexPage')"
-          >keyboard_backspace</i
-        >
-      </div>
       <div class="col-12" style="text-align: center">
         <h3>Add hotel</h3>
       </div>
@@ -109,6 +102,7 @@
       </form>
     </div>
   </div>
+  </div>
 </template>
 <script>
 import axios from "axios";
@@ -196,4 +190,11 @@ export default {
 hr {
   width: 100%;
 }
+.hotel {
+  background-color: rgb(236, 240, 241);
+}
+  .container-xl{
+        padding-bottom: 250px;
+    padding-top: 100px;
+  }
 </style>

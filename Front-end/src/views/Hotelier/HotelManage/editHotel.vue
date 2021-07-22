@@ -1,5 +1,6 @@
 <template>
-  <div class="container-xl">
+  <div class="hotel">
+      <div class="container-xl">
      <div class="row">
 
     <div class="col-12" style="text-align: center">
@@ -81,6 +82,7 @@
     </div>
   </div>
   </div>
+  </div>
 </template>
 <script>
 import axios from "axios";
@@ -145,4 +147,11 @@ export default {
 hr {
   width: 100%;
 }
+.hotel {
+  background-color: rgb(236, 240, 241);
+}
+  .container-xl{
+        padding-bottom: 250px;
+    padding-top: 100px;
+  }
 </style>
