@@ -138,7 +138,7 @@ func EsSearchByName(w http.ResponseWriter, r *http.Request) {
 	// search
 	bm := NewHotelManager((*ESClient)(esclient))
 	productGotten := bm.SearchHotels(name)
-	JSON(w, http.StatusOK, productGotten)
+	JSONS(w, http.StatusOK, productGotten)
 }
 
 func NewESClient(url string) (*ESClient, error) {
@@ -153,7 +153,7 @@ func NewESClient(url string) (*ESClient, error) {
 
 	return &ESClient{client}, err
 }
-func JSON(w http.ResponseWriter, status int, object interface{}) {
+func JSONS(w http.ResponseWriter, status int, object interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(object)
