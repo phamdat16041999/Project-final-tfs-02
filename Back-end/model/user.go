@@ -90,6 +90,15 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		response.Messenger = "Create successfull"
 		w.WriteHeader(http.StatusOK)
 	}
+	var Auth = Authentication{
+		UserID: User.ID,
+		RoleID: 1,
+	}
+	auth := db.Create(&Auth)
+	if auth.Error != nil {
+		fmt.Fprintln(w, "Error!")
+		return
+	}
 }
 
 // }
