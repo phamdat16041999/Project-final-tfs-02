@@ -215,6 +215,7 @@ data() {
               this.err = res.data;
             }
           });
+          console.log(this.formData);
     },
   },
   created() {

@@ -526,7 +526,6 @@ func UpdateHotel(w http.ResponseWriter, r *http.Request) {
 		Name:        data.Name,
 		Address:     data.Address,
 		Description: data.Description,
-		Image:       "",
 		Longitude:   data.Longitude,
 		Latitude:    data.Latitude,
 		UserID:      uint(userID),
