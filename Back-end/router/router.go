@@ -39,8 +39,8 @@ func Run() {
 	get.Path("/essearch/{name}").HandlerFunc(model.EsSearchByName)
 	get.Path("/hotelier").HandlerFunc(middlewares.SetMiddlewareAuthenticationHotelOwner(model.Hotelier))
 	get.Path("/option").HandlerFunc(model.OptionforHotel)
-	get.Path("/detailbillofmanagerhotel").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Allbillofmanagerhotel))
-	get.Path("/detailbill/{id}").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Detailbill))
+	get.Path("/detailbillofmanagerhotel").HandlerFunc(middlewares.SetMiddlewareAuthenticationHotelOwner(model.Allbillofmanagerhotel))
+	get.Path("/detailbill/{id}").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Detailbill))
 	get.Path("/listConversation").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ListConversation))
 
 	// delete method
