@@ -125,8 +125,10 @@ func GetBill(w http.ResponseWriter, r *http.Request) {
 	if err1 != nil {
 		fmt.Println("error:", err1)
 	}
-	var bills []ListBill
+	var bills []Listbillofmanager
 	var listbill []Bill
+	var user User
+	db.Where("id = ?", userid).Find(&user)
 	db.Where("user_id =?", userid).Find(&listbill)
 	for i := 0; i < len(listbill); i++ {
 		var hotel Hotel
@@ -135,12 +137,17 @@ func GetBill(w http.ResponseWriter, r *http.Request) {
 		db.Where("id = ?", listbill[i].HotelID).Find(&hotel)
 		db.Where("id = ?", listbill[i].RoomID).Find(&roomID)
 		db.Where("id = ?", listbill[i].TimeID).Find(&time)
-		bills = append(bills, ListBill{
-			NameHotel:  hotel.Name,
-			NameRoom:   roomID.Name,
-			StartTime:  time.StartTime,
-			EndTime:    time.EndTime,
-			TotalPrice: listbill[i].Total,
+		bills = append(bills, Listbillofmanager{
+			ID:           int(listbill[i].ID),
+			NameCustomer: user.FirstName + user.LastName,
+			Address:      user.Address,
+			Mail:         user.Email,
+			Phone:        user.Phone,
+			NameHotel:    hotel.Name,
+			NameRoom:     roomID.Name,
+			StartTime:    time.StartTime,
+			EndTime:      time.EndTime,
+			TotalPrice:   listbill[i].Total,
 		})
 	}
 	b, err := json.Marshal(&bills)
