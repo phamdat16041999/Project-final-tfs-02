@@ -57,7 +57,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	hash, _ := HashPassword(user.Password)
 	// Create password
 	randomCode := codeAuthentication()
-	// errmail := gmail.SendEmail(user.Email, randomCode)
+	errmail := gmail.SendEmail(user.Email, randomCode)
 	var User = User{
 		FirstName:          user.FirstName,
 		LastName:           user.LastName,
@@ -70,39 +70,39 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		Password:           hash,
 		Active:             user.Active,
 	}
-	// if errmail != "" {
-	// 	fmt.Fprintln(w, "Email is incorrect!")
-	// 	return
-	// } else {
-	result := db.Create(&User)
-	if result.Error != nil {
-		fmt.Fprintln(w, "Account already in use, please change username and email !")
+	if errmail != "" {
+		fmt.Fprintln(w, "Email is incorrect!")
 		return
 	} else {
-		var newUser = User
-		type Response struct {
-			ID        int
-			Messenger string
+		result := db.Create(&User)
+		if result.Error != nil {
+			fmt.Fprintln(w, "Account already in use, please change username and email !")
+			return
+		} else {
+			var newUser = User
+			type Response struct {
+				ID        int
+				Messenger string
+			}
+			db.Last(&newUser)
+			var response Response
+			response.ID = int(newUser.ID)
+			response.Messenger = "Create successfull"
+			w.WriteHeader(http.StatusOK)
 		}
-		db.Last(&newUser)
-		var response Response
-		response.ID = int(newUser.ID)
-		response.Messenger = "Create successfull"
-		w.WriteHeader(http.StatusOK)
+		var Auth = Authentication{
+			UserID: User.ID,
+			RoleID: 1,
+		}
+		auth := db.Create(&Auth)
+		if auth.Error != nil {
+			fmt.Fprintln(w, "Error!")
+			return
+		}
 	}
-	var Auth = Authentication{
-		UserID: User.ID,
-		RoleID: 1,
-	}
-	auth := db.Create(&Auth)
-	if auth.Error != nil {
-		fmt.Fprintln(w, "Error!")
-		return
-	}
+
 }
 
-// }
-// }
 func UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	data := r.Context().Value("data")
 	UserID := middlewares.ConvertDataToken(data, "user_id")

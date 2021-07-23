@@ -15,7 +15,6 @@ export default {
         commit("setUser")
     },
     delUser({commit}) {
-        console.log("acacacac")
         commit("delUser")
     }
   },
@@ -24,7 +23,6 @@ export default {
       state.login = true;
     },
     delUser(state) {
-        console.log("acacacac")
       state.login = false;
     },
   },

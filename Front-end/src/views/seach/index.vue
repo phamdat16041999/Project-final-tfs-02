@@ -74,8 +74,7 @@ export default {
   async created() {
     let hotelFilter = await axios.get(
       "http://localhost:8080/essearch/" +
-        this.$route.query.name,
-      this.hotel
+        this.$route.query.name
     );
     if (hotelFilter.data != null) {
       this.address = hotelFilter.data[0].address;

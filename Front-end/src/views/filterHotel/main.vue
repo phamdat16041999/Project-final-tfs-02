@@ -85,6 +85,7 @@ export default {
       this.hotel = hotelFilter.data;
       this.isEmpty = false;
     }
+    console.log(hotelFilter.data)
   },
   data() {
     return {

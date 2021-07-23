@@ -3,7 +3,7 @@
     <div class="container-xl">
       <div class="row">
         <div class="col-12" style="text-align: center">
-          <h3>Edit hotel</h3>
+          <!-- <h3>Edit hotel</h3>
         </div>
         <div class="col-xl-6 col-12">
           <label class="form-label">Hotel name</label>
@@ -47,7 +47,7 @@
                 Add address
               </button>
             </div>
-          </div>
+          </div> -->
           <div class="col-xl-6 col-12">
             <label class="form-label">Hotel name</label>
             <input
@@ -235,7 +235,7 @@ export default {
           if (res.status == 200) {
             // chuyen huong sang trang login
             console.log(res.data.Messenger);
-            //  this.$router.push("/");
+             this.$router.push("/Hotelier");
           } else {
             console.log(res.data);
           }

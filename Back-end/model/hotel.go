@@ -39,7 +39,7 @@ type TopHotel struct {
 	Name        string `gorm:"type:varchar(100);" json:"name" `
 	Address     string `gorm:"type:varchar(100);" json:"address" `
 	Description string `gorm:"type:varchar(100);" json:"description" `
-	Image       string `gorm:"type:varchar(100);" json:"image" `
+	Image       string `gorm:"type:varchar(255);" json:"image" `
 	Longitude   string `gorm:"type:varchar(100);" json:"longitude" `
 	Latitude    string `gorm:"type:varchar(100);" json:"latitude" `
 	UserID      uint   `json:"userID"`
@@ -527,7 +527,6 @@ func UpdateHotel(w http.ResponseWriter, r *http.Request) {
 		Name:        data.Name,
 		Address:     data.Address,
 		Description: data.Description,
-		Image:       "",
 		Longitude:   data.Longitude,
 		Latitude:    data.Latitude,
 		UserID:      uint(userID),

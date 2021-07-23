@@ -19,7 +19,7 @@ func RunRmq() {
 	// sendgrid api
 	// apiKey := ""
 	// creates rmq connection
-	fmt.Println("aaaaaaaaacccccccccccc")
+
 	rmqURI := "amqp://guest:guest@localhost:5672/"
 	exch := "order"
 	exchType := "direct"

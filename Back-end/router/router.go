@@ -20,12 +20,12 @@ func Run() {
 	post.Path("/account").HandlerFunc(model.CreateAccount)
 	post.Path("/login").HandlerFunc(model.LoginAcount)
 	post.Path("/forgotpassword").HandlerFunc(model.ForgotPassword)
-	post.Path("/changepassword").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.ChangePassword))
+	post.Path("/changepassword").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ChangePassword))
 	post.Path("/active").HandlerFunc(model.ActiveAccount)
 	post.Path("/createbill").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Createbill))
-	post.Path("/rating").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Rating))
+	post.Path("/rating").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Rating))
 	post.Path("/checkroomstatus").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Checkroomstatus))
-	post.Path("/createhotel").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.CreateHotel))
+	post.Path("/createhotel").HandlerFunc(middlewares.SetMiddlewareAuthenticationHotelOwner(model.CreateHotel))
 	// post.Path("/payment").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Payment))
 
 	//get method
@@ -37,22 +37,22 @@ func Run() {
 	get.Path("/getbill").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.GetBill))
 	get.Path("/search/{name}").HandlerFunc(model.SearchByName)
 	get.Path("/essearch/{name}").HandlerFunc(model.EsSearchByName)
-	get.Path("/hotelier").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Hotelier))
+	get.Path("/hotelier").HandlerFunc(middlewares.SetMiddlewareAuthenticationHotelOwner(model.Hotelier))
 	get.Path("/option").HandlerFunc(model.OptionforHotel)
-	get.Path("/detailbillofmanagerhotel").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Allbillofmanagerhotel))
-	get.Path("/detailbill/{id}").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Detailbill))
+	get.Path("/detailbillofmanagerhotel").HandlerFunc(middlewares.SetMiddlewareAuthenticationHotelOwner(model.Allbillofmanagerhotel))
+	get.Path("/detailbill/{id}").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.Detailbill))
 	get.Path("/listConversation").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ListConversation))
 
 	// delete method
 	detelte := r.Methods(http.MethodDelete).Subrouter()
-	detelte.Path("/hotel/{id}").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.DeleteHotel))
+	detelte.Path("/hotel/{id}").HandlerFunc(middlewares.SetMiddlewareAuthenticationHotelOwner(model.DeleteHotel))
 	// methodput
 	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
 	r.HandleFunc("/updatehotel", middlewares.SetMiddlewareAuthentication(model.UpdateHotel)).Methods("PUT")
 	r.HandleFunc("/checklogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
 	http.Handle("/", r)
 	//methoddelete
-	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthenticationUser(model.DeleteAccount)).Methods("Delete")
+	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthentication(model.DeleteAccount)).Methods("Delete")
 	// chat API
 	r.HandleFunc("/ws", websocket.HandleConnections)
 
