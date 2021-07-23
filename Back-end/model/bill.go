@@ -205,7 +205,8 @@ func Allbillofmanagerhotel(w http.ResponseWriter, r *http.Request) {
 	var listbillofmanager []Listbillofmanager
 	var hotels []Hotel
 	var bill []Bill
-	db.Where("user_id = ?", userid).Find(&hotels)
+	db.Debug().Where("user_id = ?", userid).Find(&hotels)
+	fmt.Print(hotels)
 	for _, hotel := range hotels {
 		db.Where("hotel_id =?", hotel.ID).Find(&bill)
 		for _, bills := range bill {
