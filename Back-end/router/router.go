@@ -39,15 +39,17 @@ func Run() {
 	get.Path("/essearch/{name}").HandlerFunc(model.EsSearchByName)
 	get.Path("/hotelier").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Hotelier))
 	get.Path("/option").HandlerFunc(model.OptionforHotel)
-
 	get.Path("/detailbillofmanagerhotel").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Allbillofmanagerhotel))
 	get.Path("/detailbill/{id}").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.Detailbill))
+	get.Path("/listConversation").HandlerFunc(middlewares.SetMiddlewareAuthentication(model.ListConversation))
+
 	// delete method
 	detelte := r.Methods(http.MethodDelete).Subrouter()
 	detelte.Path("/hotel/{id}").HandlerFunc(middlewares.SetMiddlewareAuthenticationUser(model.DeleteHotel))
 	// methodput
-	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthenticationUser(model.UpdateAccount)).Methods("PUT")
-	r.HandleFunc("/checklogin", middlewares.SetMiddlewareAuthenticationUser(CheckLogin)).Methods("GET")
+	r.HandleFunc("/update/{id}", middlewares.SetMiddlewareAuthentication(model.UpdateAccount)).Methods("PUT")
+	r.HandleFunc("/updatehotel", middlewares.SetMiddlewareAuthentication(model.UpdateHotel)).Methods("PUT")
+	r.HandleFunc("/checklogin", middlewares.SetMiddlewareAuthentication(CheckLogin)).Methods("GET")
 	http.Handle("/", r)
 	//methoddelete
 	r.HandleFunc("/delete/{id}", middlewares.SetMiddlewareAuthenticationUser(model.DeleteAccount)).Methods("Delete")
