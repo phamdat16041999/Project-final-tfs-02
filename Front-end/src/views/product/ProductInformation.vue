@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container-xl">
     <div class="row">
       <div class="col-xl-6 col-12">
         <ShowSlide :imageLink="imageLink" />
@@ -12,7 +12,7 @@
       </div>
     </div>
     <div>
-      <boxChat :hotel="hotel"></boxChat>
+      <boxChat :hotel="hotel" v-if="login.login"></boxChat>
     </div>
   </div>
 </template>
@@ -22,7 +22,9 @@ import SetBooking from "./Booking.vue";
 import ShowSlide from "./ShowSlide.vue";
 import HotelDescription from "./HotelDescription.vue";
 import boxChat from "../BoxChat.vue"
+import { mapState } from "vuex";
 export default {
+  computed: mapState(["login"]),
   components: {
     ShowSlide,
     SetBooking,
@@ -58,4 +60,8 @@ export default {
 };
 </script>
 <style scoped>
+  .container-xl{
+        padding-bottom: 250px;
+    padding-top: 100px;
+  }
 </style>
