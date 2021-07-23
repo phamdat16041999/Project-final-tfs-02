@@ -129,7 +129,7 @@ export default {
     this.ws.addEventListener("message", function (e) {
       var msg = JSON.parse(e.data);
       // self.chatContent = ""
-      if (msg.userid != parseInt(self.userID2)) {
+      if (msg.userid == parseInt(self.userID2)) {
         self.chatContent +=
           ' <div class="d-flex justify-content-start mb-4">' +
           '<div class="img_cont_msg">' +
