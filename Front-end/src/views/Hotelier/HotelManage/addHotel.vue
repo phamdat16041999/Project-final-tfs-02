@@ -210,7 +210,8 @@ data() {
             if (res.status == 200) {
               // chuyen huong sang trang login
               this.err = res.data.Messenger;
-              //  this.$router.push("/");
+              console.log("add success")
+              this.$router.push("/Hotelier");
             } else {
               this.err = res.data;
             }

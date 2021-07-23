@@ -39,7 +39,7 @@ type TopHotel struct {
 	Name        string `gorm:"type:varchar(100);" json:"name" `
 	Address     string `gorm:"type:varchar(100);" json:"address" `
 	Description string `gorm:"type:varchar(100);" json:"description" `
-	Image       string `gorm:"type:varchar(100);" json:"image" `
+	Image       string `gorm:"type:varchar(255);" json:"image" `
 	Longitude   string `gorm:"type:varchar(100);" json:"longitude" `
 	Latitude    string `gorm:"type:varchar(100);" json:"latitude" `
 	UserID      uint   `json:"userID"`
@@ -106,6 +106,7 @@ func (bm *BookManager) SearchHotels(name string) []*Hotel {
 	// build query to search for title
 	query := elastic.NewSearchSource()
 	query.Query(elastic.NewMatchQuery("name", name))
+	query.Query(elastic.NewMatchQuery("address", name))
 	// get search's service
 	searchService := bm.esClient.
 		Search().
@@ -282,8 +283,8 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 }
 
 func Rating(w http.ResponseWriter, r *http.Request) {
-	// cache.DeleteRemoteCache(w, "tophotel")
-	// cache.DeleteLocalCache(w, "tophotel")
+	cache.DeleteRemoteCache(w, "tophotel")
+	cache.DeleteLocalCache(w, "tophotel")
 	data := r.Context().Value("data")
 	UserID := middlewares.ConvertDataToken(data, "user_id")
 	userid, err1 := strconv.ParseUint(UserID, 10, 64)
@@ -526,7 +527,6 @@ func UpdateHotel(w http.ResponseWriter, r *http.Request) {
 		Name:        data.Name,
 		Address:     data.Address,
 		Description: data.Description,
-		Image:       "",
 		Longitude:   data.Longitude,
 		Latitude:    data.Latitude,
 		UserID:      uint(userID),

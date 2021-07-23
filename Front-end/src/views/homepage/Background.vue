@@ -109,6 +109,9 @@ export default {
       if (this.rate == "" && this.address != "") {
          this.$router.push("/filter?name="+this.address+"i&rate=5");
       }
+      else{
+         this.$router.push("/filter?name="+this.address+"i&rate="+this.rate);
+      }
     },
   },
 };
