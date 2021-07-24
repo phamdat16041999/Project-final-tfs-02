@@ -71,11 +71,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		Active:             user.Active,
 	}
 	if errmail != "" {
-<<<<<<< Updated upstream
 		fmt.Fprintln(w, "Email is incorrect!")
-=======
-		fmt.Fprintf(w, "Email is incorrect ! %v", errmail)
->>>>>>> Stashed changes
 		return
 	} else {
 		result := db.Create(&User)

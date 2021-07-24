@@ -162,10 +162,7 @@ func JSONS(w http.ResponseWriter, status int, object interface{}) {
 func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
 	vars := mux.Vars(r)
-<<<<<<< Updated upstream
 	rate, _ := strconv.ParseFloat(vars["rate"], 64)
-=======
->>>>>>> Stashed changes
 	var hotels []Hotel
 	var resulthotels []Hotel
 	db.Where("address LIKE ?", "%"+vars["address"]+"%").Find(&hotels)
@@ -180,7 +177,6 @@ func GetHotelAddress(w http.ResponseWriter, r *http.Request) {
 
 func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-<<<<<<< Updated upstream
 	if cache.ServeJQueryWithCache(w, "tophotel") == "No data in remote cache" {
 		db := connect.Connect()
 		var hotel []Hotel
@@ -191,22 +187,20 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprintln(w, cache.ServeJQueryWithCache(w, "tophotel"))
 	}
-=======
-	var rate1 []ratehotel
-	for i := 0; i < len(rates); i++ {
-		rate1 = append(rate1, ratehotel{HotelId: rates[i].HotelID,
-			Rate: rates[i].Rate})
-	}
-	for i := 0; i < len(rate1); i++ {
-		var hotels []Hotel
-		db.Where("id = ?", rate1[i].HotelId).Find(&hotels)
-		b, _ := json.Marshal(hotels)
-		fmt.Fprintln(w, string(b))
-	}
-	b1, _ := json.Marshal(rates)
-	fmt.Fprintln(w, rate1[0].HotelId)
-	fmt.Fprintln(w, string(b1))
->>>>>>> Stashed changes
+	// var rate1 []ratehotel
+	// for i := 0; i < len(rates); i++ {
+	// 	rate1 = append(rate1, ratehotel{HotelId: rates[i].HotelID,
+	// 		Rate: rates[i].Rate})
+	// }
+	// for i := 0; i < len(rate1); i++ {
+	// 	var hotels []Hotel
+	// 	db.Where("id = ?", rate1[i].HotelId).Find(&hotels)
+	// 	b, _ := json.Marshal(hotels)
+	// 	fmt.Fprintln(w, string(b))
+	// }
+	// b1, _ := json.Marshal(rates)
+	// fmt.Fprintln(w, rate1[0].HotelId)
+	// fmt.Fprintln(w, string(b1))
 }
 func SearchHotelAddress(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
