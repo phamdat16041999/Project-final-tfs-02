@@ -105,8 +105,7 @@ func (bm *BookManager) SearchHotels(name string) []*Hotel {
 	}
 	// build query to search for title
 	query := elastic.NewSearchSource()
-	query.Query(elastic.NewMatchQuery("name", name))
-	query.Query(elastic.NewMatchQuery("address", name))
+	query.Query(elastic.NewMultiMatchQuery(name, "name", "address"))
 	// get search's service
 	searchService := bm.esClient.
 		Search().
