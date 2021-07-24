@@ -1,10 +1,12 @@
 package router
 
 import (
+	"encoding/json"
 	"fmt"
+	"hotel/connect"
 	"hotel/middlewares"
 	"hotel/model"
-	"hotel/pkg"
+	"strconv"
 
 	//"hotel/pkg"
 	"hotel/pkg/websocket"
@@ -15,7 +17,7 @@ import (
 )
 
 func Run() {
-	go pkg.RunRmq()
+	// go pkg.RunRmq()
 	r := mux.NewRouter().StrictSlash(true)
 	post := r.Methods(http.MethodPost).Subrouter()
 	post.Path("/account").HandlerFunc(model.CreateAccount)
@@ -63,6 +65,28 @@ func Run() {
 	}).Handler(r)
 	http.ListenAndServe(":8080", handler)
 }
+
+type CheckLogins struct {
+	Role   string `json:"role"`
+	Status string `json:"status"`
+}
+
 func CheckLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "ok")
+	db := connect.Connect()
+	data := r.Context().Value("data")
+	UserID := middlewares.ConvertDataToken(data, "user_id")
+	userid, err1 := strconv.ParseUint(UserID, 10, 64)
+	if err1 != nil {
+		fmt.Println("error:", err1)
+	}
+	var roles model.Role
+	var authentication model.Authentication
+	db.Where("user_id = ?", userid).Find(&authentication)
+	db.Where("ID =?", authentication.ID).Find(&roles)
+	checkLogin := CheckLogins{
+		Role:   roles.Name,
+		Status: "ok",
+	}
+	b, _ := json.Marshal(checkLogin)
+	fmt.Fprint(w, string(b))
 }
