@@ -73,7 +73,8 @@ export default {
       newMsg: '', // Holds new messages to be sent to the server
       chatContent: '', // A running list of chat messages displayed on the screen
       token: localStorage.getItem("token").split('"')[1], // Our userid1
-      count:0
+      count:0,
+      userid1: null
     };
   },
   // beforeCreate(){
@@ -109,11 +110,13 @@ export default {
     showBoxChat() {
       this.show = true;
       this.boxChat = "card cardShow";
+      this.userid1 = this.$route.query.userid
       if(this.count == 0){
                       this.ws.send(
             JSON.stringify({
                 token: this.token,
                 userid2: this.$route.query.userid,
+                message: ""
                 // Strip out html
             }));
             this.count++

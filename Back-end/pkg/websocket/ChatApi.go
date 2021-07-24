@@ -1,7 +1,6 @@
 package websocket
 
 import (
-	"encoding/json"
 	"fmt"
 	"hotel/auth"
 	"hotel/model"
@@ -27,6 +26,7 @@ var upgrader = websocket.Upgrader{
 }
 
 type MessageForEachPeople struct {
+	From    string `json:"-"`
 	UserID  uint   `json:"userid"`
 	Message string `json:"message"`
 }
@@ -74,21 +74,26 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 				delete(clientRooms, roomid)
 				continue
 			}
-			// tao conversation
+
+			// step 1: day message cu && gan flag la da ban message
 			conversationID := model.CheckConvsersation(UserID1, msg.UserID2)
 			// tao mess trong conversation
 			arrmess := model.CreateMessenger(UserID1, msg.Message, conversationID)
+			// step 2: ban message moi
+			// tao conversation
 			//hien thi toan bo tin nhan sau chuyen vao broadcast
 			// hien thi toan bo tin nhan cu
 			if msg.Message == "" {
 				for i := 0; i < len(arrmess); i++ {
 					a := MessageForEachPeople{
+						From:    roomid, // 1+2 // 2+1
 						UserID:  arrmess[i].UserID,
 						Message: arrmess[i].Messenger,
 					}
 					broadcast <- a
 				}
-				continue
+				// delete(clientRooms, roomid)
+				// delete(clientRooms, roomid1)
 			} else {
 				id1, _ := strconv.ParseUint(UserID1, 10, 64)
 				newMess := MessageForEachPeople{
@@ -108,27 +113,22 @@ func handleMessages() {
 		// Grab the next message from the broadcast channel
 		msg := <-broadcast
 		// Send it out to every client that is currently connected
-		b, _ := json.Marshal(clientRooms)
-		fmt.Println(string(b))
-		fmt.Println("---------")
-		for key := range clientRooms {
-			if clientRooms[key] == clientRooms[roomid] {
-				// fmt.Println("user1", roomid)
-				err := clientRooms[roomid].WriteJSON(msg)
-				if err != nil {
-					log.Printf("error: %v", err)
-					clientRooms[roomid].Close()
-					delete(clientRooms, roomid)
-				}
+		if clientRooms[roomid] != nil && (msg.From == roomid || len(msg.From) == 0) {
+			// fmt.Println("user1", roomid)
+			err := clientRooms[roomid].WriteJSON(msg)
+			if err != nil {
+				log.Printf("error: %v", err)
+				clientRooms[roomid].Close()
+				delete(clientRooms, roomid)
 			}
-			if clientRooms[key] == clientRooms[roomid1] {
-				// fmt.Println("user2", roomid1)
-				err := clientRooms[roomid1].WriteJSON(msg)
-				if err != nil {
-					log.Printf("error: %v", err)
-					clientRooms[roomid1].Close()
-					delete(clientRooms, roomid1)
-				}
+		}
+		if clientRooms[roomid1] != nil && (msg.From == roomid1 || len(msg.From) == 0) {
+			// fmt.Println("user2", roomid1)
+			err := clientRooms[roomid1].WriteJSON(msg)
+			if err != nil {
+				log.Printf("error: %v", err)
+				clientRooms[roomid1].Close()
+				delete(clientRooms, roomid1)
 			}
 		}
 	}
