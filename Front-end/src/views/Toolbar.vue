@@ -69,7 +69,7 @@
                 User
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">Setting</a>
+                <a class="dropdown-item" href="#">{{login.role}}</a>
                 <a class="dropdown-item" href="#">View profile</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" @click="logOut">LogOut</a>
@@ -82,7 +82,7 @@
   </div>
 </template>
 <script>
-import axios from "axios";
+// import axios from "axios";
 import { mapState } from "vuex";
 export default {
   computed: mapState(["login"]),
@@ -107,25 +107,26 @@ export default {
       this.$router.push("/");
     },
   },
-  async created() {
+  created() {
     if(localStorage.getItem("role") == "\"HotelOwner\""){
         this.HotelOwner = true
     }
-    if (localStorage.getItem("token") != null) {
-      const token = localStorage.getItem("token").split('"')[1];
-      const url = "http://localhost:8080/checklogin";
-      let user = await axios.get(url, {
-        headers: {
-          Authorization: `bearer ${token}`,
-        },
-      });
-      console.log(user.data);
-      if (user.data == "ok") {
-        this.$store.dispatch("setUser");
-      } else {
-        this.$store.dispatch("delUser");
-      }
-    }
+    // if (localStorage.getItem("token") != null) {
+    //   const token = localStorage.getItem("token").split('"')[1];
+    //   const url = "http://localhost:8080/checklogin";
+    //   let user = await axios.get(url, {
+    //     headers: {
+    //       Authorization: `bearer ${token}`,
+    //     },
+    //   });
+    //   console.log(user.data);
+    //   if (user.data == "ok") {
+    //     this.$store.dispatch("setUser");
+    //   } else {
+    //     this.$store.dispatch("delUser");
+    //   }
+    // }
+    this.$store.dispatch("setUser");
   },
   data() {
     return {

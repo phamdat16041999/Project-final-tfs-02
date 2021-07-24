@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"hotel/middlewares"
 	"hotel/model"
-	"hotel/pkg"
 
 	//"hotel/pkg"
 	"hotel/pkg/websocket"
@@ -15,7 +14,7 @@ import (
 )
 
 func Run() {
-	go pkg.RunRmq()
+	// go pkg.RunRmq()
 	r := mux.NewRouter().StrictSlash(true)
 	post := r.Methods(http.MethodPost).Subrouter()
 	post.Path("/account").HandlerFunc(model.CreateAccount)

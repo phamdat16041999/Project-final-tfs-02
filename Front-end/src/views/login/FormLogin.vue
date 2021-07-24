@@ -110,6 +110,7 @@ export default {
           let Role = users.data.split("\n")[0];
           localStorage.setItem("token", (users.data.split("\n")[1]));
           localStorage.setItem("role", Role);
+          this.$store.dispatch("setRole", Role);
           this.$store.dispatch("setUser");
           if(Role == "User"){
               this.$router.push("/");
