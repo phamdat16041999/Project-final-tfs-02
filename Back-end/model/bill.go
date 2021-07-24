@@ -101,7 +101,7 @@ func Createbill(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println("error:", err)
 			}
-			fmt.Fprintf(w, string(b))
+			fmt.Fprintln(w, string(b))
 		}
 
 	}

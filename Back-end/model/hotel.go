@@ -22,7 +22,7 @@ type Hotel struct {
 	Name        string       `gorm:"type:varchar(100);" json:"name,omitempty" `
 	Address     string       `gorm:"type:varchar(100);" json:"address,omitempty" `
 	Description string       `gorm:"type:varchar(100);" json:"description,omitempty" `
-	Image       string       `gorm:"type:varchar(100);" json:"image,omitempty" `
+	Image       string       `gorm:"type:text;" json:"image,omitempty" `
 	Longitude   string       `gorm:"type:varchar(100);" json:"longitude,omitempty" `
 	Latitude    string       `gorm:"type:varchar(100);" json:"latitude,omitempty" `
 	UserID      uint         `json:"userID,omitempty"`
@@ -53,6 +53,7 @@ type HotelInformation struct {
 	Latitude    string            `json:"latitude"`
 	Description string            `json:"description"`
 	Address     string            `json:"address"`
+	Image       string            `gorm:"type:varchar(255);" json:"image" `
 }
 type RoomInformation struct {
 	ID         int    `json:"id"`
@@ -183,7 +184,7 @@ func GetTopHotel(w http.ResponseWriter, r *http.Request) {
 		db.Limit(9).Order("average_rate desc").Find(&hotel)
 		b, _ := json.Marshal(hotel)
 		// cache.InsertData("tophotel", string(b))
-		fmt.Fprintf(w, cache.InsertData("tophotel", string(b)))
+		fmt.Fprintln(w, cache.InsertData("tophotel", string(b)))
 	} else {
 		fmt.Fprintln(w, cache.ServeJQueryWithCache(w, "tophotel"))
 	}
@@ -491,64 +492,144 @@ func UpdateHotel(w http.ResponseWriter, r *http.Request) {
 	}
 	// fmt.Println(string(b))
 	// take older rate
-	var option []Option
-	db.Find(&option)
-	var hotelOdler Hotel
-	var rooms []Room
-	var imageroom []ImageRoom
-	for _, room := range data.Room {
-		for _, image := range room.Img {
-			imageroom = append(imageroom, ImageRoom{
-				Model: gorm.Model{
-					ID: image.ID,
-				},
-				Image:  image.Image,
-				RoomID: uint(room.ID),
-			})
+	fmt.Fprintln(w, userID)
+	var PriceDays Option
+	var priceUpdate Price
+	var PriceHour Option
+	var ExtraPrice Option
+	db.Where("name = ?", "PriceDays").First(&PriceDays)
+	db.Where("name = ?", "PriceHours").First(&PriceHour)
+	db.Where("name = ?", "ExtraPrice").First(&ExtraPrice)
+	db.Model(Hotel{}).Where("id = ?", data.ID).Updates(Hotel{Name: data.Name, Address: data.Address, Description: data.Description, Longitude: data.Latitude, Latitude: data.Latitude})
+	for _, room1 := range data.Room {
+		if room1.ID == 0 {
+			room := Room{Name: room1.Name, Description: room1.Decription, HotelID: uint(data.ID)}
+			result := db.Create(&room)
+			if result == nil {
+				fmt.Fprintln(w, "error when update room Hotel")
+			}
+			db.Last(&room)
+			// db.Last(&room)
+			image := ImageRoom{Image: room1.Img[0].Image, RoomID: room.ID}
+			result1 := db.Create(&image)
+			if result1 == nil {
+				fmt.Fprintln(w, "error when update room Hotel")
+			}
+		} else {
+			db.Model(Room{}).Where("id = ?", room1.ID).Updates(Room{Name: room1.Name, Description: room1.Decription})
+			if len(room1.Img) > 0 {
+				if room1.Img[0].ID == 0 {
+					image := ImageRoom{Image: room1.Img[0].Image, RoomID: uint(room1.ID)}
+					result1 := db.Create(&image)
+					if result1 == nil {
+						fmt.Fprintln(w, "error when update room Hotel")
+					}
+				} else {
+					db.Model(ImageRoom{}).Where("id = ?", room1.Img[0].ID).Updates(ImageRoom{Image: room1.Img[0].Image, RoomID: uint(room1.ID)})
+				}
+
+			}
+			// else{
+			// 	db.Model(ImageRoom{}).Where("id = ?", room1.Img[0].ID).Update(ImageRoom{Image: "acscsc", RoomID: uint(room1.ID)})
+			// }
 		}
-		db.Debug().Model(&Price{}).Where("room_id = ? AND option_id = ?", room.ID, option[0].ID).Update("price", room.PriceDay)
-		db.Debug().Model(&Price{}).Where("room_id = ? AND option_id = ?", room.ID, option[1].ID).Update("price", room.PriceHrs)
-		db.Debug().Model(&Price{}).Where("room_id = ? AND option_id = ?", room.ID, option[2].ID).Update("price", room.ExtraPrice)
-		rooms = append(rooms, Room{
-			Model: gorm.Model{
-				ID: uint(room.ID),
-			},
-			Name:        room.Name,
-			Description: room.Decription,
-			HotelID:     uint(room.ID),
-			ImageRoom:   imageroom,
-		})
+		// update price day
+		result := db.Raw("SELECT * FROM prices WHERE prices.option_id = ? AND prices.room_id = ?", PriceDays.ID, room1.ID).Scan(&priceUpdate)
+		fmt.Println(result.RowsAffected)
+		if result.RowsAffected == 0 {
+			price := Price{Price: room1.PriceDay, RoomID: uint(room1.ID), OptionID: PriceDays.ID}
+			result := db.Create(&price)
+			if result == nil {
+				fmt.Fprintln(w, "error when create price for room Hotel")
+			}
+		}
+		if result.RowsAffected != 0 {
+			db.Model(Price{}).Where("option_id = ? AND room_id = ?", PriceDays.ID, room1.ID).Updates(Price{Price: room1.PriceDay})
+		}
+		// update price Hourse
+		result1 := db.Debug().Raw("SELECT * FROM prices WHERE prices.option_id = ? AND prices.room_id = ?", PriceHour.ID, room1.ID).Scan(&priceUpdate)
+		if result1.RowsAffected == 0 {
+			price := Price{Price: room1.PriceHrs, RoomID: uint(room1.ID), OptionID: PriceHour.ID}
+			result := db.Create(&price)
+			if result == nil {
+				fmt.Fprintln(w, "error when create price for room Hotel")
+			}
+		}
+		if result1.RowsAffected != 0 {
+			db.Model(Price{}).Where("option_id = ? AND room_id = ?", PriceHour.ID, room1.ID).Updates(Price{Price: room1.PriceHrs})
+		}
+		// update price ExtraPrice
+		result2 := db.Debug().Raw("SELECT * FROM prices WHERE prices.option_id = ? AND prices.room_id = ?", ExtraPrice.ID, room1.ID).Scan(&priceUpdate)
+		if result2.RowsAffected == 0 {
+			price := Price{Price: room1.ExtraPrice, RoomID: uint(room1.ID), OptionID: ExtraPrice.ID}
+			result := db.Create(&price)
+			if result == nil {
+				fmt.Fprintln(w, "error when create price for room Hotel")
+			}
+		}
+		if result2.RowsAffected != 0 {
+			db.Model(Price{}).Where("option_id = ? AND room_id = ?", ExtraPrice.ID, room1.ID).Updates(Price{Price: room1.ExtraPrice})
+		}
 	}
-	db.Where("id =?", data.ID).Find(&hotelOdler)
-	hotel := Hotel{
-		Model: gorm.Model{
-			ID: uint(data.ID),
-		},
-		Name:        data.Name,
-		Address:     data.Address,
-		Description: data.Description,
-		Longitude:   data.Longitude,
-		Latitude:    data.Latitude,
-		UserID:      uint(userID),
-		AverageRate: hotelOdler.AverageRate,
-		NumberRate:  hotelOdler.NumberRate,
-		Room:        rooms,
-	}
-	// b, _ := json.Marshal(&hotel)
-	// fmt.Println(string(b))
-	// fmt.Println(hotel)
-	result := db.Save(&hotel)
-	if result.Error != nil {
-		fmt.Fprintln(w, "Rating error: ", result.Error)
-	}
-	result1 := db.Save(&rooms)
-	if result1.Error != nil {
-		fmt.Fprintln(w, "Rating error: ", result1.Error)
-	}
-	result2 := db.Save(&imageroom)
-	if result2.Error != nil {
-		fmt.Fprintln(w, "Rating error: ", result2.Error)
-	}
+	//Cua Kha
+	// var option []Option
+	// db.Find(&option)
+	// var hotelOdler Hotel
+	// var rooms []Room
+	// var imageroom []ImageRoom
+	// for _, room := range data.Room {
+	// 	for _, image := range room.Img {
+	// 		imageroom = append(imageroom, ImageRoom{
+	// 			Model: gorm.Model{
+	// 				ID: image.ID,
+	// 			},
+	// 			Image:  image.Image,
+	// 			RoomID: uint(room.ID),
+	// 		})
+	// 	}
+	// 	db.Debug().Model(&Price{}).Where("room_id = ? AND option_id = ?", room.ID, option[0].ID).Update("price", room.PriceDay)
+	// 	db.Debug().Model(&Price{}).Where("room_id = ? AND option_id = ?", room.ID, option[1].ID).Update("price", room.PriceHrs)
+	// 	db.Debug().Model(&Price{}).Where("room_id = ? AND option_id = ?", room.ID, option[2].ID).Update("price", room.ExtraPrice)
+	// 	rooms = append(rooms, Room{
+	// 		Model: gorm.Model{
+	// 			ID: uint(room.ID),
+	// 		},
+	// 		Name:        room.Name,
+	// 		Description: room.Decription,
+	// 		HotelID:     uint(room.ID),
+	// 		ImageRoom:   imageroom,
+	// 	})
+	// }
+	// db.Where("id =?", data.ID).Find(&hotelOdler)
+	// hotel := Hotel{
+	// 	Model: gorm.Model{
+	// 		ID: uint(data.ID),
+	// 	},
+	// 	Name:        data.Name,
+	// 	Address:     data.Address,
+	// 	Description: data.Description,
+	// 	Longitude:   data.Longitude,
+	// 	Latitude:    data.Latitude,
+	// 	UserID:      uint(userID),
+	// 	AverageRate: hotelOdler.AverageRate,
+	// 	NumberRate:  hotelOdler.NumberRate,
+	// 	Room:        rooms,
+	// }
+	// // b, _ := json.Marshal(&hotel)
+	// // fmt.Println(string(b))
+	// // fmt.Println(hotel)
+	// result := db.Save(&hotel)
+	// if result.Error != nil {
+	// 	fmt.Fprintln(w, "Rating error: ", result.Error)
+	// }
+	// result1 := db.Save(&rooms)
+	// if result1.Error != nil {
+	// 	fmt.Fprintln(w, "Rating error: ", result1.Error)
+	// }
+	// result2 := db.Save(&imageroom)
+	// if result2.Error != nil {
+	// 	fmt.Fprintln(w, "Rating error: ", result2.Error)
+	// }
 }
 func DeleteHotel(w http.ResponseWriter, r *http.Request) {
 	db := connect.Connect()
