@@ -72,7 +72,7 @@ import { mapState } from "vuex";
 export default {
   computed: mapState(["topHotel"]),
   async created() {
-    console.log(this.$store.state.topHotel);
+    console.log(this.$route.query.name + this.$route.query.rate);
     let hotelFilter = await axios.get(
       "http://localhost:8080/hotel/" +
         this.$route.query.name +

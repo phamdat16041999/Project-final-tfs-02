@@ -9,13 +9,31 @@ Vue.use(VueAxios, axios);
 export default {
   state: {
     login: false,
+    role: "",
   },
   actions: {
-    setUser({commit}) {
-        commit("setUser")
+    async setUser({commit}) {
+      if (localStorage.getItem("token") != null) {
+        const token = localStorage.getItem("token").split('"')[1];
+        const url = "http://localhost:8080/checklogin";
+        let user = await axios.get(url, {
+          headers: {
+            Authorization: `bearer ${token}`,
+          },
+        });
+        if (user.data == "ok") {
+          commit("setUser")
+        } else {
+          commit("delUser")
+        }
+      }
+        // commit("setUser")
     },
     delUser({commit}) {
         commit("delUser")
+    },
+    setRole({commit}, data){
+      commit("setRole", data)
     }
   },
   mutations: {
@@ -25,6 +43,9 @@ export default {
     delUser(state) {
       state.login = false;
     },
+    setRole(state, data){
+      state.role = data
+    }
   },
   modules: {},
 };

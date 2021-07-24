@@ -107,10 +107,10 @@ export default {
         this.$router.push("/filter?name=ha noi&rate=" + this.rate);
       }
       if (this.rate == "" && this.address != "") {
-         this.$router.push("/filter?name="+this.address+"i&rate=5");
+         this.$router.push("/filter?name="+this.address+"&rate=5");
       }
       else{
-         this.$router.push("/filter?name="+this.address+"i&rate="+this.rate);
+         this.$router.push("/filter?name="+this.address+"&rate="+this.rate);
       }
     },
   },
