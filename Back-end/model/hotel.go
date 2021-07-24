@@ -284,8 +284,8 @@ func GetDetailHotel(w http.ResponseWriter, r *http.Request) {
 }
 
 func Rating(w http.ResponseWriter, r *http.Request) {
-	cache.DeleteRemoteCache(w, "tophotel")
-	cache.DeleteLocalCache(w, "tophotel")
+	//cache.DeleteRemoteCache(w, "tophotel")
+	//cache.DeleteLocalCache(w, "tophotel")
 	data := r.Context().Value("data")
 	UserID := middlewares.ConvertDataToken(data, "user_id")
 	userid, err1 := strconv.ParseUint(UserID, 10, 64)
