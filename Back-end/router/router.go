@@ -81,8 +81,8 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	var roles model.Role
 	var authentication model.Authentication
-	db.Where("user_id = ?", userid).Find(&authentication)
-	db.Where("ID =?", authentication.ID).Find(&roles)
+	db.Debug().Where("user_id = ?", userid).Find(&authentication)
+	db.Debug().Where("ID =?", authentication.RoleID).Find(&roles)
 	checkLogin := CheckLogins{
 		Role:   roles.Name,
 		Status: "ok",
