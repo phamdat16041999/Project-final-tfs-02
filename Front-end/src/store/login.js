@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import App from "../App.vue";
 import Vuex from "vuex";
-import axios from "axios";
+import axios from "@/utils/axios";
 import VueAxios from "vue-axios";
 const Vue = createApp(App);
 Vue.use(Vuex);
@@ -13,21 +13,13 @@ export default {
   },
   actions: {
     async setUser({commit}) {
-      if (localStorage.getItem("token") != null) {
-        const token = localStorage.getItem("token").split('"')[1];
-        const url = "http://localhost:8080/checklogin";
-        let user = await axios.get(url, {
-          headers: {
-            Authorization: `bearer ${token}`,
-          },
-        });
+        let user = await axios.get("/checklogin");
         if (user.data.status == "ok") {
           commit("setUser")
           commit("setRole", user.data.role)
         } else {
           commit("delUser")
         }
-      }
         // commit("setUser")
     },
     delUser({commit}) {

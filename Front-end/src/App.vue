@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100vh;">
     <toolbar></toolbar>
-    <router-view />
+    <router-view :key="$route.fullPath"/>
     <footers></footers>
   </div>
 </template>
