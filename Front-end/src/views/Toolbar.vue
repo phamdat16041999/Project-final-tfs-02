@@ -25,7 +25,7 @@
                   >Home <span class="sr-only">(current)</span></a
                 >
               </li>
-              <li class="nav-item" v-if="HotelOwner == true">
+              <li class="nav-item" v-if="login.role == 'HotelOwner'">
                 <a class="nav-link toolbarText" href="/Hotelier">Hotel manage</a>
               </li>
               <li class="nav-item" v-if="login.login == true">
@@ -103,35 +103,15 @@ export default {
       this.$store.dispatch("delUser");
       localStorage.removeItem("token");
       localStorage.removeItem("role");
-      this.HotelOwner = false;
       this.$router.push("/");
     },
   },
   created() {
-    if(localStorage.getItem("role") == "\"HotelOwner\""){
-        this.HotelOwner = true
-    }
-    // if (localStorage.getItem("token") != null) {
-    //   const token = localStorage.getItem("token").split('"')[1];
-    //   const url = "http://localhost:8080/checklogin";
-    //   let user = await axios.get(url, {
-    //     headers: {
-    //       Authorization: `bearer ${token}`,
-    //     },
-    //   });
-    //   console.log(user.data);
-    //   if (user.data == "ok") {
-    //     this.$store.dispatch("setUser");
-    //   } else {
-    //     this.$store.dispatch("delUser");
-    //   }
-    // }
     this.$store.dispatch("setUser");
   },
   data() {
     return {
       searchData: "",
-      HotelOwner : false,
     };
   },
 };

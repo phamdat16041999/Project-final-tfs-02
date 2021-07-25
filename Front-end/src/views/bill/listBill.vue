@@ -43,7 +43,9 @@
 </template>
 <script>
 import axios from "axios";
+import { mapState } from "vuex";
 export default {
+  computed: mapState(["login"]),
   data() {
     return {
       bill: [],
@@ -51,7 +53,7 @@ export default {
   },
   created() {
     if (localStorage.getItem("token") != null) {
-      if (localStorage.getItem("role") == '"User"') {
+      if (this.login.role == "User") {
         const token = localStorage.getItem("token").split('"')[1];
         const url = "http://localhost:8080/getbill";
         axios
@@ -61,7 +63,7 @@ export default {
             },
           })
           .then((res) => (this.bill = res.data));
-      } else {
+      }  if (this.login.role == "HotelOwner") {
         const token = localStorage.getItem("token").split('"')[1];
         const url = "http://localhost:8080/detailbillofmanagerhotel";
         axios

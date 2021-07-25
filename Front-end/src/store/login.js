@@ -21,8 +21,9 @@ export default {
             Authorization: `bearer ${token}`,
           },
         });
-        if (user.data == "ok") {
+        if (user.data.status == "ok") {
           commit("setUser")
+          commit("setRole", user.data.role)
         } else {
           commit("delUser")
         }
