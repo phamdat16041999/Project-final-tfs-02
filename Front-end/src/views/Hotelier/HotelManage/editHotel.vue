@@ -184,7 +184,7 @@
   </div>
 </template>
 <script>
-import axios from "axios";
+import axios from "@/utils/axios";
 export default {
   async created() {
     let hotelDetal = await axios.get(
@@ -220,26 +220,14 @@ export default {
         extraPrice: null,
       });
     },
-    UpdateHotel() {
-      console.log(this.hotel);
-      const token = localStorage.getItem("token").split('"')[1];
-      const url = "http://localhost:8080/updatehotel";
-      axios
-        .put(url, this.hotel, {
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          if (res.status == 200) {
-            // chuyen huong sang trang login
-            console.log(res.data.Messenger);
-             this.$router.push("/Hotelier");
-          } else {
-            console.log(res.data);
-          }
-        });
+    async UpdateHotel() {
+      const update = await axios.put("/updatehotel", this.hotel);
+      if (update.status == 200) {
+        // chuyen huong sang trang login
+        this.$router.push("/Hotelier");
+      } else {
+        console.log(update.data);
+      }
     },
     onFileChange(e, index) {
       console.log(index);
